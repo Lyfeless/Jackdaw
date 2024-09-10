@@ -44,7 +44,7 @@ public abstract class Entity {
 
         Size = new(data.Width, data.Height);
 
-        //! FIXME (Alex): Time tracker isn't set when loaded from a save. Could check for a field entry?
+        TimeTracker = EntityLayer.GetDefaultTracker(GetType());
 
         Reference = new(this);
     }
@@ -63,7 +63,7 @@ public abstract class Entity {
 
         Reference = new(this);
 
-        TimeTracker = args.TimeTracker;
+        TimeTracker = args.TimeTracker ?? EntityLayer.GetDefaultTracker(GetType());
 
         Size = args.Size;
 
@@ -175,5 +175,13 @@ public abstract class Entity {
     /// <returns>The Vector2 position of the target point.</returns>
     public virtual Vector2 GetTargetPosition() {
         return Position.Rounded + Hitboxes.Bounds.Center;
+    }
+
+    public Vector2 RelativeCoordsToWorldCoords(Vector2 relativeCoords) {
+        return relativeCoords + Position.Precise;
+    }
+
+    public Vector2 WorldCoordsToRelativeCoords(Vector2 relativeCoords) {
+        return relativeCoords - Position.Precise;
     }
 }

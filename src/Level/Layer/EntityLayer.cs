@@ -7,6 +7,7 @@ namespace LittleLib;
 /// </summary>
 public class EntityLayer : Layer {
     static readonly Dictionary<string, Func<EntitySaveData, Entity>> entityTypes = [];
+    static readonly Dictionary<Type, string> timeTrackers = [];
 
     List<EntityReference> entities = [];
 
@@ -24,6 +25,17 @@ public class EntityLayer : Layer {
 
     public static void AddType(string id, Func<EntitySaveData, Entity> func) {
         entityTypes.Add(id, func);
+    }
+
+    public static void SetDefaultTimeTracker(Type type, string tracker) {
+        if (!timeTrackers.TryAdd(type, tracker)) {
+            timeTrackers[type] = tracker;
+        }
+    }
+
+    public static string? GetDefaultTracker(Type type) {
+        timeTrackers.TryGetValue(type, out string? tracker);
+        return tracker;
     }
 
     public void AddEntity(Entity entity) {

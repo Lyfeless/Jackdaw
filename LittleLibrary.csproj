@@ -20,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Fallback\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Fallback/font.ttf" />
+    <EmbeddedResource Include="Fallback/sound.ogg" />
+    <EmbeddedResource Include="Fallback/texture.png" />
   </ItemGroup>
 
 </Project>

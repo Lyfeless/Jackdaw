@@ -84,8 +84,8 @@ public class TileLayer : Layer {
             adjustedPosition + hitbox.Size
         );
 
-        Point2 checkStart = new((int)(adjustedHitbox.Left / TileSize), (int)(adjustedHitbox.Top / TileSize));
-        Point2 checkEnd = new((int)((adjustedHitbox.Right - 0.01f) / TileSize), (int)((adjustedHitbox.Bottom - 0.01f) / TileSize));
+        Point2 checkStart = new((int)Math.Floor(adjustedHitbox.Left / TileSize), (int)Math.Floor(adjustedHitbox.Top / TileSize));
+        Point2 checkEnd = new((int)Math.Floor((adjustedHitbox.Right - 0.01f) / TileSize), (int)Math.Floor((adjustedHitbox.Bottom - 0.01f) / TileSize));
         Point2 checkSize = checkEnd - checkStart + Point2.One;
 
         List<Point2> tiles = [];

@@ -9,7 +9,9 @@ public class UIElement {
     public bool Selectable { get; private set; }
     public bool Active { get; private set; } = false;
     public bool Selected { get; private set; } = false;
+
     public bool ParentSelected => Selected || (Parent != null && Parent.ParentSelected);
+    public bool ParentSelectable => Selectable || (Parent != null && Parent.ParentSelectable);
 
     public UIElement? Parent;
 
@@ -148,24 +150,6 @@ public class UIElement {
     public UIElement SplitVertical(UIElement Top, UIElement Bottom) =>
         AddNewChild(new() { Children = [Top], Parent = this, Size = UIVector2.Right })
         .AddNewChild(new() { Children = [Bottom], Parent = this, Size = UIVector2.Right, Position = UIVector2.Left });
-
-    public UIElement ContainedListHorizontal(params UIElement[] elements) {
-        float width = 1 / elements.Length;
-        for (int i = 0; i < elements.Length; ++i) {
-            AddNewChild(new() { Children = [elements[i]], Size = UIVector2.Scaling(width, 1), Position = UIVector2.Scaling(i * width, 0) });
-        }
-
-        return this;
-    }
-
-    public UIElement ContainedListVertical(params UIElement[] elements) {
-        float height = 1.0f / elements.Length;
-        for (int i = 0; i < elements.Length; ++i) {
-            AddNewChild(new() { Children = [elements[i]], Size = UIVector2.Scaling(1, height), Position = UIVector2.Scaling(0, i * height) });
-        }
-
-        return this;
-    }
 
     // FixedListHorizontal
     // FixedListVertical

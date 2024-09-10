@@ -43,6 +43,8 @@ public static class LevelManager {
         ActiveLevel.Deactivate();
         ActiveLevel = LoadLevel(levelName, false);
         ActiveLevel.Activate();
+
+        LittleLibMain.LevelChange();
     }
 
     /// <summary>

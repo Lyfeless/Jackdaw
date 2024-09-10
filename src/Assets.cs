@@ -1,6 +1,8 @@
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Foster.Audio;
@@ -153,9 +155,11 @@ public static class Assets {
 
     static readonly Dictionary<string, Subtexture> Textures = [];
     public static Subtexture GetTexture(string name) => Textures.TryGetValue(name, out Subtexture output) ? output : Textures["error"];
+    const string TextureFallbackName = "Fallback.texture.png";
 
     static readonly Dictionary<string, SpriteFont> Fonts = [];
     public static SpriteFont GetFont(string name) => Fonts.TryGetValue(name, out SpriteFont? output) ? output : Fonts["error"];
+    const string FontFallbackName = "Fallback.font.ttf";
 
     static readonly Dictionary<string, Shader> Shaders = [];
     public static Shader GetShader(string name) => Shaders.TryGetValue(name, out Shader? output) ? output : Shaders["error"];
@@ -166,6 +170,7 @@ public static class Assets {
 
     static readonly Dictionary<string, Sound> Sounds = [];
     public static Sound GetSound(string name) => Sounds.TryGetValue(name, out Sound? output) ? output : Sounds["error"];
+    const string SoundFallbackName = "Fallback.sound.ogg";
 
     #endregion
 
@@ -219,6 +224,10 @@ public static class Assets {
     /// Load and initialize all asset types
     /// </summary>
     public static void Init() {
+        // Assembly data for fallback
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        string? assemblyName = assembly.GetName().Name;
+
         // Textures
         {
             // Create asset packer
@@ -229,7 +238,8 @@ public static class Assets {
             };
 
             // Load fallback texture
-            packer.Add("error", Path.Join(FallbackFolder, "texture.png"));
+            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{TextureFallbackName}")!;
+            packer.Add("error", new Image(stream));
 
             // Load all textures in asset directory
             string texturePath = Path.Join(AssetPath, TextureFolder);
@@ -258,7 +268,8 @@ public static class Assets {
         // Fonts
         {
             // Load fallback font
-            Fonts.Add("error", new SpriteFont(Path.Join(FallbackFolder, "font.ttf"), 16));
+            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{FontFallbackName}")!;
+            Fonts.Add("error", new SpriteFont(stream, 16));
 
             // Load all fonts in asset directory
             string fontPath = Path.Join(AssetPath, FontFolder);
@@ -279,7 +290,8 @@ public static class Assets {
             //! FIXME (Alex): Load config for sound settings, mostly for sounds that should be streamed
 
             // Load fallback sound
-            Sounds.Add("error", new Sound(Path.Join(FallbackFolder, "sound.ogg")));
+            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;
+            Sounds.Add("error", new Sound(stream));
 
             string soundPath = Path.Join(AssetPath, SoundFolder);
             if (Directory.Exists(soundPath)) {
