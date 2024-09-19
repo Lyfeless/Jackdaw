@@ -40,11 +40,13 @@ public static class LevelManager {
     }
 
     public static void SetActiveLevel(string levelName) {
+        LittleLibMain.PreLevelChange();
+
         ActiveLevel.Deactivate();
         ActiveLevel = LoadLevel(levelName, false);
         ActiveLevel.Activate();
 
-        LittleLibMain.LevelChange();
+        LittleLibMain.PostLevelChange();
     }
 
     /// <summary>

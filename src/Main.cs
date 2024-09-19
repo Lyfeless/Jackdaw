@@ -16,11 +16,15 @@ public static class LittleLibMain {
     // public delegate void PreUpdate();
     // public delegate void PostUpdate();
     public delegate void Callback();
+    public delegate void RenderCallback(Batcher batcher);
     public static Callback TransitionStart = () => { };
-    public static Callback LevelChange = () => { };
+    public static Callback PreLevelChange = () => { };
+    public static Callback PostLevelChange = () => { };
     public static Callback TransitionEnd = () => { };
     public static Callback PreUpdate = () => { };
     public static Callback PostUpdate = () => { };
+    public static RenderCallback PreRender = (batcher) => { };
+    public static RenderCallback PostRender = (batcher) => { };
 
     public static void Init(Point2 viewport) {
         Assets.Init();
@@ -59,11 +63,17 @@ public static class LittleLibMain {
     }
 
     public static void Render(Color? backgroundColor = null, Color? letterboxColor = null) {
+        Batcher.Clear();
         Target.Clear(backgroundColor ?? Color.White);
+
+        PreRender(Batcher);
 
         LevelManager.ActiveLevel.Render(Batcher);
         UIManager.Render(Batcher);
         Transition?.Render(Batcher);
+
+        PostRender(Batcher);
+
         Batcher.Render(Target);
 
         //! FIXME (Alex): Only run this in debug mode

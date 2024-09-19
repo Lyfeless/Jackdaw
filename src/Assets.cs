@@ -1,8 +1,4 @@
-using System.Numerics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Foster.Audio;
@@ -100,7 +96,7 @@ public static class Assets {
         public int VerticalFrames { get; set; } = 0;
 
         [JsonPropertyName("defaultFrameTime")]
-        public float DefaultFrametime { get; set; } = 100;
+        public float DefaultFrameTime { get; set; } = 100;
 
         [JsonPropertyName("defaultStartDelay")]
         public float DefaultStartDelay { get; set; } = 0;
@@ -352,9 +348,9 @@ public static class Assets {
                 AnimationConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AnimationConfig);
                 if (config != null) {
                     foreach (AnimationConfigEntry entry in config.AnimationConfigs) {
-                        if (entry.Frames == null) {
+                        if (entry.Frames.Length == 0) {
                             Animations.Add(entry.Name, new(entry.HorizontalFrames, entry.VerticalFrames, new(entry.FrameWidth, entry.FrameHeight)) {
-                                DefaultFrametime = entry.DefaultFrametime,
+                                DefaultFrametime = entry.DefaultFrameTime,
                                 DefaultLooping = entry.DefaultLooping,
                                 DefaultPositionOffset = new(entry.DefaultOffset.X, entry.DefaultOffset.Y),
                                 DefaultStartDelay = entry.DefaultStartDelay
@@ -362,7 +358,7 @@ public static class Assets {
                         }
                         else {
                             Animations.Add(entry.Name, new([.. entry.Frames.Select(e => new Point2(e.X, e.Y))], new(entry.FrameWidth, entry.FrameHeight)) {
-                                DefaultFrametime = entry.DefaultFrametime,
+                                DefaultFrametime = entry.DefaultFrameTime,
                                 DefaultLooping = entry.DefaultLooping,
                                 DefaultPositionOffset = new(entry.DefaultOffset.X, entry.DefaultOffset.Y),
                                 DefaultStartDelay = entry.DefaultStartDelay

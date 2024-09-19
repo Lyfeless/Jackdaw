@@ -29,6 +29,8 @@ public static class UIManager {
     }
 
     public static void ClearElements() {
+        SetSelected(null);
+
         clearList = [.. elements];
         DefaultElement = null;
     }
@@ -133,7 +135,7 @@ public static class UIManager {
         elements = [.. elements.OrderBy(e => e.Z)];
         foreach (UIElement element in elements) {
             //! FIXME (Alex): This will likely need to be adjusted once the scaling is figured out
-            batcher.PushMatrix(element.Parent?.AbsoluteTopLeft ?? Vector2.Zero);
+            batcher.PushMatrix(element.AbsoluteTopLeft);
             element.Render(batcher);
             batcher.PopMatrix();
         }

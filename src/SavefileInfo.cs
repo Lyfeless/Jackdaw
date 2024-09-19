@@ -214,7 +214,7 @@ public class FieldSaveData {
 
     #region Reference Types
 
-    //! FIXME (Alex): I don't like how similar this is to other tile types, possibly try combinding this with other tile management systems
+    //! FIXME (Alex): I don't like how similar this is to other tile types, possibly try combining this with other tile management systems
     /// <summary>
     /// Displayable tile reference, stores the position and size of a texture source on a tileset.
     /// </summary>

@@ -5,12 +5,12 @@ namespace LittleLib;
 
 //! FIXME (Alex): This is identical to the horizontal slider with different values. I think I just need to not care?
 public abstract class UISliderVertical(float startValue, float minValue, float maxValue, float stepSize, Action<float> changeCallback, UICreateArgs args) : UIElement(args) {
-    public float Value { get; protected set; } = startValue;
-    public float MinValue { get; protected set; } = minValue;
-    public float MaxValue { get; protected set; } = maxValue;
-    public float StepSize { get; protected set; } = stepSize;
+    public float Value = startValue;
+    public float MinValue = minValue;
+    public float MaxValue = maxValue;
+    public float StepSize = stepSize;
 
-    public Action<float> ChangeCallback { get; protected set; } = changeCallback;
+    public Action<float> ChangeCallback = changeCallback;
 
     public override void Update() {
         if (!ParentSelected) { return; }

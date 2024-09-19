@@ -4,9 +4,9 @@ using Foster.Framework;
 namespace LittleLib;
 
 public class UILabel : UIElement {
-    public SpriteFont Font { get; protected set; }
-    public string Text { get; protected set; }
-    public Color Color { get; protected set; }
+    public SpriteFont Font;
+    public string Text;
+    public Color Color;
 
     public UILabel(string font, string text, Color color, UICreateArgs args) : this(Assets.GetFont(font), text, color, args) { }
     public UILabel(SpriteFont font, string text, Color color, UICreateArgs args) : base(args) {
@@ -19,7 +19,6 @@ public class UILabel : UIElement {
     }
 
     public override void Render(Batcher batcher) {
-        batcher.Text(Font, Text, RelativeTopLeft, Color);
-        // batcher.RectLine(RelativeBounds, 1, Color.Red);
+        batcher.Text(Font, Text, Vector2.Zero, Color);
     }
 }

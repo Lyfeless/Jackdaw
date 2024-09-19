@@ -4,15 +4,14 @@ using Foster.Framework;
 namespace LittleLib;
 
 public class AnimationInstance {
-    readonly string TimeTracker;
+    public readonly string TimeTracker;
 
-    readonly AnimationData Data;
+    public readonly AnimationData Data;
     Subtexture Texture;
 
+    public readonly float FrameTime;
 
-    readonly float FrameTime;
-
-    readonly double StartTime;
+    public readonly double StartTime;
 
     public bool Looping;
 

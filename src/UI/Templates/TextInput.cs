@@ -4,8 +4,8 @@ using TextCopy;
 namespace LittleLib;
 
 public abstract class UITextInput(string startValue, Action<string> changeCallback, UICreateArgs args, string? allowedCharacters = null) : UIElement(args) {
-    public string Value { get; protected set; } = startValue;
-    public Action<string> Callback { get; protected set; } = changeCallback;
+    public string Value = startValue;
+    public Action<string> Callback = changeCallback;
 
     //! FIXME (Alex): Check if giving a null has issues, ignore check if empty
     readonly bool limitCharacters = allowedCharacters != null;

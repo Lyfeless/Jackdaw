@@ -150,6 +150,11 @@ public class Camera(Vector2 startPos, UIVector2 anchor, Vector2 panAmount, Vecto
         }
     }
 
+    public void ClearTarget() {
+        EntityTarget = null;
+        PositionTarget = null;
+    }
+
     public void StartShake(float duration, Vector2 amount) {
         ShakeTimer = new(duration);
         ShakeStrength = amount;

@@ -20,9 +20,9 @@ public class UIElement {
     public UIElement? ConnectionLeft = null;
     public UIElement? ConnectionRight = null;
 
-    UIVector2 position;
-    UIVector2 size;
-    UIVector2 anchor;
+    protected UIVector2 position;
+    protected UIVector2 size;
+    protected UIVector2 anchor;
 
     public void SetPosition(UIVector2 value) => position = value;
     public void SetSize(UIVector2 value) => size = value;
@@ -30,12 +30,13 @@ public class UIElement {
 
     readonly HashSet<UIElement> children = [];
 
+    public Vector2 InternalPosition {
+        get => position.value;
+        set => position.value = value;
+    }
+
     public Vector2 RelativePosition {
-        // get => position.GetAppliedValue(Parent?.Size ?? Vector2.Zero);
-        get {
-            // Console.WriteLine(position.GetAppliedValue(Parent?.Size ?? Vector2.Zero));
-            return position.GetAppliedValue(Parent?.Size ?? Vector2.Zero);
-        }
+        get => position.GetAppliedValue(Parent?.Size ?? Vector2.Zero);
         set => position.value = value;
     }
     public Vector2 AbsolutePosition => RelativePosition + (Parent?.AbsoluteTopLeft ?? Vector2.Zero);
@@ -175,6 +176,6 @@ public class UIElement {
     public virtual void Update() { }
 
     public virtual void Render(Batcher batcher) {
-        // batcher.RectLine(RelativeBounds, 1, Color.Yellow);
+        // batcher.RectLine(new(Size.X, Size.Y), 1, Color.Yellow);
     }
 }

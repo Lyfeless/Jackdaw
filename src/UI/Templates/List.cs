@@ -6,7 +6,7 @@ public class UIList(UICreateArgs args) : UIElement(args) {
     public UIList() : this(new()) { }
 
     public UIList ContainedListHorizontal(bool connect, bool loop, bool setDefault, params UIElement[] elements) {
-        float width = 1 / elements.Length;
+        float width = 1.0f / elements.Length;
         int lastSelectable = -1;
 
         for (int i = 0; i < elements.Length; ++i) {
@@ -23,7 +23,7 @@ public class UIList(UICreateArgs args) : UIElement(args) {
             }
         }
 
-        if (loop && defaultSelect != elements[lastSelectable]) {
+        if (loop && defaultSelect != null && defaultSelect != elements[lastSelectable]) {
             defaultSelect?.ConnectUp(elements[lastSelectable]);
         }
 
@@ -50,7 +50,7 @@ public class UIList(UICreateArgs args) : UIElement(args) {
             }
         }
 
-        if (loop && defaultSelect != elements[lastSelectable]) {
+        if (loop && defaultSelect != null && defaultSelect != elements[lastSelectable]) {
             defaultSelect?.ConnectUp(elements[lastSelectable]);
         }
 
