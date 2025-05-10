@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TextCopy" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Foster\Framework\Foster.Framework.csproj" />
+    <ProjectReference Include="..\Foster.Audio\Foster.Audio\Foster.Audio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Fallback/font.ttf" />
+    <EmbeddedResource Include="Fallback/sound.ogg" />
+    <EmbeddedResource Include="Fallback/texture.png" />
+  </ItemGroup>
+
+</Project>
