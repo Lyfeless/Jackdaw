@@ -117,16 +117,16 @@ public class Actor {
             AddedToTree = true;
         }
 
+        foreach (Actor child in Children.Elements) {
+            child.EnterTree();
+        }
+
         foreach (Component component in Components.Elements) {
             component.EnterTree();
             if (!component.AddedToTree) {
                 component.EnterTreeFirst();
                 component.AddedToTree = true;
             }
-        }
-
-        foreach (Actor child in Children.Elements) {
-            child.EnterTree();
         }
 
         Components.QueueEvents = false;
@@ -167,6 +167,7 @@ public class Actor {
         IsValid = false;
     }
 
+    //! FIXME (Alex): I don't like these find functions being here but moving them to the containers makes it even messier unfortunately
     public Actor? FindChild(Func<ObjectIdentifier<Actor>, bool> func) {
         foreach (Actor child in Children.Elements) {
             if (func(child.Match)) {
@@ -211,7 +212,7 @@ public class Actor {
 
     bool ParentMatches(Actor check) {
         if (this == check) { return true; }
-        if (Parent.IsValid) { return ParentMatches(check); }
+        if (Parent.IsValid) { return Parent.ParentMatches(check); }
         return false;
     }
 

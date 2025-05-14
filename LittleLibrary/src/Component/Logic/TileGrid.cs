@@ -5,8 +5,24 @@ namespace LittleLib;
 
 public class TileGridComponent(LittleGame game, Vector2 position, Point2 gridSize, Vector2 tileSize) : Component(game) {
     Vector2 Position = position;
-    GridCollider collider = new(position, gridSize, tileSize);
-    GridRendererComponent renderer = new(game, position, gridSize, tileSize);
+    CollisionDetectorComponent Collider = new(game, new GridCollider(position, gridSize, tileSize));
+    GridRendererComponent Renderer = new(game, position, gridSize, tileSize);
 
-    //! FIXME (Alex): Don't run update or render for these, just handle adding/removing the components when the controller (this) changes parenting
+    Vector2 oldPosition = position;
+
+    public override void Added() {
+        Actor.Components.Add(Collider);
+        Actor.Components.Add(Renderer);
+    }
+
+    public override void Removed() {
+        Actor.Components.Remove(Collider);
+        Actor.Components.Remove(Renderer);
+    }
+
+    public override void Update() {
+        if (oldPosition != Position) {
+            //! FIXME (Alex): Update positions
+        }
+    }
 }

@@ -1,28 +1,39 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Foster.Framework;
 
 namespace LittleLib;
 
-public class GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : Collider {
-    //! FIXME (Alex): Recalculate bounds if either of these change
+public class GridCollider(Vector2 position, Grid<int> grid) : Collider {
     Vector2 Position = position;
-    //! FIXME (Alex): Should this just be float to make things easier?
-    Vector2 TileSize = tileSize;
 
-    readonly int[,] Tiles = new int[gridSize.X, gridSize.Y];
+    readonly Grid<int> Grid = grid;
 
-    List<Collider> colliders = [new ConvexCollider(new Rect(Vector2.Zero, tileSize))];
+    List<Collider> colliders = [new ConvexCollider(new Rect(Vector2.Zero, grid.TileSize))];
 
-    Rect bounds = GetBounds(position, gridSize, tileSize);
-    public override Rect Bounds => bounds;
+    public override Rect Bounds => new(Position, Grid.Size);
+
+    public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<int>(gridSize, tileSize)) { }
 
     public GridCollider AddCollider(Collider collider) {
         if (!colliders.Any(e => e == collider)) { colliders.Add(collider); }
         return this;
     }
 
+    //! FIXME (Alex): Adds collider if it doesnt exist, do we want that?
     public int GetColliderIndex(Collider collider) {
-        return colliders.IndexOf(collider);
+        int index = colliders.IndexOf(collider);
+        if (index == -1) {
+            colliders.Add(collider);
+            return colliders.Count - 1;
+        }
+        return index;
+    }
+
+    public GridCollider Set(Collider collider, Point2 position) => Set(GetColliderIndex(collider), position);
+    public GridCollider Set(int? collider, Point2 position) {
+        Grid.Set(collider, position);
+        return this;
     }
 
     public override bool Overlaps(Collider with, out Vector2 pushout) {
@@ -34,9 +45,5 @@ public class GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) :
         //      - If passed, check overlapped tile's custom collider, if set
         //      - Collect all pushout positions, ??? to chose one
         throw new NotImplementedException();
-    }
-
-    static Rect GetBounds(Vector2 position, Point2 gridSize, Vector2 tileSize) {
-        return new Rect(position, gridSize * tileSize);
     }
 }

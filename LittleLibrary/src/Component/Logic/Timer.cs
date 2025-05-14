@@ -1,32 +1,15 @@
 namespace LittleLib;
 
-public class TimerComponent : Component {
-    public readonly float Duration;
-    public readonly float StartDelay;
+public class TimerComponent(LittleGame game, float duration, string? timeTracker = null, bool startFinished = false, float startDelay = 0) : Component(game) {
+    //! FIXME (Alex): Not the prettiest implementation but ig it works
+    //! FIXME (Alex): Should maybe clean up the timer constructor to take in less info by default?
+    Timer Timer = new(game, duration, timeTracker, startFinished, startDelay);
 
-    readonly string Tracker;
-    double StartTime;
+    public double ElapsedTime => Timer.ElapsedTime;
+    public double ElapsedTimeClamped => Timer.ElapsedTimeClamped;
+    public float Percent => Timer.Percent;
+    public bool Done => Timer.Done;
 
-    public TimerComponent(
-        LittleGame game,
-        float duration,
-        string? tracker = null,
-        bool startFinished = false,
-        float startDelay = 0
-    ) : base(game) {
-        Tracker = tracker ?? string.Empty;
-        Duration = duration;
-        StartDelay = startDelay;
-        StartTime = Milliseconds;
-        if (startFinished) { Stop(); }
-    }
-
-    double Milliseconds => Game.Timers.GetTrackedTime(Tracker).TotalMilliseconds;
-
-    public double ElapsedTime => Milliseconds - StartTime - StartDelay;
-    public double ElapsedTimeClamped => Math.Clamp(ElapsedTime, 0, Duration);
-    public float Percent => (float)(ElapsedTimeClamped / Duration);
-    public bool Done => ElapsedTime >= Duration;
-    public void Restart() { StartTime = Milliseconds; }
-    public void Stop() { StartTime = Milliseconds - Duration - StartDelay; }
+    public void Restart() => Timer.Restart();
+    public void Stop() => Timer.Stop();
 }

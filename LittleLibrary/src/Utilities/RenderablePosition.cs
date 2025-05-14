@@ -50,4 +50,21 @@ public struct RenderablePosition {
     public void Set(float x, float y) => Set(new(x, y));
     public void SetX(float value) => Set(value, Precise.Y);
     public void SetY(float value) => Set(Precise.X, value);
+
+    public static RenderablePosition operator +(RenderablePosition a, RenderablePosition b) => new(a.Precise + b.Precise);
+    public static RenderablePosition operator +(RenderablePosition a, Vector2 b) => new(a.Precise + b);
+    public static RenderablePosition operator +(Vector2 a, RenderablePosition b) => new(a + b.Precise);
+
+    public static RenderablePosition operator -(RenderablePosition a) => new(-a.Precise);
+    public static RenderablePosition operator -(RenderablePosition a, RenderablePosition b) => a + (-b);
+    public static RenderablePosition operator -(RenderablePosition a, Vector2 b) => a + (-b);
+    public static RenderablePosition operator -(Vector2 a, RenderablePosition b) => a + (-b);
+
+    public static RenderablePosition operator *(RenderablePosition a, Vector2 b) => new(a.Precise * b);
+    public static RenderablePosition operator *(Vector2 a, RenderablePosition b) => new(a * b.Precise);
+    public static RenderablePosition operator *(RenderablePosition a, RenderablePosition b) => new(a.Precise * b.Precise);
+
+    public static RenderablePosition operator /(RenderablePosition a, RenderablePosition b) => new(a.Precise / b.Precise);
+    public static RenderablePosition operator /(RenderablePosition a, Vector2 b) => new(a.Precise / b);
+    public static RenderablePosition operator /(Vector2 a, RenderablePosition b) => new(a / b.Precise);
 }

@@ -52,6 +52,8 @@ public class NinesliceComponent : Component {
         : this(game, game.Assets.GetTexture(texture), center, extendBehavior, ConstrainSize) { }
 
     public override void Render(Batcher batcher) {
+        if (Game.Viewspace.Bounds.Contains(new Rect(Actor.GlobalPosition + Bounds.Position, Bounds.Size))) { return; }
+
         batcher.PushMatrix(Bounds.Position);
 
         int minWidth = (int)(TopLeft.Width + TopRight.Width);

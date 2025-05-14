@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Foster.Framework;
 
 namespace LittleLib;
@@ -6,12 +7,15 @@ public class LittleGame : App {
     public Assets Assets;
     public TimeManager Timers;
     public AudioManager Audio;
-
-    ScreenScaler Scaler;
+    public CollisionManager Collision;
 
     public Rng Random = new(DateTime.Now.Millisecond);
 
+    readonly ScreenScaler Scaler;
     public Batcher Batcher { get; private set; }
+    public Viewspace Viewspace { get; private set; }
+
+    //! FIXME (Alex): Need some way to dynamically store global systems, perhaps a childcontainer of components or actors?
 
     Actor root;
     public Actor Root {
@@ -33,20 +37,23 @@ public class LittleGame : App {
     record struct QueuedInvalidation(Actor Actor, bool InvalidateChildren);
     readonly List<QueuedInvalidation> InvalidateQueue = [];
 
-    public LittleGame() : base(new AppConfig() {
-        //! FIXME (Alex): Temp data, need to probably load from a config?
-        ApplicationName = "Test App",
-        WindowTitle = "Test Window",
-        Width = 800,
-        Height = 800,
+    public LittleGame(string configPath)
+        : this(JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.LittleGameConfig)) { }
+
+    public LittleGame(LittleGameConfig config) : base(new AppConfig() {
+        ApplicationName = config.ApplicationName,
+        WindowTitle = config.WindowTitle,
+        Width = config.ScreenWidth,
+        Height = config.ScreenHeight,
         Resizable = true
     }) {
         Assets = new(GraphicsDevice);
         Timers = new(this);
         Audio = new(this);
+        Collision = new();
 
-        //! FIXME (Alex): Needs viewport size config
-        Scaler = new(this, new(800, 800));
+        Viewspace = new(new(config.ViewWidth, config.ViewHeight));
+        Scaler = new(this, Viewspace.Size);
 
         Batcher = new(GraphicsDevice);
 
@@ -74,10 +81,13 @@ public class LittleGame : App {
     }
 
     protected override void Render() {
+        //! FIXME (Alex): The renderer really should handle all this and just get passed the root to render from
         //! FIXME (Alex): Needs background and letterbox colors
         Window.Clear(Color.Black);
 
+        Batcher.PushMatrix(Viewspace.RenderPosition);
         Root?.Render(Batcher);
+        Batcher.PopMatrix();
 
         //! FIXME (Alex): Only run this in debug mode
         //! FIXME (Alex): Should this be rendered at a higher res?

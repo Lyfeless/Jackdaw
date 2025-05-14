@@ -10,6 +10,7 @@ namespace LittleLib;
 //! FIXME (Alex): Disabled for now
 // [JsonSerializable(typeof(WorldSaveData))]
 // [JsonSerializable(typeof(LevelSaveData))]
+[JsonSerializable(typeof(LittleGameConfig))]
 [JsonSerializable(typeof(FontConfig))]
 [JsonSerializable(typeof(ShaderConfig))]
 [JsonSerializable(typeof(AnimationConfig))]

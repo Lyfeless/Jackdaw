@@ -10,15 +10,7 @@ namespace LittleLib;
 /// </summary>
 public class Assets {
     #region File/path definitions
-    public const string AssetPath = "Content";
-    public const string TextureFolder = "Textures";
-    public const string FontFolder = "Fonts";
-    public const string SoundFolder = "Sounds";
-    public const string ShaderFolder = "Shaders";
-
-    public const string ConfigName = "Config.json";
-
-    public const string AnimationDataName = "AnimData.json";
+    LittleGameContentConfig config;
 
     public readonly string[] TextureExtensions = [".png", ".jpg"];
     public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
@@ -71,7 +63,7 @@ public class Assets {
             packer.Add("error", new Image(stream));
 
             // Load all textures in asset directory
-            string texturePath = Path.Join(AssetPath, TextureFolder);
+            string texturePath = Path.Join(config.RootFolder, config.TextureFolder);
             if (Directory.Exists(texturePath)) {
 
                 foreach (string file in Directory.EnumerateFiles(texturePath, "*.*", SearchOption.AllDirectories).Where(e => TextureExtensions.Any(e.EndsWith))) {
@@ -101,14 +93,14 @@ public class Assets {
             Fonts.Add("error", new SpriteFont(graphicsDevice, stream, 16));
 
             // Load all fonts in asset directory
-            string fontPath = Path.Join(AssetPath, FontFolder);
+            string fontPath = Path.Join(config.RootFolder, config.FontFolder);
             if (Directory.Exists(fontPath)) {
-                string configPath = Path.Join(fontPath, ConfigName);
-                FontConfig? config = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
+                string configPath = Path.Join(config.RootFolder, config.RootFolder);
+                FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
 
                 foreach (string file in Directory.EnumerateFiles(fontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
                     string name = GetAssetName(fontPath, file);
-                    FontConfigEntry? configEntry = config?.FontConfigs.FirstOrDefault(e => e.Name == name);
+                    FontConfigEntry? configEntry = fontConfig?.FontConfigs.FirstOrDefault(e => e.Name == name);
                     Fonts.Add(name, new SpriteFont(graphicsDevice, file, configEntry?.Size ?? FontConfig.DefaultFontSize));
                 }
             }
@@ -122,14 +114,14 @@ public class Assets {
             using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;
             Sounds.Add("error", new Sound(stream));
 
-            string soundPath = Path.Join(AssetPath, SoundFolder);
+            string soundPath = Path.Join(config.RootFolder, config.SoundFolder);
             if (Directory.Exists(soundPath)) {
-                string configPath = Path.Join(soundPath, ConfigName);
-                SoundConfig? config = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.SoundConfig) : null;
+                string configPath = Path.Join(config.RootFolder, config.SoundConfig);
+                SoundConfig? soundConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.SoundConfig) : null;
 
                 foreach (string file in Directory.EnumerateFiles(soundPath, "*.*", SearchOption.AllDirectories).Where(e => SoundExtensions.Any(e.EndsWith))) {
                     string name = GetAssetName(soundPath, file);
-                    SoundConfigEntry? configEntry = config?.SoundConfigs.FirstOrDefault(e => e.Name == name);
+                    SoundConfigEntry? configEntry = soundConfig?.SoundConfigs.FirstOrDefault(e => e.Name == name);
                     Sounds.Add(name, new Sound(file, configEntry?.LoadingMethod ?? SoundConfig.DefaultLoadingMethod));
                 }
             }
@@ -143,15 +135,15 @@ public class Assets {
 
             // Load shaders from config
             //      Shaders are built from more data than just files, so read directly off the config
-            string shaderPath = Path.Join(AssetPath, ShaderFolder);
-            string shaderConfigPath = Path.Join(shaderPath, ConfigName);
+            string shaderPath = Path.Join(config.RootFolder, config.ShaderFolder);
+            string shaderConfigPath = Path.Join(config.RootFolder, config.ShaderConfig);
             string shaderExtension = graphicsDevice.Driver.GetShaderExtension(); graphicsDevice.Driver.GetShaderExtension();
             //! FIXME (Alex): Needs new shader data
             if (Path.Exists(shaderConfigPath)) {
-                ShaderConfig? config = JsonSerializer.Deserialize(File.ReadAllText(shaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
+                ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(shaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
 
-                if (config != null) {
-                    foreach (ShaderConfigEntry entry in config.ShaderConfigs) {
+                if (shaderConfig != null) {
+                    foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
                         // Find files from config entry
                         string vertexPath = Path.Join(shaderPath, entry.Vertex);
                         string fragmentPath = Path.Join(shaderPath, entry.Fragment);
@@ -184,9 +176,9 @@ public class Assets {
         {
             //! FIXME (Alex): Rework animations
             //     Animations.Add("error", new([Point2.Zero], Point2.One));
-            //     string path = Path.Join(AssetPath, AnimationDataName);
+            //     string path = Path.Join(config.RootFolder, config.AnimationConfig);
             //     if (Path.Exists(path)) {
-            //         AnimationConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AnimationConfig);
+            //         AnimationConfig? animationConfig = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AnimationConfig);
             //         if (config != null) {
             //             foreach (AnimationConfigEntry entry in config.AnimationConfigs) {
             //                 if (entry.Frames.Length == 0) {

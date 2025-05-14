@@ -6,6 +6,7 @@ public abstract class Component {
     public LittleGame Game;
     public Actor Actor = Actor.Invalid;
     public bool ActorValid => Actor.IsValid;
+    public bool InTree => Actor.InTree;
 
     public ObjectIdentifier<Component> Match;
 
