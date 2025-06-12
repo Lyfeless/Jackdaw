@@ -37,4 +37,8 @@ public class CircleCollider(Circle circle) : Collider {
     static Rect GetBounds(Circle circle) {
         return new BoundsBuilder(new Rect(-circle.Radius, -circle.Radius, circle.Radius * 2, circle.Radius * 2)).Rect;
     }
+
+    public override Collider Offset(Vector2 amount) {
+        return new CircleCollider(new(Circle.Position + amount, Circle.Radius));
+    }
 }

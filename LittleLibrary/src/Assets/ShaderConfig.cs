@@ -12,8 +12,22 @@ public class ShaderConfigEntry {
     public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("vertex")]
-    public string Vertex { get; set; } = string.Empty;
+    public ShaderConfigEntryStage Vertex { get; set; } = new();
 
     [JsonPropertyName("fragment")]
-    public string Fragment { get; set; } = string.Empty;
+    public ShaderConfigEntryStage Fragment { get; set; } = new();
+}
+
+public class ShaderConfigEntryStage {
+    [JsonPropertyName("path")]
+    public string Path { get; set; } = string.Empty;
+
+    [JsonPropertyName("entryPoint")]
+    public string EntryPoint { get; set; } = "main";
+
+    [JsonPropertyName("samplers")]
+    public int Samplers { get; set; } = 0;
+
+    [JsonPropertyName("uniforms")]
+    public int Uniforms { get; set; } = 0;
 }

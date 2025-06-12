@@ -10,7 +10,7 @@ namespace LittleLib;
 /// </summary>
 public class Assets {
     #region File/path definitions
-    LittleGameContentConfig config;
+    public LittleGameContentConfig Config;
 
     public readonly string[] TextureExtensions = [".png", ".jpg"];
     public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
@@ -20,15 +20,27 @@ public class Assets {
 
     #region Assets storage and accessors
     readonly Dictionary<string, Subtexture> Textures = [];
-    public Subtexture GetTexture(string name) => Textures.TryGetValue(name, out Subtexture output) ? output : Textures["error"];
+    public Subtexture GetTexture(string name) {
+        if (Textures.TryGetValue(name, out Subtexture output)) { return output; }
+        Console.WriteLine($"ASSETS: Failed to find texture {name}, returning default");
+        return Textures["error"];
+    }
     const string TextureFallbackName = "Fallback.texture.png";
 
     readonly Dictionary<string, SpriteFont> Fonts = [];
-    public SpriteFont GetFont(string name) => Fonts.TryGetValue(name, out SpriteFont? output) ? output : Fonts["error"];
+    public SpriteFont GetFont(string name) {
+        if (Fonts.TryGetValue(name, out SpriteFont? output)) { return output; }
+        Console.WriteLine($"ASSETS: Failed to find font {name}, returning default");
+        return Fonts["error"];
+    }
     const string FontFallbackName = "Fallback.font.ttf";
 
     readonly Dictionary<string, Shader> Shaders = [];
-    public Shader GetShader(string name) => Shaders.TryGetValue(name, out Shader? output) ? output : Shaders["error"];
+    public Shader GetShader(string name) {
+        if (Shaders.TryGetValue(name, out Shader? output)) { return output; }
+        Console.WriteLine($"ASSETS: Failed to find shader {name}, returning default");
+        return Shaders["error"];
+    }
 
     //! FIXME (Alex): Animations not re-implemented
     // readonly Dictionary<string, AnimationData> Animations = [];
@@ -36,7 +48,11 @@ public class Assets {
 
 
     readonly Dictionary<string, Sound> Sounds = [];
-    public Sound GetSound(string name) => Sounds.TryGetValue(name, out Sound? output) ? output : Sounds["error"];
+    public Sound GetSound(string name) {
+        if (Sounds.TryGetValue(name, out Sound? output)) { return output; }
+        Console.WriteLine($"ASSETS: Failed to find sound {name}, returning default");
+        return Sounds["error"];
+    }
     const string SoundFallbackName = "Fallback.sound.ogg";
 
     #endregion
@@ -44,7 +60,9 @@ public class Assets {
     /// <summary>
     /// Load and initialize all asset types
     /// </summary>
-    public Assets(GraphicsDevice graphicsDevice) {
+    public Assets(GraphicsDevice graphicsDevice, LittleGameContentConfig config) {
+        Config = config;
+
         // Assembly data for fallback
         Assembly assembly = Assembly.GetExecutingAssembly();
         string? assemblyName = assembly.GetName().Name;
@@ -63,7 +81,7 @@ public class Assets {
             packer.Add("error", new Image(stream));
 
             // Load all textures in asset directory
-            string texturePath = Path.Join(config.RootFolder, config.TextureFolder);
+            string texturePath = Path.Join(Config.RootFolder, Config.TextureFolder);
             if (Directory.Exists(texturePath)) {
 
                 foreach (string file in Directory.EnumerateFiles(texturePath, "*.*", SearchOption.AllDirectories).Where(e => TextureExtensions.Any(e.EndsWith))) {
@@ -93,9 +111,9 @@ public class Assets {
             Fonts.Add("error", new SpriteFont(graphicsDevice, stream, 16));
 
             // Load all fonts in asset directory
-            string fontPath = Path.Join(config.RootFolder, config.FontFolder);
+            string fontPath = Path.Join(Config.RootFolder, Config.FontFolder);
             if (Directory.Exists(fontPath)) {
-                string configPath = Path.Join(config.RootFolder, config.RootFolder);
+                string configPath = Path.Join(Config.RootFolder, Config.RootFolder);
                 FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
 
                 foreach (string file in Directory.EnumerateFiles(fontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
@@ -114,9 +132,9 @@ public class Assets {
             using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;
             Sounds.Add("error", new Sound(stream));
 
-            string soundPath = Path.Join(config.RootFolder, config.SoundFolder);
+            string soundPath = Path.Join(Config.RootFolder, Config.SoundFolder);
             if (Directory.Exists(soundPath)) {
-                string configPath = Path.Join(config.RootFolder, config.SoundConfig);
+                string configPath = Path.Join(Config.RootFolder, Config.SoundConfig);
                 SoundConfig? soundConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.SoundConfig) : null;
 
                 foreach (string file in Directory.EnumerateFiles(soundPath, "*.*", SearchOption.AllDirectories).Where(e => SoundExtensions.Any(e.EndsWith))) {
@@ -135,33 +153,39 @@ public class Assets {
 
             // Load shaders from config
             //      Shaders are built from more data than just files, so read directly off the config
-            string shaderPath = Path.Join(config.RootFolder, config.ShaderFolder);
-            string shaderConfigPath = Path.Join(config.RootFolder, config.ShaderConfig);
+            string shaderPath = Path.Join(Config.RootFolder, Config.ShaderFolder);
+            string shaderConfigPath = Path.Join(Config.RootFolder, Config.ShaderConfig);
             string shaderExtension = graphicsDevice.Driver.GetShaderExtension(); graphicsDevice.Driver.GetShaderExtension();
-            //! FIXME (Alex): Needs new shader data
             if (Path.Exists(shaderConfigPath)) {
                 ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(shaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
 
                 if (shaderConfig != null) {
                     foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
                         // Find files from config entry
-                        string vertexPath = Path.Join(shaderPath, entry.Vertex);
-                        string fragmentPath = Path.Join(shaderPath, entry.Fragment);
+                        //! FIXME (Alex): Should the path extensions be more configurable?
+                        string vertexPath = Path.Join(shaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
+                        string fragmentPath = Path.Join(shaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
                         if (!Path.Exists(vertexPath) || !Path.Exists(fragmentPath)) { continue; }
+
+                        // Load files into bytes
+                        byte[] vertexBytes;
+                        byte[] fragmentBytes;
+                        vertexBytes = File.ReadAllBytes(vertexPath);
+                        fragmentBytes = vertexPath == fragmentPath ? vertexBytes : File.ReadAllBytes(fragmentPath);
 
                         // Build shader info
                         ShaderCreateInfo createInfo = new(
                             Vertex: new(
-                                Code: File.ReadAllBytes($"{vertexPath}.{shaderExtension}"),
-                                SamplerCount: 0,
-                                UniformBufferCount: 0,
-                                EntryPoint: "vertex_main"
+                                Code: vertexBytes,
+                                SamplerCount: entry.Vertex.Samplers,
+                                UniformBufferCount: entry.Vertex.Uniforms,
+                                EntryPoint: entry.Vertex.EntryPoint
                             ),
                             Fragment: new(
-                                Code: File.ReadAllBytes($"{fragmentPath}.{shaderExtension}"),
-                                SamplerCount: 0,
-                                UniformBufferCount: 0,
-                                EntryPoint: "vertex_main"
+                                Code: fragmentBytes,
+                                SamplerCount: entry.Fragment.Samplers,
+                                UniformBufferCount: entry.Fragment.Uniforms,
+                                EntryPoint: entry.Fragment.EntryPoint
                             )
                         );
 

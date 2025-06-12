@@ -5,7 +5,7 @@ namespace LittleLib;
 
 public class Viewspace(Vector2 position, Point2 size) {
     RenderablePosition Position = new(position);
-    public Point2 Size { get; } = size;
+    public Point2 Size = size;
 
     public Vector2 TopLeft {
         get => Position.Precise;

@@ -1,19 +1,18 @@
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using Foster.Framework;
 
 namespace LittleLib;
 
-public class GridCollider(Vector2 position, Grid<int> grid) : Collider {
+public class GridCollider(Vector2 position, Grid<int?> grid) : Collider {
     Vector2 Position = position;
 
-    readonly Grid<int> Grid = grid;
+    readonly Grid<int?> Grid = grid;
 
-    List<Collider> colliders = [new ConvexCollider(new Rect(Vector2.Zero, grid.TileSize))];
+    readonly List<Collider> colliders = [new RectangleCollider(grid.TileSize)];
 
     public override Rect Bounds => new(Position, Grid.Size);
 
-    public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<int>(gridSize, tileSize)) { }
+    public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<int?>(gridSize, tileSize)) { }
 
     public GridCollider AddCollider(Collider collider) {
         if (!colliders.Any(e => e == collider)) { colliders.Add(collider); }
@@ -44,6 +43,11 @@ public class GridCollider(Vector2 position, Grid<int> grid) : Collider {
         //      - check each overlapped tile aabb
         //      - If passed, check overlapped tile's custom collider, if set
         //      - Collect all pushout positions, ??? to chose one
+        throw new NotImplementedException();
+    }
+
+    public override Collider Offset(Vector2 amount) {
+        //! FIXME (Alex): Needs proper offset when implemented
         throw new NotImplementedException();
     }
 }

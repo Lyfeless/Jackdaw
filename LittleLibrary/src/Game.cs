@@ -5,13 +5,15 @@ namespace LittleLib;
 
 public class LittleGame : App {
     public Assets Assets;
+    public Controls Controls;
     public TimeManager Timers;
     public AudioManager Audio;
     public CollisionManager Collision;
+    public EventBus Events;
 
     public Rng Random = new(DateTime.Now.Millisecond);
 
-    readonly ScreenScaler Scaler;
+    readonly LittleGameRenderer Renderer;
     public Batcher Batcher { get; private set; }
     public Viewspace Viewspace { get; private set; }
 
@@ -21,7 +23,6 @@ public class LittleGame : App {
     public Actor Root {
         get => root;
         set {
-            //! FIXME (Alex): Probably do unloading stuff here
             if (value == null || root == value) { return; }
             if (root.IsValid) {
                 root.ExitTree();
@@ -32,8 +33,6 @@ public class LittleGame : App {
         }
     }
 
-    // Debug Debug;
-
     record struct QueuedInvalidation(Actor Actor, bool InvalidateChildren);
     readonly List<QueuedInvalidation> InvalidateQueue = [];
 
@@ -43,24 +42,33 @@ public class LittleGame : App {
     public LittleGame(LittleGameConfig config) : base(new AppConfig() {
         ApplicationName = config.ApplicationName,
         WindowTitle = config.WindowTitle,
-        Width = config.ScreenWidth,
-        Height = config.ScreenHeight,
+        Width = config.Window.WindowWidth,
+        Height = config.Window.WindowHeight,
         Resizable = true
     }) {
-        Assets = new(GraphicsDevice);
+        Assets = new(GraphicsDevice, config.Content);
+        Controls = new(Input);
         Timers = new(this);
         Audio = new(this);
         Collision = new();
+        Events = new();
 
-        Viewspace = new(new(config.ViewWidth, config.ViewHeight));
-        Scaler = new(this, Viewspace.Size);
+        //! FIXME (Alex): YUCK
+        switch (config.Window.Renderer) {
+            case LittleGameWindowConfig.RendererType.FULL_WINDOW:
+                Viewspace = new(new(config.Window.WindowWidth, config.Window.WindowHeight));
+                Renderer = new FullWindowRenderer(this);
+                break;
+            case LittleGameWindowConfig.RendererType.FIXED_VIEWPORT:
+            default:
+                Viewspace = new(new(config.Window.ViewportWidth, config.Window.ViewportHeight));
+                Renderer = new FixedViewportRenderer(this, Viewspace.Size);
+                break;
+        }
 
         Batcher = new(GraphicsDevice);
 
         root = Actor.Invalid;
-
-        //! FIXME (Alex): Only do this when in debug mode
-        // Debug = new();
     }
 
     protected override void Startup() { }
@@ -70,40 +78,19 @@ public class LittleGame : App {
     }
 
     protected override void Update() {
+        Controls.Update();
         Timers.Update();
         Audio.Update();
 
         Root?.Update();
+        Collision.Update();
 
         foreach (QueuedInvalidation item in InvalidateQueue) {
             item.Actor.Invalidate(item.InvalidateChildren);
         }
     }
 
-    protected override void Render() {
-        //! FIXME (Alex): The renderer really should handle all this and just get passed the root to render from
-        //! FIXME (Alex): Needs background and letterbox colors
-        Window.Clear(Color.Black);
+    protected override void Render() => Renderer.Render(Batcher, Root);
 
-        Batcher.PushMatrix(Viewspace.RenderPosition);
-        Root?.Render(Batcher);
-        Batcher.PopMatrix();
-
-        //! FIXME (Alex): Only run this in debug mode
-        //! FIXME (Alex): Should this be rendered at a higher res?
-        // Debug.Render(Batcher);
-
-        // Scaler operates under the assumtion of:
-        //  1. Game clears window
-        //  2. Game batches all draw calls
-        //  3. Game sends batchers filled with calls to scaler
-        //  4. Scaler renders scaled
-        //  5. scaler clears batcher
-        // Unsure if this is the best pipeline but it could be used in the future to build multiple renderer types
-        Scaler.Render(Batcher);
-    }
-
-    public void QueueInvalidate(Actor actor, bool invalidateChildren) {
-        InvalidateQueue.Add(new(actor, invalidateChildren));
-    }
+    public void QueueInvalidate(Actor actor, bool invalidateChildren) => InvalidateQueue.Add(new(actor, invalidateChildren));
 }

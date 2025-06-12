@@ -23,4 +23,8 @@ public class MultiCollider(params Collider[] colliders) : Collider {
 
         return collide;
     }
+
+    public override Collider Offset(Vector2 amount) {
+        return new MultiCollider([.. Colliders.Select(e => e.Offset(amount))]);
+    }
 }

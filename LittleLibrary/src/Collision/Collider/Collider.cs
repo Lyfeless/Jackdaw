@@ -7,4 +7,6 @@ public abstract class Collider {
     public abstract Rect Bounds { get; }
 
     public abstract bool Overlaps(Collider with, out Vector2 pushout);
+
+    public abstract Collider Offset(Vector2 amount);
 }

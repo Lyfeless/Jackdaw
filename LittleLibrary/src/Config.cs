@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace LittleLib;
@@ -8,19 +8,35 @@ public struct LittleGameConfig() {
     public string ApplicationName = "LittleGame";
     [JsonPropertyName("windowTitle")]
     public string WindowTitle = "Little Game";
-
-    [JsonPropertyName("viewWidth")]
-    public int ViewWidth = 352;
-    [JsonPropertyName("viewHeight")]
-    public int ViewHeight = 256;
-
-    [JsonPropertyName("screenWidth")]
-    public int ScreenWidth = 600;
-    [JsonPropertyName("screenHeight")]
-    public int ScreenHeight = 600;
-
+    [JsonPropertyName("window")]
+    public LittleGameWindowConfig Window = new();
     [JsonPropertyName("content")]
     public LittleGameContentConfig Content = new();
+}
+
+public struct LittleGameWindowConfig() {
+    public enum RendererType {
+        FULL_WINDOW,
+        FIXED_VIEWPORT
+    }
+
+    public RendererType Renderer = RendererType.FIXED_VIEWPORT;
+
+    [JsonPropertyName("windowWidth")]
+    public int WindowWidth = 600;
+    [JsonPropertyName("windowHeight")]
+    public int WindowHeight = 600;
+    [JsonPropertyName("clearColor")]
+    public string ClearColor = "0xffffff";
+
+    // FIXED_VIEWPORT specific options
+    [JsonPropertyName("viewportWidth")]
+    public int ViewportWidth = 352;
+    [JsonPropertyName("viewportHeight")]
+    public int ViewportHeight = 256;
+    //? Taking the color from foster's cornflower blue
+    [JsonPropertyName("viewportColor")]
+    public string ViewportColor = "0x6495ed";
 }
 
 public struct LittleGameContentConfig() {

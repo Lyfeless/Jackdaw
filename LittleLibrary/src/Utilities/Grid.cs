@@ -4,6 +4,7 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): Should probably store position?
+//! FIXME (Alex): Or should position/size be left out of this entirely?
 public class Grid<T>(Point2 gridSize, Vector2 tileSize) {
     public readonly Vector2 TileSize = tileSize;
     public readonly Point2 GridSize = gridSize;

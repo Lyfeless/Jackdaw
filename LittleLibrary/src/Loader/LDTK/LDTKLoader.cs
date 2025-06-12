@@ -4,6 +4,8 @@ using Foster.Framework;
 namespace LittleLib.Loader.LDTK;
 
 public class LDTKLoader {
+    LittleGame Game;
+
     static readonly Dictionary<int, TilesetSaveDefinition> tilesets = [];
 
     static readonly Dictionary<string, LevelSaveReference> levels = [];
@@ -11,7 +13,9 @@ public class LDTKLoader {
 
     readonly Dictionary<string, Func<EntitySaveData, Actor>> ActorRegistry = [];
 
-    public LDTKLoader(string path) {
+    public LDTKLoader(LittleGame game, string path) {
+        Game = game;
+
         if (!File.Exists(path)) { return; }
         WorldSaveData? data = JsonSerializer.Deserialize(File.ReadAllText(path), LDTKSourceGenerationContext.Default.WorldSaveData);
         if (data == null) { return; }
@@ -70,5 +74,15 @@ public class LDTKLoader {
         if (ActorRegistry.ContainsKey(id)) { throw new Exception($"LDTKLoader: Attempting to re-define actor id {id}"); }
         ActorRegistry.Add(id, func);
         return this;
+    }
+
+    Subtexture GetTilesetTexture(TilesetSaveDefinition tileset) {
+        string path = Path.Join(
+                //! FIXME (Alex): This is a bit jank, look into a better way to handle this
+                Path.GetDirectoryName(tileset.TexturePath.Remove(0, Game.Assets.Config.TextureFolder.Length + 1)),
+                Path.GetFileNameWithoutExtension(tileset.TexturePath)
+            ).Replace("\\", "/");
+
+        return Game.Assets.GetTexture(path);
     }
 }

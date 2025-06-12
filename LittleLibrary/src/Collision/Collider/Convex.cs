@@ -3,7 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class ConvexCollider(IConvexShape shape) : Collider {
+public abstract class ConvexCollider(IConvexShape shape) : Collider {
     IConvexShape shape = shape;
     public IConvexShape Shape {
         get => shape;
@@ -16,7 +16,6 @@ public class ConvexCollider(IConvexShape shape) : Collider {
     Rect bounds = GetBounds(shape);
     public override Rect Bounds => bounds;
 
-    //! FIXME (Alex): These collider handlers require knowledge of one another, so it can't handle dynamic colliders. Is this important?
     //! FIXME (Alex): Exit will have issues if they make it far enough into an object, closest exit point will be on the other side
     public override bool Overlaps(Collider with, out Vector2 pushout) {
         if (with is ConvexCollider withConvex) {
