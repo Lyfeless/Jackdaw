@@ -14,6 +14,7 @@ namespace LittleLib;
 [JsonSerializable(typeof(FontConfig))]
 [JsonSerializable(typeof(ShaderConfig))]
 [JsonSerializable(typeof(AnimationConfig))]
+[JsonSerializable(typeof(AnimationGroupConfig))]
 [JsonSerializable(typeof(SoundConfig))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(bool))]

@@ -3,14 +3,14 @@ using Foster.Audio;
 
 namespace LittleLib;
 
-public class SoundConfig {
+internal class SoundConfig {
     public const SoundLoadingMethod DefaultLoadingMethod = SoundLoadingMethod.Preload;
 
     [JsonPropertyName("entries")]
     public SoundConfigEntry[] SoundConfigs { get; set; } = [];
 }
 
-public class SoundConfigEntry {
+internal class SoundConfigEntry {
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 

@@ -1,8 +1,7 @@
 namespace LittleLib;
 
-//! FIXME (Alex): Not Implemented
 public struct TagContainer() {
-    long Tags;
+    public long Tags;
 
     public void Set(params Enum[] values) => Set(EnumToTags(values));
     public void Set(params int[] values) => Set(IntToTags(values));
@@ -27,12 +26,14 @@ public struct TagContainer() {
         throw new NotImplementedException();
     }
 
+    public readonly bool Any(TagContainer container) => Any(container.Tags);
     public readonly bool Any(params Enum[] values) => Any(EnumToTags(values));
     public readonly bool Any(params int[] values) => Any(IntToTags(values));
     public readonly bool Any(long tags) {
         return (tags & Tags) != 0;
     }
 
+    public readonly bool All(TagContainer container) => All(container.Tags);
     public readonly bool All(params Enum[] values) => All(EnumToTags(values));
     public readonly bool All(params int[] values) => All(IntToTags(values));
     public readonly bool All(long tags) {

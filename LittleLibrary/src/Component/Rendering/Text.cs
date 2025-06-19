@@ -13,6 +13,7 @@ public class TextComponent(LittleGame game, string text, SpriteFont font, Color 
 
     public override void Render(Batcher batcher) {
         //! FIXME (Alex): Cull
+        // Actually maybe culling should be handled by the actor when calling these things? How should that work?
 
         batcher.Text(Font, Text, Offset, Color);
     }

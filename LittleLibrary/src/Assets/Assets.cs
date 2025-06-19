@@ -42,10 +42,12 @@ public class Assets {
         return Shaders["error"];
     }
 
-    //! FIXME (Alex): Animations not re-implemented
-    // readonly Dictionary<string, AnimationData> Animations = [];
-    // public AnimationData GetAnimation(string name) => Animations.TryGetValue(name, out AnimationData? output) ? output : Animations["error"];
-
+    readonly Dictionary<string, AnimationData> Animations = [];
+    public AnimationData GetAnimation(string name) {
+        if (Animations.TryGetValue(name, out AnimationData? output)) { return output; }
+        Console.WriteLine($"ASSETS: Failed to find animation {name}, returning default");
+        return Animations["error"];
+    }
 
     readonly Dictionary<string, Sound> Sounds = [];
     public Sound GetSound(string name) {
@@ -198,32 +200,31 @@ public class Assets {
 
         // Animation Data
         {
-            //! FIXME (Alex): Rework animations
-            //     Animations.Add("error", new([Point2.Zero], Point2.One));
-            //     string path = Path.Join(config.RootFolder, config.AnimationConfig);
-            //     if (Path.Exists(path)) {
-            //         AnimationConfig? animationConfig = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AnimationConfig);
-            //         if (config != null) {
-            //             foreach (AnimationConfigEntry entry in config.AnimationConfigs) {
-            //                 if (entry.Frames.Length == 0) {
-            //                     Animations.Add(entry.Name, new(entry.HorizontalFrames, entry.VerticalFrames, new(entry.FrameWidth, entry.FrameHeight)) {
-            //                         DefaultFrametime = entry.DefaultFrameTime,
-            //                         DefaultLooping = entry.DefaultLooping,
-            //                         DefaultPositionOffset = new(entry.DefaultOffset.X, entry.DefaultOffset.Y),
-            //                         DefaultStartDelay = entry.DefaultStartDelay
-            //                     });
-            //                 }
-            //                 else {
-            //                     Animations.Add(entry.Name, new([.. entry.Frames.Select(e => new Point2(e.X, e.Y))], new(entry.FrameWidth, entry.FrameHeight)) {
-            //                         DefaultFrametime = entry.DefaultFrameTime,
-            //                         DefaultLooping = entry.DefaultLooping,
-            //                         DefaultPositionOffset = new(entry.DefaultOffset.X, entry.DefaultOffset.Y),
-            //                         DefaultStartDelay = entry.DefaultStartDelay
-            //                     });
-            //                 }
-            //             }
-            //         }
-            //     }
+            // Create fallback animation
+            Animations.Add("error", new(this));
+
+            // Load all animations and groups from directory
+            string animationPath = Path.Join(config.RootFolder, config.AnimationFolder);
+            if (Directory.Exists(animationPath)) {
+                // Load single animations
+                foreach (string file in Directory.EnumerateFiles(animationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationExtension))) {
+                    string name = GetAssetName(animationPath, file);
+                    AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationConfig);
+                    if (data != null) {
+                        Animations.Add(name, new(data, this));
+                    }
+                }
+
+                // Load animation group files
+                foreach (string file in Directory.EnumerateFiles(animationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationGroupExtension))) {
+                    AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationGroupConfig);
+                    if (data != null) {
+                        foreach (AnimationConfigEntry entry in data.Entries) {
+                            Animations.Add(entry.Name, new(entry.Animation, this));
+                        }
+                    }
+                }
+            }
         }
     }
 

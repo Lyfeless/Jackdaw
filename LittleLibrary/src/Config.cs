@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace LittleLib;
@@ -64,7 +63,12 @@ public struct LittleGameContentConfig() {
     [JsonPropertyName("shaderConfig")]
     public string ShaderConfig = "Shaders/config.json";
 
-    //! FIXME (Alex): Maybe animations should be split into seperate files instead? Would that be easier to read?
-    [JsonPropertyName("animationConfig")]
-    public string AnimationConfig = "Animations/config.json";
+    [JsonPropertyName("animationFolder")]
+    public string AnimationFolder = "Animations";
+
+    [JsonPropertyName("animationExtension")]
+    public string AnimationExtension = ".llanim";
+
+    [JsonPropertyName("animationGroupExtension")]
+    public string AnimationGroupExtension = ".llganim";
 }

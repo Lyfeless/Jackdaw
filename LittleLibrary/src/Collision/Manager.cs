@@ -3,24 +3,15 @@ using System.Numerics;
 namespace LittleLib;
 
 public class CollisionManager {
-    record struct ParsedCollider(CollisionDetectorComponent Component, Collider Collider);
+    record struct ParsedCollider(CollisionComponent Component, Collider Collider);
 
-    readonly List<CollisionDetectorComponent> Colliders = [];
-    readonly List<CollisionResolverComponent> Resolvers = [];
+    readonly List<CollisionComponent> Colliders = [];
 
-    public void Add(CollisionResolverComponent resolver) {
-        Resolvers.Add(resolver);
-    }
-
-    public void Remove(CollisionResolverComponent resolver) {
-        Resolvers.Remove(resolver);
-    }
-
-    public void Add(CollisionDetectorComponent collider) {
+    public void Add(CollisionComponent collider) {
         Colliders.Add(collider);
     }
 
-    public void Remove(CollisionDetectorComponent collider) {
+    public void Remove(CollisionComponent collider) {
         Colliders.Remove(collider);
     }
 
@@ -30,7 +21,7 @@ public class CollisionManager {
         ParsedCollider[] parsedColliders = [.. Colliders.Select(e => new ParsedCollider(e, e.Collider.Offset(e.Actor.GlobalPosition)))];
 
         //! FIXME (Alex): Store collisions from last tick to only clear ones that are needed
-        foreach (CollisionDetectorComponent collider in Colliders) {
+        foreach (CollisionComponent collider in Colliders) {
             collider.Collisions.Clear();
         }
 
@@ -41,15 +32,20 @@ public class CollisionManager {
                 ParsedCollider colliderA = parsedColliders[a];
                 ParsedCollider colliderB = parsedColliders[b];
 
+                bool tagMatchA = colliderA.Component.Mask.Any(colliderB.Component.Tags);
+                bool tagMatchB = colliderB.Component.Mask.Any(colliderA.Component.Tags);
+
                 if (
-                    // First check collider bounds
+                    // Ensure either collider has matching tags
+                    (tagMatchA || tagMatchB) &&
+                    // Check collider bounds
                     colliderA.Collider.Bounds.Overlaps(colliderB.Collider.Bounds) &&
-                    // Then do more precise check if there's a match
+                    // Do more precise check if there's a match
                     colliderA.Collider.Overlaps(colliderB.Collider, out Vector2 pushout)
                 ) {
-                    //! FIXME (Alex): Probably not how this'll be handled in the end
-                    colliderA.Component.Collisions.Add(new(colliderB.Component, pushout));
-                    colliderB.Component.Collisions.Add(new(colliderA.Component, -pushout));
+                    //! FIXME (Alex): Likely not the data that will be stored on the entity in the end
+                    if (tagMatchA) { colliderA.Component.Collisions.Add(new(colliderB.Component, pushout)); }
+                    if (tagMatchB) { colliderB.Component.Collisions.Add(new(colliderA.Component, -pushout)); }
                 }
             }
         }
@@ -64,5 +60,8 @@ public class CollisionManager {
                 member of the collision detector. when a collision occurs, store both locally if a
                 resolver exists for both and handle all stored resolves afterwards?
         */
+        //! FIXME (Alex): How should resolution between object with one-directional matching tags work?
+        //      Does the ground need to have player tags? Or should every physics resolve be handled individually?
+        //      Or should it only resolve collisions with a tag match in both directions
     }
 }

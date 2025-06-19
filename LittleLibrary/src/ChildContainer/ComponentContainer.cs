@@ -26,6 +26,7 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component>() {
         if (Actor.InTree) {
             child.EnterTree();
             //! FIXME (Alex): Redundant with actor check, does that matter?
+            //      I already don't remember what this means
             if (Actor.Parent.IsValid && !child.AddedToTree) {
                 child.EnterTreeFirst();
                 child.AddedToTree = true;

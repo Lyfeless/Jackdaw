@@ -5,7 +5,7 @@ namespace LittleLib;
 
 public class TileGridComponent(LittleGame game, Vector2 position, Point2 gridSize, Vector2 tileSize) : Component(game) {
     Vector2 Position = position;
-    CollisionDetectorComponent Collider = new(game, new GridCollider(position, gridSize, tileSize));
+    CollisionComponent Collider = new(game, new GridCollider(position, gridSize, tileSize));
     GridRendererComponent Renderer = new(game, position, gridSize, tileSize);
 
     Vector2 oldPosition = position;

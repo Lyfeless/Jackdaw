@@ -5,7 +5,7 @@ namespace LittleLib;
 
 public class Actor {
     public static Actor Empty(LittleGame game) => new(game);
-    public static Actor Invalid = new(null) { IsValid = false };
+    public readonly static Actor Invalid = new(null) { IsValid = false };
 
     public LittleGame Game;
 
@@ -16,23 +16,17 @@ public class Actor {
     public bool IsValid {
         get => isValid;
         //! FIXME (Alex): Stop actor from being re-validated, is this smart?
-        protected set {
-            if (!value) { isValid = value; }
-        }
+        protected set { if (!value) { isValid = false; } }
     }
 
     public ComponentContainer Components;
 
     public RenderablePosition Position = new();
-    //! FIXME (Alex): Only gives precies position because I can't image this will be rendered, is that a bad assumption?
+    //! FIXME (Alex): Only gives precise position because I can't image this will be rendered, is that a bad assumption?
     public Vector2 GlobalPosition {
-        get {
-            if (Parent.IsValid) {
-                return Position.Precise + Parent.GlobalPosition;
-            }
-
-            return Position.Precise;
-        }
+        get => Parent.IsValid
+            ? Position.Precise + Parent.GlobalPosition
+            : Position.Precise;
     }
     //! FIXME (Alex): Need utils for converting positions between local and global
 
@@ -46,8 +40,12 @@ public class Actor {
     public bool InTree {
         get => ParentMatches(Game.Root);
     }
-    //! FIXME (Alex): Should this have reset protection like IsValid?
-    public bool AddedToTree = false;
+
+    public bool addedToTree = false;
+    public bool AddedToTree {
+        get => addedToTree;
+        protected set { if (value) { addedToTree = true; } }
+    }
 
     public Actor(LittleGame game) {
         Game = game;
@@ -65,7 +63,7 @@ public class Actor {
 
         if (Ticking) {
             foreach (Component component in Components.Elements) {
-                component.Update();
+                if (component.Ticking) { component.Update(); }
             }
         }
 
@@ -84,6 +82,7 @@ public class Actor {
     }
 
     //! FIXME (Alex): batcher maybe doesnt need to be passed? They already have access to game
+    //      Actually, actor should store current batcher and other batcher effects to allow for components to control rendering of others
     public void Render(Batcher batcher) {
         batcher.PushMatrix(Position.Rounded);
 
@@ -92,7 +91,7 @@ public class Actor {
 
         if (Visible) {
             foreach (Component component in Components.Elements) {
-                component.Render(batcher);
+                if (component.Visible) { component.Render(batcher); }
             }
         }
 
@@ -134,9 +133,7 @@ public class Actor {
         Children.QueueEvents = false;
     }
 
-    public void EnterTreeFirst() {
-        //! FIXME (Alex): Nothing to do here?
-    }
+    public void EnterTreeFirst() { }
 
     public void ExitTree() {
         Components.QueueEvents = true;

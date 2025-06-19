@@ -1,7 +1,6 @@
 namespace LittleLib;
 
 public class Timer {
-    //! FIXME (Alex): Needs logic for looping
     LittleGame Game;
 
     readonly string TimeTracker;
@@ -10,17 +9,26 @@ public class Timer {
     public readonly float StartDelay;
 
     double StartTime;
+    bool Looping;
 
-    public Timer(LittleGame game, float duration, string? timeTracker = null, bool startFinished = false, float startDelay = 0) {
+    public Timer(LittleGame game, float duration, string? timeTracker = null, bool startFinished = false, float startDelay = 0, bool looping = false) {
         Game = game;
         TimeTracker = timeTracker ?? string.Empty;
         Duration = duration;
         StartDelay = startDelay;
         StartTime = Milliseconds;
+        Looping = looping;
         if (startFinished) { Stop(); }
     }
 
-    double Milliseconds => Game.Timers.GetTrackedTime(TimeTracker).TotalMilliseconds;
+    double Milliseconds {
+        get {
+            double millis = Game.Timers.GetTrackedTime(TimeTracker).TotalMilliseconds;
+            //! FIXME (Alex): Untested, no clue if this works
+            if (Looping) { millis %= Duration; }
+            return millis;
+        }
+    }
 
     public double ElapsedTime => Milliseconds - StartTime - StartDelay;
     public double ElapsedTimeClamped => Math.Clamp(ElapsedTime, 0, Duration);

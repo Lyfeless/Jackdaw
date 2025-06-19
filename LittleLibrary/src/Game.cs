@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Foster.Framework;
+using Foster.Audio;
 
 namespace LittleLib;
 
@@ -7,7 +8,6 @@ public class LittleGame : App {
     public Assets Assets;
     public Controls Controls;
     public TimeManager Timers;
-    public AudioManager Audio;
     public CollisionManager Collision;
     public EventBus Events;
 
@@ -49,7 +49,6 @@ public class LittleGame : App {
         Assets = new(GraphicsDevice, config.Content);
         Controls = new(Input);
         Timers = new(this);
-        Audio = new(this);
         Collision = new();
         Events = new();
 
@@ -71,7 +70,9 @@ public class LittleGame : App {
         root = Actor.Invalid;
     }
 
-    protected override void Startup() { }
+    protected override void Startup() {
+        Audio.Startup();
+    }
 
     protected override void Shutdown() {
         Audio.Shutdown();

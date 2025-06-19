@@ -2,13 +2,17 @@ using System.Numerics;
 
 namespace LittleLib;
 
-public class CollisionDetectorComponent(LittleGame game, Collider collider) : Component(game) {
+public class CollisionComponent(LittleGame game, Collider collider) : Component(game) {
+    public record struct CollisionInfo(CollisionComponent Other, Vector2 Pushout);
+
     public Collider Collider = collider;
 
-    public TagContainer Tag = new();
+    public CollisionResolver? Resolver;
+    public VelocityComponent? Velocity;
+
+    public TagContainer Tags = new();
     public TagContainer Mask = new();
 
-    public record struct CollisionInfo(CollisionDetectorComponent Other, Vector2 Pushout);
     public readonly List<CollisionInfo> Collisions = [];
     public bool Collided => Collisions.Count > 0;
 
@@ -19,4 +23,9 @@ public class CollisionDetectorComponent(LittleGame game, Collider collider) : Co
     public override void ExitTree() {
         Game.Collision.Remove(this);
     }
+}
+
+public struct CollisionResolver() {
+    public float Mass = 100;
+    public float PushoutPercent = 1;
 }

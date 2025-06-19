@@ -1,6 +1,27 @@
 namespace LittleLib;
 
 public class SaveDataV1(string savePath) : SaveData(savePath) {
+    /*
+        Layout:
+            int32: Version (already read if skipVersion is true)
+            int32: String Count
+            for String Count value:
+                string: String Entry Key
+                string: String Entry Value
+            int32: Float Count
+            for Float Count value:
+                string: Float Entry Key
+                float: Float Entry Value
+            int32: Int Count
+            for Int Count value:
+                string: Int Entry Key
+                int32: Int Entry Value
+            int32: Bool Count
+            for Bool Count value:
+                string: Bool Entry Key
+                bool: Bool Entry Value
+    */
+
     public SaveDataV1(string savePath, BinaryReader reader) : this(savePath) {
         Load(reader, true);
     }
@@ -14,9 +35,9 @@ public class SaveDataV1(string savePath) : SaveData(savePath) {
         Load(reader);
     }
 
-    void Load(BinaryReader reader, bool skippedVersion = false) {
+    void Load(BinaryReader reader, bool skipVersion = false) {
         // Version
-        if (!skippedVersion) { reader.ReadInt32(); }
+        if (!skipVersion) { reader.ReadInt32(); }
 
         // Strings
         int stringCount = reader.ReadInt32();

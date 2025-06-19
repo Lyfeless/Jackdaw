@@ -3,7 +3,26 @@ using System.Numerics;
 namespace LittleLib;
 
 public class VelocityComponent(LittleGame game) : Component(game) {
-    Vector2 Value;
+    public Vector2 Value { get; private set; }
+    public Vector2 OldValue { get; private set; }
+    public Vector2 Delta { get; private set; }
 
-    //! FIXME (Alex): Idk
+    public VelocityDampener? DampenerX;
+    public VelocityDampener? DampenerY;
+
+    public override void Update() {
+        Delta = Value;
+        Actor.Position += Value;
+        if (DampenerX != null || DampenerY != null) {
+            Value = new(DampenerX?.Apply(Value.X, Delta.X) ?? Value.X, DampenerY?.Apply(Value.Y, Delta.X) ?? Value.Y);
+        }
+    }
+
+    public void Set(Vector2 value) {
+        Value = value;
+    }
+
+    public void Change(Vector2 amount) {
+        Value += amount;
+    }
 }

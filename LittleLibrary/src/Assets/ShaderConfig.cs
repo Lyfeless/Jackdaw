@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace LittleLib;
 
-public class ShaderConfig {
+internal class ShaderConfig {
     [JsonPropertyName("entries")]
     public ShaderConfigEntry[] ShaderConfigs { get; set; } = [];
 }
 
-public class ShaderConfigEntry {
+internal class ShaderConfigEntry {
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
@@ -18,7 +18,7 @@ public class ShaderConfigEntry {
     public ShaderConfigEntryStage Fragment { get; set; } = new();
 }
 
-public class ShaderConfigEntryStage {
+internal class ShaderConfigEntryStage {
     [JsonPropertyName("path")]
     public string Path { get; set; } = string.Empty;
 

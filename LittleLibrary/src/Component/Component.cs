@@ -11,9 +11,20 @@ public abstract class Component {
     public ObjectIdentifier<Component> Match;
 
     //! FIXME (Alex): Ticking and Rendering disablable values
+    public bool Ticking = true;
+    public bool Visible = true;
 
-    public bool AddedToActor = false;
-    public bool AddedToTree = false;
+    public bool addedToActor = false;
+    public bool AddedToActor {
+        get => addedToActor;
+        set { if (value) { addedToActor = true; } }
+    }
+
+    public bool addedToTree = false;
+    public bool AddedToTree {
+        get => addedToTree;
+        set { if (value) { addedToTree = true; } }
+    }
 
     public Component(LittleGame game) {
         Game = game;
