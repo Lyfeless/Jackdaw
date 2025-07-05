@@ -4,9 +4,11 @@ using Foster.Framework;
 namespace LittleLib;
 
 public abstract class Collider {
+    public abstract bool Multi { get; }
+    public abstract Collider[] GetSubColliders(Collider collider, Vector2 position);
+
     public abstract Rect Bounds { get; }
+    public abstract Vector2 Center { get; }
 
-    public abstract bool Overlaps(Collider with, out Vector2 pushout);
-
-    public abstract Collider Offset(Vector2 amount);
+    public abstract Vector2 Support(Vector2 position, Vector2 direction);
 }

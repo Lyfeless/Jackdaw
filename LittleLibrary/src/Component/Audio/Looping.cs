@@ -2,7 +2,7 @@ using Foster.Audio;
 
 namespace LittleLib;
 
-public class LoopingSoundPlayerComponent(LittleGame game, Sound sound, SoundGroup? group = null) : SoundPlayerComponent(game, sound, group) {
+public class LoopingSoundPlayerComponent(LittleGame game, Sound sound, string? bus = null) : SoundPlayerComponent(game, sound, bus) {
     public float? LoopStart;
     public float? LoopEnd;
 

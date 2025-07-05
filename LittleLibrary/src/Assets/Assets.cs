@@ -211,7 +211,9 @@ public class Assets {
                     string name = GetAssetName(animationPath, file);
                     AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationConfig);
                     if (data != null) {
-                        Animations.Add(name, new(data, this));
+                        AnimationData? anim = GetAnimationData(data);
+                        if (anim != null) { Animations.Add(name, (AnimationData)anim); }
+
                     }
                 }
 
@@ -220,12 +222,47 @@ public class Assets {
                     AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationGroupConfig);
                     if (data != null) {
                         foreach (AnimationConfigEntry entry in data.Entries) {
-                            Animations.Add(entry.Name, new(entry.Animation, this));
+                            AnimationData? anim = GetAnimationData(entry.Animation);
+                            if (anim != null) { Animations.Add(entry.Name, (AnimationData)anim); }
                         }
                     }
                 }
             }
         }
+    }
+
+    AnimationData? GetAnimationData(AnimationConfig config) {
+        if (config.HorizontalFrames != 0 && config.VerticalFrames != 0) {
+            return new(
+                texture: GetTexture(config.Textures[0]),
+                horizontalFrames: config.HorizontalFrames,
+                verticalFrames: config.VerticalFrames,
+                frameTime: config.FrameTime,
+                startDelay: config.StartDelay,
+                looping: config.Looping,
+                positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
+            );
+        }
+        else if (config.Frames.Length > 0) {
+            return new(
+                frames: [..config.Frames.Select(frame => new AnimationFrame(
+                    texture: GetTexture(config.Textures[frame.Texture]),
+                    duration: frame.Duration,
+                    positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
+                    clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null
+                ))],
+                startDelay: config.StartDelay,
+                looping: config.Looping,
+                positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
+            );
+        }
+
+        return null;
+    }
+
+    AnimationData? GetAnimationData(Aseprite aseprite) {
+        //! FIXME (Alex): Aseprite animations support
+        return null;
     }
 
     /// <summary>

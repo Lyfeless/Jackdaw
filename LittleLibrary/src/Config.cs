@@ -5,12 +5,18 @@ namespace LittleLib;
 public struct LittleGameConfig() {
     [JsonPropertyName("applicationName")]
     public string ApplicationName = "LittleGame";
+
     [JsonPropertyName("windowTitle")]
     public string WindowTitle = "Little Game";
+
     [JsonPropertyName("window")]
     public LittleGameWindowConfig Window = new();
+
     [JsonPropertyName("content")]
     public LittleGameContentConfig Content = new();
+
+    [JsonPropertyName("audio")]
+    public LittleGameAudioConfig Audio = new();
 }
 
 public struct LittleGameWindowConfig() {
@@ -71,4 +77,23 @@ public struct LittleGameContentConfig() {
 
     [JsonPropertyName("animationGroupExtension")]
     public string AnimationGroupExtension = ".llganim";
+}
+
+public struct LittleGameAudioConfig() {
+    [JsonPropertyName("buses")]
+    public LittleGameAudioBusConfig[] Buses = [];
+
+    [JsonPropertyName("defaultBus")]
+    public string DefaultBus = string.Empty;
+}
+
+public struct LittleGameAudioBusConfig() {
+    [JsonPropertyName("name")]
+    public string Name = string.Empty;
+
+    [JsonPropertyName("parent")]
+    public string Parent = string.Empty;
+
+    [JsonPropertyName("defaultVolume")]
+    public float DefaultVolume = 0.5f;
 }

@@ -16,29 +16,16 @@ public class CircleCollider(Circle circle) : Collider {
     Rect bounds = GetBounds(circle);
     public override Rect Bounds => bounds;
 
-    public override bool Overlaps(Collider with, out Vector2 pushout) {
-        if (with is ConvexCollider withConvex) {
-            return withConvex.Shape.Overlaps(Circle, out pushout);
-        }
+    public override Vector2 Center => circle.Position;
 
-        if (with is CircleCollider withCircle) {
-            return Circle.Overlaps(withCircle.Circle, out pushout);
-        }
-
-        if (with is GridCollider withGrid) {
-            return withGrid.Overlaps(this, out pushout);
-        }
-
-        Console.WriteLine($"Collider: Undefined collision interaction between colliders {GetType()} and {with.GetType()}");
-        pushout = Vector2.Zero;
-        return false;
-    }
+    public override bool Multi => false;
+    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => [this];
 
     static Rect GetBounds(Circle circle) {
         return new BoundsBuilder(new Rect(-circle.Radius, -circle.Radius, circle.Radius * 2, circle.Radius * 2)).Rect;
     }
 
-    public override Collider Offset(Vector2 amount) {
-        return new CircleCollider(new(Circle.Position + amount, Circle.Radius));
+    public override Vector2 Support(Vector2 position, Vector2 direction) {
+        return position + Circle.Position + (Circle.Radius * direction.Normalized());
     }
 }

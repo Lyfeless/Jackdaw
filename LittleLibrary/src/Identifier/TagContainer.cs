@@ -52,7 +52,7 @@ public struct TagContainer() {
     static long EnumToTags(params Enum[] values) {
         long tags = 0;
         for (int i = 0; i < values.Length; ++i) {
-            tags &= 1 >> (int)(object)values[i];
+            tags |= (long)1 << (int)(object)values[i];
         }
         return tags;
     }
@@ -60,7 +60,7 @@ public struct TagContainer() {
     static long IntToTags(params int[] values) {
         long tags = 0;
         for (int i = 0; i < values.Length; ++i) {
-            tags &= 1 >> values[i];
+            tags |= (long)1 << values[i];
         }
         return tags;
     }

@@ -15,25 +15,10 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
 
     Rect bounds = GetBounds(shape);
     public override Rect Bounds => bounds;
+    public override Vector2 Center => bounds.Center;
 
-    //! FIXME (Alex): Exit will have issues if they make it far enough into an object, closest exit point will be on the other side
-    public override bool Overlaps(Collider with, out Vector2 pushout) {
-        if (with is ConvexCollider withConvex) {
-            return shape.Overlaps(withConvex.Shape, out pushout);
-        }
-
-        if (with is CircleCollider withCircle) {
-            return shape.Overlaps(withCircle.Circle, out pushout);
-        }
-
-        if (with is GridCollider withGrid) {
-            return withGrid.Overlaps(this, out pushout);
-        }
-
-        Console.WriteLine($"Collider: Undefined collision interaction between colliders {GetType()} and {with.GetType()}");
-        pushout = Vector2.Zero;
-        return false;
-    }
+    public override bool Multi => false;
+    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => [this];
 
     static Rect GetBounds(IConvexShape shape) {
         BoundsBuilder builder = new();
@@ -41,5 +26,21 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
             builder.Add(shape.GetPoint(i));
         }
         return builder.Rect;
+    }
+
+    public override Vector2 Support(Vector2 position, Vector2 direction) {
+        float furthestDistance = float.NegativeInfinity;
+        Vector2 furthestPoint = Vector2.Zero;
+
+        for (int i = 0; i < Shape.Points; ++i) {
+            Vector2 comparePoint = Shape.GetPoint(i) + position;
+            float compareDistance = Vector2.Dot(comparePoint, direction);
+            if (compareDistance > furthestDistance) {
+                furthestDistance = compareDistance;
+                furthestPoint = comparePoint;
+            }
+        }
+
+        return furthestPoint;
     }
 }

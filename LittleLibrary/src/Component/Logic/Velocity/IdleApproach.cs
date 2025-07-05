@@ -2,7 +2,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class DampenerIdleApproach(float speed, float target) : VeloctyDampener() {
+public class DampenerIdleApproach(float speed, float target) : VelocityDampener() {
     readonly float Speed = speed;
     readonly float Target = target;
 

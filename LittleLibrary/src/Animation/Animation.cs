@@ -1,3 +1,5 @@
+using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using Foster.Framework;
 
 namespace LittleLib;
@@ -9,6 +11,58 @@ public class AnimationData {
     public readonly bool Looping;
     public readonly float StartDelay;
     public readonly Point2 PositionOffset;
+
+    public AnimationData(
+        Assets assets,
+        string texture,
+        int horizontalFrames,
+        int verticalFrames,
+        float frameTime,
+        int maxFrames = 0,
+        float startDelay = 0,
+        bool looping = false,
+        Point2? positionOffset = null
+    ) : this(assets.GetTexture(texture), horizontalFrames, verticalFrames, frameTime, maxFrames, startDelay, looping, positionOffset) { }
+
+    public AnimationData(
+        Subtexture texture,
+        int horizontalFrames,
+        int verticalFrames,
+        float frameTime,
+        int maxFrames = 0,
+        float startDelay = 0,
+        bool looping = false,
+        Point2? positionOffset = null
+    ) : this(startDelay, looping, positionOffset) {
+        int frameCount = Math.Min(horizontalFrames * verticalFrames, maxFrames);
+        Frames = new AnimationFrame[frameCount];
+        int width = (int)(texture.Width / horizontalFrames);
+        int height = (int)(texture.Height / verticalFrames);
+        Duration = frameCount * frameTime;
+        for (int x = 0; x < horizontalFrames; ++x) {
+            for (int y = 0; y < verticalFrames; ++y) {
+                int index = (y * horizontalFrames) + x;
+                if (index >= frameCount) { return; }
+                Frames[index] = new(texture, x * width, y * height, width, height, frameTime);
+            }
+        }
+    }
+
+    public AnimationData(
+        AnimationFrame[] frames,
+        float startDelay = 0,
+        bool looping = false,
+        Point2? positionOffset = null
+    ) : this(startDelay, looping, positionOffset) {
+        Frames = frames;
+        Duration = frames.Sum(e => e.Duration);
+    }
+
+    AnimationData(float startDelay = 0, bool looping = false, Point2? positionOffset = null) {
+        Looping = looping;
+        StartDelay = startDelay;
+        PositionOffset = positionOffset ?? Point2.Zero;
+    }
 
     //! FIXME (Alex): This can possibly be optimized with some kind of lookup list/tree
     public AnimationFrame GetFrame(float time) {
@@ -22,39 +76,39 @@ public class AnimationData {
         return Frames[index];
     }
 
-    public AnimationData(AnimationConfig data, Assets assets) {
-        Subtexture[] textures = [.. data.Textures.Select(assets.GetTexture)];
+    // public AnimationData(AnimationConfig data, Assets assets) {
+    //     Subtexture[] textures = [.. data.Textures.Select(assets.GetTexture)];
 
-        Looping = data.Looping;
-        StartDelay = data.StartDelay;
-        PositionOffset = new(data.PositionOffsetX, data.PositionOffsetY);
+    //     Looping = data.Looping;
+    //     StartDelay = data.StartDelay;
+    //     PositionOffset = new(data.PositionOffsetX, data.PositionOffsetY);
 
-        if (data.HorizontalFrames > 0 && data.VerticalFrames >= 0) {
-            //! FIXME (Alex): This will crash if textures is empty, do we care?
-            Subtexture texture = textures[0];
-            int width = (int)(texture.Width / data.HorizontalFrames);
-            int height = (int)(texture.Height / data.VerticalFrames);
-            Frames = new AnimationFrame[data.HorizontalFrames * data.VerticalFrames];
-            for (int x = 0; x < data.HorizontalFrames; ++x) {
-                for (int y = 0; y < data.VerticalFrames; ++y) {
-                    Frames[(y * data.HorizontalFrames) + x] = new AnimationFrame(
-                        texture: texture,
-                        x: x * width,
-                        y: y * height,
-                        width: width,
-                        height: height,
-                        duration: data.FrameTime
-                    );
-                }
-            }
+    //     if (data.HorizontalFrames > 0 && data.VerticalFrames >= 0) {
+    //         //! FIXME (Alex): This will crash if textures is empty, do we care?
+    //         Subtexture texture = textures[0];
+    //         int width = (int)(texture.Width / data.HorizontalFrames);
+    //         int height = (int)(texture.Height / data.VerticalFrames);
+    //         Frames = new AnimationFrame[data.HorizontalFrames * data.VerticalFrames];
+    //         for (int x = 0; x < data.HorizontalFrames; ++x) {
+    //             for (int y = 0; y < data.VerticalFrames; ++y) {
+    //                 Frames[(y * data.HorizontalFrames) + x] = new AnimationFrame(
+    //                     texture: texture,
+    //                     x: x * width,
+    //                     y: y * height,
+    //                     width: width,
+    //                     height: height,
+    //                     duration: data.FrameTime
+    //                 );
+    //             }
+    //         }
 
-            Duration = data.FrameTime * Frames.Length;
-        }
-        else {
-            Frames = [.. data.Frames.Select(e => new AnimationFrame(textures[e.Texture], e))];
-            Duration = Frames.Sum(e => e.Duration);
-        }
-    }
+    //         Duration = data.FrameTime * Frames.Length;
+    //     }
+    //     else {
+    //         Frames = [.. data.Frames.Select(e => new AnimationFrame(textures[e.Texture], e))];
+    //         Duration = Frames.Sum(e => e.Duration);
+    //     }
+    // }
 
     // Only used for error fallback
     public AnimationData(Assets assets) {

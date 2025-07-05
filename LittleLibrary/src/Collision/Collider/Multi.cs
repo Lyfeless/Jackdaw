@@ -6,25 +6,13 @@ namespace LittleLib;
 public class MultiCollider(params Collider[] colliders) : Collider {
     readonly Collider[] Colliders = colliders;
 
+    public override bool Multi => true;
+    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => Colliders;
+
     public override Rect Bounds { get; } = new BoundsBuilder(colliders.Select(e => e.Bounds).ToArray()).Rect;
+    public override Vector2 Center => throw new NotImplementedException();
 
-    public override bool Overlaps(Collider with, out Vector2 pushout) {
-        //! FIXME (Alex): Does this make sense? Does this work? I haven't tested it
-        pushout = Vector2.Zero;
-        bool collide = false;
-        foreach (Collider collider in Colliders) {
-            if (collider.Overlaps(with, out Vector2 compare)) {
-                if (compare.LengthSquared() > pushout.LengthSquared()) {
-                    pushout = compare;
-                    collide = true;
-                }
-            }
-        }
-
-        return collide;
-    }
-
-    public override Collider Offset(Vector2 amount) {
-        return new MultiCollider([.. Colliders.Select(e => e.Offset(amount))]);
+    public override Vector2 Support(Vector2 position, Vector2 direction) {
+        throw new NotImplementedException();
     }
 }

@@ -5,12 +5,9 @@ namespace LittleLib;
 
 //! FIXME (Alex): Should probably store position?
 //! FIXME (Alex): Or should position/size be left out of this entirely?
-public class Grid<T>(Point2 gridSize, Vector2 tileSize) {
-    public readonly Vector2 TileSize = tileSize;
-    public readonly Point2 GridSize = gridSize;
+public class Grid<T>(Point2 gridSize) {
+    public readonly Point2 Size = gridSize;
     readonly T?[,] Tiles = new T?[gridSize.X, gridSize.Y];
-
-    public Vector2 Size { get; } = tileSize * gridSize;
 
     public T? Get(int tileX, int tileY) => Get(new(tileX, tileY));
     public T? Get(Point2 tile) {
@@ -26,7 +23,7 @@ public class Grid<T>(Point2 gridSize, Vector2 tileSize) {
     }
 
     bool Contains(Point2 tile) {
-        return tile.X > 0 && tile.Y > 0 && tile.X < GridSize.X && tile.Y < GridSize.Y;
+        return tile.X > 0 && tile.Y > 0 && tile.X < Size.X && tile.Y < Size.Y;
     }
 
     //! FIXME (Alex): Needs extra utility functions

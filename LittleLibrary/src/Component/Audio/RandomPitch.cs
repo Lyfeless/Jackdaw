@@ -2,7 +2,7 @@ using Foster.Audio;
 
 namespace LittleLib;
 
-public class RandomPitchSoundPlayerComponent(LittleGame game, Sound sound, float pitchRange, SoundGroup? group = null) : SoundPlayerComponent(game, sound, group) {
+public class RandomPitchSoundPlayerComponent(LittleGame game, Sound sound, float pitchRange, string? bus = null) : SoundPlayerComponent(game, sound, bus) {
     public float PitchRange = pitchRange;
 
     public override void Play() {

@@ -13,8 +13,4 @@ public class ConvexPolygonCollider(ConvexPolygon polygon) : ConvexCollider(polyg
             triangle.GetPoint(2),
         ]
     }) { }
-
-    public override Collider Offset(Vector2 amount) {
-        return new ConvexPolygonCollider(ConvexPolygon.Transform((ConvexPolygon)Shape, Matrix3x2.CreateTranslation(amount)));
-    }
 }

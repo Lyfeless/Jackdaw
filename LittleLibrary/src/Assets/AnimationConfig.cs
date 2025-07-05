@@ -15,8 +15,7 @@ internal class AnimationConfigEntry {
     public AnimationConfig Animation = new();
 }
 
-//! FIXME (Alex): These should NOT be public, handle them somewhere before passing the DATA to animations
-public class AnimationConfig {
+internal class AnimationConfig {
     [JsonPropertyName("textures")]
     public string[] Textures = [];
 
@@ -30,6 +29,11 @@ public class AnimationConfig {
     // Used only if auto-clip is used
     [JsonPropertyName("frameTime")]
     public float FrameTime { get; set; } = 100;
+
+    // Frame count limit, used only if auto-clip is used
+    //      exists in case spritesheet has empty tiles at the end of the animation that need to be ignored
+    [JsonPropertyName("maxFrameCount")]
+    public int MaxFrameCount { get; set; } = 0;
 
     [JsonPropertyName("frames")]
     public AnimationConfigFrame[] Frames { get; set; } = [];
@@ -47,7 +51,7 @@ public class AnimationConfig {
     public int PositionOffsetY { get; set; } = 0;
 }
 
-public class AnimationConfigFrame {
+internal class AnimationConfigFrame {
     [JsonPropertyName("texture")]
     public int Texture { get; set; } = 0;
 

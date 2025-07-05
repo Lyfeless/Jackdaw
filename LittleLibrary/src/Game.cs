@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Foster.Framework;
-using Foster.Audio;
 
 namespace LittleLib;
 
@@ -10,6 +9,7 @@ public class LittleGame : App {
     public TimeManager Timers;
     public CollisionManager Collision;
     public EventBus Events;
+    public AudioManager Audio;
 
     public Rng Random = new(DateTime.Now.Millisecond);
 
@@ -51,6 +51,9 @@ public class LittleGame : App {
         Timers = new(this);
         Collision = new();
         Events = new();
+        Audio = new();
+        //! FIXME (Alex): TEMP
+        CollisionManager.Game = this;
 
         //! FIXME (Alex): YUCK
         switch (config.Window.Renderer) {
@@ -65,14 +68,17 @@ public class LittleGame : App {
                 break;
         }
 
+        foreach (LittleGameAudioBusConfig bus in config.Audio.Buses) {
+            Audio.AddBus(bus.Name, bus.Parent != string.Empty ? bus.Parent : null, bus.DefaultVolume);
+        }
+        if (config.Audio.DefaultBus != string.Empty) { Audio.SetDefaultBus(config.Audio.DefaultBus); }
+
         Batcher = new(GraphicsDevice);
 
         root = Actor.Invalid;
     }
 
-    protected override void Startup() {
-        Audio.Startup();
-    }
+    protected override void Startup() { }
 
     protected override void Shutdown() {
         Audio.Shutdown();
