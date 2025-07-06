@@ -221,7 +221,7 @@ public class CollisionManager {
         // Point C
         Vector2 AInv = -pointA;
         Vector2 AB = pointB + AInv;
-        direction = TripleProduct(AB, AInv, AB);
+        direction = CalcExtra.TripleProduct(AB, AInv, AB);
         Vector2 pointC = Support(colliderA, positionA, colliderB, positionB, direction);
         if (!PointCrossesOrigin(pointC, direction)) { return new(pointA, pointB, pointC, false); }
 
@@ -230,8 +230,8 @@ public class CollisionManager {
             Vector2 CInv = -pointC;
             Vector2 CB = pointB + CInv;
             Vector2 CA = pointA + CInv;
-            Vector2 perpCB = TripleProduct(CA, CB, CB);
-            Vector2 perpCA = TripleProduct(CB, CA, CA);
+            Vector2 perpCB = CalcExtra.TripleProduct(CA, CB, CB);
+            Vector2 perpCA = CalcExtra.TripleProduct(CB, CA, CA);
             if (Vector2.Dot(perpCB, CInv) > 0) {
                 pointA = pointB;
                 pointB = pointC;
@@ -331,7 +331,7 @@ public class CollisionManager {
         Vector2 pointA = Support(colliderA, positionA, colliderB, positionB, direction);
 
         // Point B
-        direction = TripleProduct(direction, -pointA, direction);
+        direction = CalcExtra.TripleProduct(direction, -pointA, direction);
         Vector2 pointB = Support(colliderA, positionA, colliderB, positionB, direction);
 
         // Fail intersection if the first 2 supports won't intersect with the velocity
@@ -346,18 +346,18 @@ public class CollisionManager {
         Vector2 farSupport = Support(colliderA, positionA, colliderB, positionB, velocityDifference);
         Vector2 scaledVelocity = velocityDifference.Normalized() * farSupport.Length();
         float velocityLength = velocityDifference.LengthSquared();
-        LineIntersection(Vector2.Zero, scaledVelocity, pointA, pointB, out Vector2 closestIntersection);
+        CalcExtra.LineSegmentIntersection(Vector2.Zero, scaledVelocity, pointA, pointB, out Vector2 closestIntersection);
         float closestDistance = closestIntersection.LengthSquared();
 
         for (int i = 0; i < ITERATION_LIMIT; ++i) {
             // Get new point C
             Vector2 line = pointB - pointA;
-            direction = -TripleProduct(line, pointA, line);
+            direction = -CalcExtra.TripleProduct(line, pointA, line);
             Vector2 pointC = Support(colliderA, positionA, colliderB, positionB, direction);
 
             // Find line segment intersections
-            bool intersectedAC = LineIntersection(pointA, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionAC);
-            bool intersectedBC = LineIntersection(pointB, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionBC);
+            bool intersectedAC = CalcExtra.LineSegmentIntersection(pointA, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionAC);
+            bool intersectedBC = CalcExtra.LineSegmentIntersection(pointB, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionBC);
             // Fail intersection if neither line collides
             //! FIXME (Alex): probably unneeded assuming the first fail check works correctly
             if (!intersectedAC && !intersectedBC) {
@@ -424,28 +424,6 @@ public class CollisionManager {
         float wind1 = (c.X - b.X) * (c.Y + b.Y);
         float wind2 = (a.X - c.X) * (a.Y + c.Y);
         return wind0 + wind1 + wind2 <= 0;
-    }
-
-    static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) {
-        Vector3 a3 = new(a.X, a.Y, 0);
-        Vector3 b3 = new(b.X, b.Y, 0);
-        Vector3 c3 = new(c.X, c.Y, 0);
-
-        Vector3 first = Vector3.Cross(a3, b3);
-        Vector3 second = Vector3.Cross(first, c3);
-
-        return new(second.X, second.Y);
-    }
-
-    static Vector2 LineMidpoint(Vector2 a, Vector2 b) {
-        return ((a - b) / 2) + b;
-    }
-
-    static bool LineIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, out Vector2 intersection) {
-        float t = (((a1.X - b1.X) * (b1.Y - b2.Y)) - ((a1.Y - b1.Y) * (b1.X - b2.X))) / (((a1.X - a2.X) * (b1.Y - b2.Y)) - ((a1.Y - a2.Y) * (b1.X - b2.X)));
-        float u = -((((a1.X - a2.X) * (a1.Y - b1.Y)) - ((a1.Y - a2.Y) * (a1.X - b1.X))) / (((a1.X - a2.X) * (b1.Y - b2.Y)) - ((a1.Y - a2.Y) * (b1.X - b2.X))));
-        intersection = new(a1.X + (t * (a2.X - a1.X)), a1.Y + (t * (a2.Y - a1.Y)));
-        return 0 <= t && t <= 1 && 0 <= u && u <= 1;
     }
 
     static bool IsRayFractionSmaller(Vector2 newFraction, Vector2 originalFraction) {
