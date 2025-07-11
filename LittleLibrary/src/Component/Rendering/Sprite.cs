@@ -20,8 +20,7 @@ public class SpriteComponent(LittleGame game, Sprite sprite, Vector2? offset = n
         : this(game, game.Assets.GetTexture(sprite), offset) { }
 
     public override void Render(Batcher batcher) {
-        //! FIXME (Alex): Need sprite bounds function to cull
-        // if(Game.Viewspace.Bounds.Contains(new Rect(Actor.GlobalPosition + Offset, Sprite.S)))
+        if (!Game.Viewspace.Bounds.Contains(Sprite.Bounds.Translate(Actor.GlobalPosition))) { return; }
 
         batcher.PushMatrix(Offset);
         Sprite.Render(batcher);

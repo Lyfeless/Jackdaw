@@ -12,12 +12,12 @@ internal class AnimationConfigEntry {
     public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("data")]
-    public AnimationConfig Animation = new();
+    public AnimationConfig Animation { get; set; } = new();
 }
 
 internal class AnimationConfig {
     [JsonPropertyName("textures")]
-    public string[] Textures = [];
+    public string[] Textures { get; set; } = [];
 
     // Automatically divide frames into clips of texture 0 if both of these properties are >0, otherwise read from frames
     [JsonPropertyName("horizontalFrames")]
@@ -42,7 +42,7 @@ internal class AnimationConfig {
     public float StartDelay { get; set; } = 0;
 
     [JsonPropertyName("looping")]
-    public bool Looping { get; set; } = false;
+    public bool Looping { get; set; } = true;
 
     [JsonPropertyName("positionOffsetX")]
     public int PositionOffsetX { get; set; } = 0;

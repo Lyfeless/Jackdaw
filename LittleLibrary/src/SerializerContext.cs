@@ -7,15 +7,13 @@ namespace LittleLib;
     ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
     PropertyNameCaseInsensitive = true
 )]
-//! FIXME (Alex): Disabled for now
-// [JsonSerializable(typeof(WorldSaveData))]
-// [JsonSerializable(typeof(LevelSaveData))]
 [JsonSerializable(typeof(LittleGameConfig))]
 [JsonSerializable(typeof(FontConfig))]
 [JsonSerializable(typeof(ShaderConfig))]
 [JsonSerializable(typeof(AnimationConfig))]
 [JsonSerializable(typeof(AnimationGroupConfig))]
 [JsonSerializable(typeof(SoundConfig))]
+[JsonSerializable(typeof(AsepriteConfig))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(float))]

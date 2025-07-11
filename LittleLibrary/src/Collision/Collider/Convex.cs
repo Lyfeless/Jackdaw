@@ -18,7 +18,7 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
     public override Vector2 Center => bounds.Center;
 
     public override bool Multi => false;
-    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => [this];
+    public override Collider[] GetSubColliders(Rect bounds) => [this];
 
     static Rect GetBounds(IConvexShape shape) {
         BoundsBuilder builder = new();

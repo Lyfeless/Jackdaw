@@ -3,7 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class RectangleCollider(Rect rect) : Collider() {
+public class RectangleCollider(Rect rect) : Collider {
     public Rect Rect = rect;
 
     public RectangleCollider(Vector2 size) : this(new Rect(Vector2.Zero, size)) { }
@@ -14,7 +14,7 @@ public class RectangleCollider(Rect rect) : Collider() {
     public override Vector2 Center => Rect.Center;
 
     public override bool Multi => false;
-    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => [this];
+    public override Collider[] GetSubColliders(Rect bounds) => [this];
 
     public override Vector2 Support(Vector2 position, Vector2 direction) {
         Vector2 halfRect = Rect.Size / 2;

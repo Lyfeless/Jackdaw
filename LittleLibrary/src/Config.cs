@@ -77,6 +77,8 @@ public struct LittleGameContentConfig() {
 
     [JsonPropertyName("animationGroupExtension")]
     public string AnimationGroupExtension = ".llganim";
+    [JsonPropertyName("asepriteConfigExtension")]
+    public string AsepriteConfigExtension = ".asedef";
 }
 
 public struct LittleGameAudioConfig() {

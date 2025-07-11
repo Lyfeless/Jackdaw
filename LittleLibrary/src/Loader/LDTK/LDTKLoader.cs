@@ -79,7 +79,7 @@ public class LDTKLoader {
     Subtexture GetTilesetTexture(TilesetSaveDefinition tileset) {
         string path = Path.Join(
                 //! FIXME (Alex): This is a bit jank, look into a better way to handle this
-                Path.GetDirectoryName(tileset.TexturePath.Remove(0, Game.Assets.Config.TextureFolder.Length + 1)),
+                Path.GetDirectoryName(tileset.TexturePath[(Game.Assets.Config.TextureFolder.Length + 1)..]),
                 Path.GetFileNameWithoutExtension(tileset.TexturePath)
             ).Replace("\\", "/");
 

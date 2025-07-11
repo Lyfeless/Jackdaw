@@ -3,9 +3,12 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+//! FIXME (Alex): Switch to interface so these can be structs?
 public abstract class Collider {
     public abstract bool Multi { get; }
-    public abstract Collider[] GetSubColliders(Collider collider, Vector2 position);
+
+    // Return all useful subcolliders for a given bound, local to collider
+    public abstract Collider[] GetSubColliders(Rect bounds);
 
     public abstract Rect Bounds { get; }
     public abstract Vector2 Center { get; }

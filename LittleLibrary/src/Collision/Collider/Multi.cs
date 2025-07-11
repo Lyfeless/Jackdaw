@@ -7,7 +7,7 @@ public class MultiCollider(params Collider[] colliders) : Collider {
     readonly Collider[] Colliders = colliders;
 
     public override bool Multi => true;
-    public override Collider[] GetSubColliders(Collider collider, Vector2 position) => Colliders;
+    public override Collider[] GetSubColliders(Rect bounds) => Colliders;
 
     public override Rect Bounds { get; } = new BoundsBuilder(colliders.Select(e => e.Bounds).ToArray()).Rect;
     public override Vector2 Center => throw new NotImplementedException();

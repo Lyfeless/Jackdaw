@@ -10,7 +10,6 @@ public abstract class Component {
 
     public ObjectIdentifier<Component> Match;
 
-    //! FIXME (Alex): Ticking and Rendering disablable values
     public bool Ticking = true;
     public bool Visible = true;
 

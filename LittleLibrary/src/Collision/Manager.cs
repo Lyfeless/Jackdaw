@@ -1,37 +1,51 @@
-using System.Linq.Expressions;
 using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
 public class CollisionManager {
+    #region Definitions
     const int ITERATION_LIMIT = 32;
     const float PUSHOUT_TOLERANCE = 0.0001f;
 
-    record struct ParsedCollider(CollisionComponent Component, Collider Collider);
-    record struct CollisionSimplexInfo(Vector2 A, Vector2 B, Vector2 C, bool Collided);
     record struct Edge(int Index, Vector2 Normal, float Distance);
-
-    //! FIXME (Alex): TEMP
-    public static LittleGame Game;
+    record struct CollisionSimplexInfo(Vector2 A, Vector2 B, Vector2 C, bool Collided);
+    public record struct SweptCollisionResult(Vector2 AdjustedVelocity, Vector2 SpeedFraction, CollisionComponent? Collision, bool Collided);
+    public record struct AllCollisionsResult(bool Collided, CollisionComponent[] Collisions);
+    public record struct SingleCollisionsResult(bool Collided, CollisionComponent? FirstCollision);
 
     public enum BroadPhaseState {
         NONE,
         COLLISION,
         COLLISION_AND_RESOLUTION
     }
+    #endregion
+
+    #region Data
     public BroadPhaseState BroadPhase = BroadPhaseState.COLLISION_AND_RESOLUTION;
 
     readonly List<CollisionComponent> Colliders = [];
+    #endregion
 
+    #region Object Registration
+    /// <summary>
+    /// Register a collider component to be used in broadphase and manual collision checks.
+    /// </summary>
+    /// <param name="collider">The collider to register.</param>
     public void Add(CollisionComponent collider) {
         Colliders.Add(collider);
     }
 
+    /// <summary>
+    /// Remove a collider component from collision registrations.
+    /// </summary>
+    /// <param name="collider">The collider to remove.</param>
     public void Remove(CollisionComponent collider) {
         Colliders.Remove(collider);
     }
+    #endregion
 
+    #region Broadphase
     public void Update() {
         //! FIXME (Alex): Disabling broadphase entirely for now
         return;
@@ -91,18 +105,50 @@ public class CollisionManager {
         //      Does the ground need to have player tags? Or should every physics resolve be handled individually?
         //      Or should it only resolve collisions with a tag match in both directions
     }
+    #endregion
 
-    public record struct AllCollisionsResult(bool Collided, CollisionComponent[] Collisions);
+    #region Manual All Collisions Checks
+    /// <summary>
+    /// Get all collisions between given collider component and all registered collision components.
+    /// Assumes default location relative to actor.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <returns>Information about collision check results.</returns>
     public AllCollisionsResult GetAllCollisions(CollisionComponent collider)
         => GetAllCollisions(collider.Collider, collider.Actor.GlobalPosition, collider.Mask);
-    public AllCollisionsResult GetAllCollisions(CollisionComponent collider, Vector2 Position)
-        => GetAllCollisions(collider.Collider, Position, collider.Mask);
+
+    /// <summary>
+    /// Get all collisions between given collider component and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public AllCollisionsResult GetAllCollisions(CollisionComponent collider, Vector2 position) {
+        List<CollisionComponent> collisions = [];
+        foreach (CollisionComponent other in Colliders) {
+            if (
+                collider != other &&
+                collider.Mask.Any(other.Tags) &&
+                ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition)
+            ) {
+                collisions.Add(other);
+            }
+        }
+
+        return new(collisions.Count > 0, [.. collisions]);
+    }
+
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <param name="tagMask">The tags on other colliders the collisions should check.</param>
+    /// <returns>Information about collision check results.</returns>
     public AllCollisionsResult GetAllCollisions(Collider collider, Vector2 position, TagContainer tagMask) {
         List<CollisionComponent> collisions = [];
         foreach (CollisionComponent other in Colliders) {
-            //! FIXME (Alex): Collider match check might be unreliable? Collider components may share a collider
             if (
-                collider != other.Collider &&
                 tagMask.Any(other.Tags) &&
                 ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)
             ) {
@@ -113,17 +159,67 @@ public class CollisionManager {
         return new(collisions.Count > 0, [.. collisions]);
     }
 
-    public record struct SingleCollisionsResult(bool Collided, CollisionComponent? FirstCollision);
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location, without any tag restrictions.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public AllCollisionsResult GetAllCollisions(Collider collider, Vector2 position) {
+        List<CollisionComponent> collisions = [];
+        foreach (CollisionComponent other in Colliders) {
+            if (ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)) {
+                collisions.Add(other);
+            }
+        }
+
+        return new(collisions.Count > 0, [.. collisions]);
+    }
+    #endregion
+
+    #region Manual Single Collisions Checks
+    /// <summary>
+    /// Get the first object the given collider component collides with.
+    /// Assumes default location relative to actor.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <returns>Information about collision check results.</returns>
     public SingleCollisionsResult GetFirstCollision(CollisionComponent collider)
         => GetFirstCollision(collider.Collider, collider.Actor.GlobalPosition, collider.Mask);
-    public SingleCollisionsResult GetFirstCollision(CollisionComponent collider, Vector2 position)
-        => GetFirstCollision(collider.Collider, position, collider.Mask);
-    public SingleCollisionsResult GetFirstCollision(Collider collider, Vector2 position, TagContainer tagMask) {
-        //! FIXME (Alex): Redundant with above
+
+    /// <summary>
+    /// Get the first object the given collider component collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionsResult GetFirstCollision(CollisionComponent collider, Vector2 position) {
         foreach (CollisionComponent other in Colliders) {
-            //! FIXME (Alex): Collider match check might be unreliable? Collider components may share a collider
             if (
-                collider != other.Collider &&
+                collider != other &&
+                collider.Mask.Any(other.Tags) &&
+                ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition)
+            ) {
+                return new(true, other);
+            }
+        }
+
+        return new(false, null);
+    }
+
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <param name="tagMask">The tags on other colliders the collisions should check.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionsResult GetFirstCollision(Collider collider, Vector2 position, TagContainer tagMask) {
+        foreach (CollisionComponent other in Colliders) {
+            if (
                 tagMask.Any(other.Tags) &&
                 ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)
             ) {
@@ -134,18 +230,49 @@ public class CollisionManager {
         return new(false, null);
     }
 
-    public record struct RayCollisionResult();
-    //! FIXME (Alex): Need raycollider object?
-    public RayCollisionResult GetRayCollision(Ray ray, TagContainer tagMask) {
-        throw new NotImplementedException();
-    }
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location, without any tag restrictions.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionsResult GetFirstCollision(Collider collider, Vector2 position) {
+        foreach (CollisionComponent other in Colliders) {
+            if (ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)) {
+                return new(true, other);
+            }
+        }
 
-    public record struct SweptCollisionResult(Vector2 AdjustedVelocity, Vector2 SpeedFraction, CollisionComponent? Collision, bool Collided);
+        return new(false, null);
+    }
+    #endregion
+
+    #region Manual Raycast Collisions Checks
+    //! FIXME (Alex): DOC COMMENTS
+    public SweptCollisionResult GetRayCollision(RaycastComponent component)
+        => GetRayCollision(component, component.Actor.GlobalPosition);
+    public SweptCollisionResult GetRayCollision(RaycastComponent component, Vector2 position)
+        => GetRayCollision(component.Ray.Position + position, component.Ray.Direction, component.Mask);
+    public SweptCollisionResult GetRayCollision(Ray ray, TagContainer tagMask)
+        => GetRayCollision(ray.Position, ray.Direction, tagMask);
+    public SweptCollisionResult GetRayCollision(Vector2 position, Vector2 direction, TagContainer tagMask)
+        => GetSweptCollision(new PointCollider(position), Vector2.Zero, direction, tagMask);
+    #endregion
+
+    #region Manual Swept Collisions Checks
+    //! FIXME (Alex): DOC COMMENTS
     public SweptCollisionResult GetSweptCollision(CollisionComponent collider, Vector2 velocity, bool allowNegative = false)
         => GetSweptCollision(collider.Collider, collider.Actor.GlobalPosition, velocity, collider.Mask, allowNegative);
     public SweptCollisionResult GetSweptCollision(CollisionComponent collider, Vector2 position, Vector2 velocity, bool allowNegative = false)
         => GetSweptCollision(collider.Collider, position, velocity, collider.Mask, allowNegative);
     public SweptCollisionResult GetSweptCollision(Collider collider, Vector2 position, Vector2 velocity, TagContainer tagMask, bool allowNegative = false) {
+        // If object isn't moving just get the first collided object to avoid extra calculations
+        if (velocity == Vector2.Zero) {
+            SingleCollisionsResult collision = GetFirstCollision(collider, position, tagMask);
+            return new(Vector2.Zero, Vector2.Zero, collision.FirstCollision, collision.Collided);
+        }
+
         Vector2 minFraction = Vector2.One;
         CollisionComponent? minCollider = null;
 
@@ -159,34 +286,56 @@ public class CollisionManager {
             }
         }
 
-        if (!allowNegative && (minFraction.X < 0 || minFraction.Y < 0)) { minFraction = Vector2.Zero; }
+        // Apply small pushback to stop objects getting stuck inside one another
+        //! FIXME (Alex): Should this be applied regardless of result? Some results can still give a full vector
+        //! FIXME (Alex): A real solution would be to return bool of collision result alongside vector
+        // if (minFraction != Vector2.One) { minFraction -= minFraction.Normalized() * 0.001f; }
+        minFraction -= minFraction.Normalized() * 0.001f;
+
+        if (!allowNegative && FractionNegative(minFraction)) {
+            minFraction = Vector2.Zero;
+        }
+
         return new(velocity * minFraction, minFraction, minCollider, minCollider == null);
     }
+    #endregion
 
+    #region Manual Pushout Checks
     //! FIXME (Alex): Need manual pushout functions
+    #endregion
 
+    #region 2 Collider Middleman Functions
     static bool ColliderOverlapCheck(Collider colliderA, Vector2 positionA, Collider colliderB, Vector2 positionB) {
-        //! FIXME (Alex): Messy?
+        if (!colliderA.Bounds.Translate(positionA).Overlaps(colliderB.Bounds.Translate(positionB))) {
+            return false;
+        }
+
         if (colliderA.Multi) {
-            foreach (Collider collider in colliderA.GetSubColliders(colliderB, positionB - positionA)) {
+            Collider[] subs = colliderA.GetSubColliders(new Rect(positionB - positionA + colliderB.Bounds.Position - colliderA.Bounds.Position, colliderB.Bounds.Size));
+            Console.WriteLine(subs.Length);
+            foreach (Collider collider in subs) {
                 if (ColliderOverlapCheck(collider, positionA, colliderB, positionB)) { return true; }
             }
             return false;
         }
 
         if (colliderB.Multi) {
-            //! FIXME (Alex): Does this work?
-            return ColliderOverlapCheck(colliderB, positionB, colliderB, positionA);
+            return ColliderOverlapCheck(colliderB, positionB, colliderA, positionA);
         }
 
         return GetCollisionSimplex(colliderA, positionA, colliderB, positionB).Collided;
     }
 
     static Vector2 ColliderIntersectionFraction(Collider colliderA, Vector2 positionA, Vector2 velocityA, Collider colliderB, Vector2 positionB, Vector2 velocityB) {
-        //! FIXME (Alex): Messy and redundant
+        Rect sweptBoundsA = SweptBounds(colliderA, velocityA);
+        Rect sweptBoundsB = SweptBounds(colliderB, velocityB);
+        if (!sweptBoundsA.Translate(positionA).Overlaps(sweptBoundsB.Translate(positionB))) {
+            return Vector2.One;
+        }
+
         if (colliderA.Multi) {
             Vector2 fraction = Vector2.One;
-            foreach (Collider collider in colliderA.GetSubColliders(colliderB, positionB - positionA)) {
+            foreach (Collider collider in colliderA.GetSubColliders(new Rect(positionB - positionA + sweptBoundsB.Position - sweptBoundsA.Position, sweptBoundsB.Size))) {
                 Vector2 newFraction = ColliderIntersectionFraction(collider, positionA, velocityA, colliderB, positionB, velocityB);
                 if (IsRayFractionSmaller(newFraction, fraction)) { fraction = newFraction; }
             }
@@ -194,14 +343,20 @@ public class CollisionManager {
         }
 
         if (colliderB.Multi) {
-            //! FIXME (Alex): Does this work?
             return ColliderIntersectionFraction(colliderB, positionB, velocityB, colliderA, positionA, velocityA);
         }
 
-        Console.WriteLine($"{positionA} {velocityA} {positionB} {velocityB}");
-        return GetRayIntersectionFraction(colliderA, positionA, velocityA, colliderB, positionB, velocityB);
+        Vector2 result = GetRayIntersectionFraction(colliderA, positionA, velocityA, colliderB, positionB, velocityB);
+        if (FractionNegative(result)) {
+            if (!ColliderOverlapCheck(colliderA, positionA, colliderB, positionB)) {
+                return Vector2.One;
+            }
+        }
+        return result;
     }
+    #endregion
 
+    #region Primary Collision Functions
     static CollisionSimplexInfo GetCollisionSimplex(
         Collider colliderA,
         Vector2 positionA,
@@ -253,6 +408,7 @@ public class CollisionManager {
         }
     }
 
+    //! FIXME (Alex): Give back more info than just the pushout
     static Vector2 GetPushout(
         Collider colliderA,
         Vector2 positionA,
@@ -309,6 +465,7 @@ public class CollisionManager {
         return pushout;
     }
 
+    //! FIXME (Alex): Give back more info than just the fraction
     static Vector2 GetRayIntersectionFraction(
         Collider colliderA,
         Vector2 positionA,
@@ -321,10 +478,10 @@ public class CollisionManager {
         Vector2 velocityDifference = velocityB - velocityA;
 
         // Cancel if objects are moving the same direction or stationary
-        if (velocityDifference == Vector2.Zero) {
-            Console.WriteLine("Fail, no velocity");
-            return Vector2.One;
-        }
+        if (velocityDifference == Vector2.Zero) { return Vector2.One; }
+
+        Vector2 velocityNormal = velocityDifference.Normalized();
+        float velocityLength = velocityDifference.LengthSquared();
 
         // Point A
         Vector2 direction = -velocityDifference;
@@ -334,79 +491,52 @@ public class CollisionManager {
         direction = CalcExtra.TripleProduct(direction, -pointA, direction);
         Vector2 pointB = Support(colliderA, positionA, colliderB, positionB, direction);
 
-        // Fail intersection if the first 2 supports won't intersect with the velocity
-        Console.WriteLine($"{pointA} {Calc.SignCross(velocityDifference, pointA)} {pointB} {Calc.SignCross(velocityDifference, pointB)}");
-        if (Calc.SignCross(velocityDifference, pointA) == Calc.SignCross(velocityDifference, pointB)) {
-            Console.WriteLine("Fail, no cross");
+        float crossA = Calc.Cross(velocityDifference, pointA);
+        float crossB = Calc.Cross(velocityDifference, pointB);
+        if (MathF.Sign(crossA) == MathF.Sign(crossB)) {
+            // First line lies exactly on velocity vector
+            if (crossA == 0 && crossB == 0) {
+                if (SweepInfiniteCollisionResolve(pointA, pointB, velocityLength, out Vector2 intersection)) {
+                    return VectorFraction(intersection, velocityDifference);
+                }
+            }
+
             return Vector2.One;
         }
-
-        // Extend velocity to cover entire difference bounds
-        //! FIXME (Alex): There's likely a better way to do this
-        Vector2 farSupport = Support(colliderA, positionA, colliderB, positionB, velocityDifference);
-        Vector2 scaledVelocity = velocityDifference.Normalized() * farSupport.Length();
-        float velocityLength = velocityDifference.LengthSquared();
-        CalcExtra.LineSegmentIntersection(Vector2.Zero, scaledVelocity, pointA, pointB, out Vector2 closestIntersection);
-        float closestDistance = closestIntersection.LengthSquared();
 
         for (int i = 0; i < ITERATION_LIMIT; ++i) {
             // Get new point C
             Vector2 line = pointB - pointA;
-            direction = -CalcExtra.TripleProduct(line, pointA, line);
+            direction = CalcExtra.TripleProduct(line, pointA, line);
+            //! FIXME (Alex): Forcing the vector to always face in opposite direction of velocity can probably be done with pure math
+            if (Vector2.Dot(direction, velocityDifference) > 0) { direction = -direction; }
             Vector2 pointC = Support(colliderA, positionA, colliderB, positionB, direction);
 
-            // Find line segment intersections
-            bool intersectedAC = CalcExtra.LineSegmentIntersection(pointA, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionAC);
-            bool intersectedBC = CalcExtra.LineSegmentIntersection(pointB, pointC, Vector2.Zero, scaledVelocity, out Vector2 intersectionBC);
-            // Fail intersection if neither line collides
-            //! FIXME (Alex): probably unneeded assuming the first fail check works correctly
-            if (!intersectedAC && !intersectedBC) {
-                Console.WriteLine("Fail, no intersection");
-                return Vector2.One;
+            if (pointC == pointA || pointC == pointB) {
+                return SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
             }
-            float distanceAC = intersectedAC ? intersectionAC.LengthSquared() : float.PositiveInfinity;
-            float distanceBC = intersectedBC ? intersectionBC.LengthSquared() : float.PositiveInfinity;
 
-            // Find closest new intersection point
-            float compareDistance = closestDistance;
-            if (distanceAC < distanceBC) {
-                pointB = pointC;
-                closestIntersection = intersectionAC;
-                closestDistance = distanceAC;
+            float crossC = Calc.Cross(velocityDifference, pointC);
+
+            if (crossC == 0) {
+                return pointC;
+            }
+
+            if (MathF.Sign(crossC) == MathF.Sign(crossA)) {
+                pointA = pointC;
+                crossA = crossC;
             }
             else {
-                pointA = pointC;
-                closestIntersection = intersectionBC;
-                closestDistance = distanceBC;
-            }
-
-            // Finish loop if new intersection didn't get closer
-            if (closestDistance >= compareDistance) {
-                // Fail if closest intersection still doesn't touch the velocity line
-                if (velocityLength < closestDistance) {
-                    Console.WriteLine($"Fail, too far {velocityLength} {closestDistance} {distanceAC} {distanceBC}");
-                    Game.Events.Dispatch(new SweepDebug(pointA, pointB, pointC, intersectionAC, intersectionBC, velocityDifference));
-                    return Vector2.One;
-                }
-                // Otherwise return percent of velocity length
-                Console.WriteLine($"Pass, value {VectorFraction(closestIntersection, velocityDifference)}");
-                return VectorFraction(closestIntersection, velocityDifference);
+                pointB = pointC;
+                crossB = crossC;
             }
         }
 
-        Console.WriteLine("Fail, iteration max");
-        return VectorFraction(closestIntersection, velocityDifference);
+        return SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
     }
-    //! FIXME (Alex): TEMP
-    public record struct SweepDebug(
-        Vector2 PointA,
-        Vector2 PointB,
-        Vector2 PointC,
-        Vector2 PointAC,
-        Vector2 PointBC,
-        Vector2 Velocity
-    );
+    #endregion
 
+    #region Utilities
     static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
 
     static Vector2 Support(
@@ -437,4 +567,54 @@ public class CollisionManager {
             (max.Y == 0) ? 0 : (value.Y / max.Y)
         );
     }
+
+    static bool FractionNegative(Vector2 fraction) {
+        return MathF.Min(fraction.X, fraction.Y) < 0;
+    }
+
+    // Returns squared length for optimization
+    // Expects direction to be normalized
+    static float SweepIntersectionLength(Vector2 intersection, Vector2 direction) {
+        float distance = intersection.LengthSquared();
+        return Vector2.Dot(intersection.Normalized(), direction) > 0 ? distance : -distance;
+    }
+
+    // Expects velocityLength to be a squared distance
+    static bool SweepInfiniteCollisionResolve(Vector2 pointA, Vector2 pointB, float velocityLength, out Vector2 intersection) {
+        float distA = pointA.LengthSquared();
+        float distB = pointB.LengthSquared();
+        float dist;
+        if (distA < distB) {
+            dist = distA;
+            intersection = pointA;
+        }
+        else {
+            dist = distB;
+            intersection = pointB;
+        }
+
+        return dist < velocityLength;
+    }
+
+    // Expects velocityLength to be a squared distance
+    static Vector2 SweepLineIntersection(Vector2 pointA, Vector2 pointB, Vector2 velocity, float velocityLength) {
+        LineIntersectionType intersectionType = CalcExtra.LineAndLineSegmentIntersection(Vector2.Zero, velocity, pointA, pointB, out Vector2 intersection);
+
+        if (intersectionType == LineIntersectionType.NONE) { return Vector2.One; }
+        else if (intersectionType == LineIntersectionType.SINGLE) {
+            if (SweepIntersectionLength(intersection, velocity) > velocityLength) { return Vector2.One; }
+        }
+        else if (intersectionType == LineIntersectionType.INFINITE) {
+            if (!SweepInfiniteCollisionResolve(pointA, pointB, velocityLength, out intersection)) { return Vector2.One; }
+        }
+
+        return VectorFraction(intersection, velocity);
+    }
+
+    static Rect SweptBounds(Collider collider, Vector2 velocity) {
+        Vector2 min = Vector2.Min(collider.Bounds.TopLeft, collider.Bounds.TopLeft + velocity);
+        Vector2 max = Vector2.Max(collider.Bounds.BottomRight, collider.Bounds.BottomRight + velocity);
+        return new(min, max - min);
+    }
+    #endregion
 }

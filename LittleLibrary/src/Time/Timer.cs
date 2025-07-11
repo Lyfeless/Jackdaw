@@ -24,7 +24,6 @@ public class Timer {
     double Milliseconds {
         get {
             double millis = Game.Timers.GetTrackedTime(TimeTracker).TotalMilliseconds;
-            //! FIXME (Alex): Untested, no clue if this works
             if (Looping) { millis %= Duration; }
             return millis;
         }

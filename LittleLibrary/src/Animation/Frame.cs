@@ -1,4 +1,3 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
@@ -18,7 +17,7 @@ public readonly struct AnimationFrame {
         PositionOffset = positionOffset ?? Point2.Zero;
         if (clip != null) {
             RectInt clipRect = (RectInt)clip;
-            Texture = Clip(texture, clipRect.X, clipRect.Y, clipRect.Width, clipRect.Height);
+            Texture = texture.Clip(clipRect);
         }
         else {
             Texture = texture;
@@ -34,10 +33,6 @@ public readonly struct AnimationFrame {
         float duration
     ) {
         Duration = duration;
-        Texture = Clip(texture, x, y, width, height);
+        Texture = texture.Clip(x, y, width, height);
     }
-
-    //! FIXME (Alex): Should probably be an extension or util function
-    public static Subtexture Clip(Subtexture texture, int x, int y, int width, int height) =>
-        new(texture.Texture, new(texture.Source.X + x, texture.Source.Y + y, width, height));
 }

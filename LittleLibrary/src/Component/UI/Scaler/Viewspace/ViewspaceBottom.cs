@@ -1,5 +1,3 @@
-using Foster.Framework;
-
 namespace LittleLib;
 
 public class ViewspaceBottomScalerElement(ScalerComponent component) : ScalerElement(component) {

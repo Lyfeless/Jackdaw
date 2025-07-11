@@ -13,8 +13,16 @@ public class Assets {
     public LittleGameContentConfig Config;
 
     public readonly string[] TextureExtensions = [".png", ".jpg"];
+    public readonly string[] AsepriteExtensions = [".aseprite", ".ase"];
     public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
     public readonly string[] SoundExtensions = [".wav", ".mp3", ".ogg"];
+
+    string TexturePath;
+    string FontPath;
+    string SoundPath;
+    string ShaderPath;
+    string ShaderConfigPath;
+    string AnimationPath;
 
     #endregion
 
@@ -69,6 +77,15 @@ public class Assets {
         Assembly assembly = Assembly.GetExecutingAssembly();
         string? assemblyName = assembly.GetName().Name;
 
+        TexturePath = Path.Join(Config.RootFolder, Config.TextureFolder);
+        FontPath = Path.Join(Config.RootFolder, Config.FontFolder);
+        SoundPath = Path.Join(Config.RootFolder, Config.SoundFolder);
+        ShaderPath = Path.Join(Config.RootFolder, Config.ShaderFolder);
+        ShaderConfigPath = Path.Join(Config.RootFolder, Config.ShaderConfig);
+        AnimationPath = Path.Join(config.RootFolder, config.AnimationFolder);
+
+        Dictionary<string, Aseprite> asepriteAnims = [];
+
         // Textures
         {
             // Create asset packer
@@ -83,12 +100,24 @@ public class Assets {
             packer.Add("error", new Image(stream));
 
             // Load all textures in asset directory
-            string texturePath = Path.Join(Config.RootFolder, Config.TextureFolder);
-            if (Directory.Exists(texturePath)) {
-
-                foreach (string file in Directory.EnumerateFiles(texturePath, "*.*", SearchOption.AllDirectories).Where(e => TextureExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(texturePath, file);
+            if (Directory.Exists(TexturePath)) {
+                // Standard files
+                foreach (string file in Directory.EnumerateFiles(TexturePath, "*.*", SearchOption.AllDirectories).Where(e => TextureExtensions.Any(e.EndsWith))) {
+                    string name = GetAssetName(TexturePath, file);
                     packer.Add(name, file);
+                }
+                // Aseprite files
+                foreach (string file in Directory.EnumerateFiles(TexturePath, "*.*", SearchOption.AllDirectories).Where(e => AsepriteExtensions.Any(e.EndsWith))) {
+                    string name = GetAssetName(TexturePath, file);
+                    Aseprite aseprite = new(file);
+                    if (aseprite.Frames.Length == 0) { continue; }
+                    if (aseprite.Frames.Length == 1) { packer.Add(name, aseprite.RenderFrame(0)); continue; }
+                    Image[] frames = aseprite.RenderAllFrames();
+                    for (int i = 0; i < frames.Length; ++i) {
+                        packer.Add(GetFrameName(name, i), frames[i]);
+                    }
+
+                    asepriteAnims.Add(name, aseprite);
                 }
             }
 
@@ -113,13 +142,12 @@ public class Assets {
             Fonts.Add("error", new SpriteFont(graphicsDevice, stream, 16));
 
             // Load all fonts in asset directory
-            string fontPath = Path.Join(Config.RootFolder, Config.FontFolder);
-            if (Directory.Exists(fontPath)) {
+            if (Directory.Exists(FontPath)) {
                 string configPath = Path.Join(Config.RootFolder, Config.RootFolder);
                 FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
 
-                foreach (string file in Directory.EnumerateFiles(fontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(fontPath, file);
+                foreach (string file in Directory.EnumerateFiles(FontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
+                    string name = GetAssetName(FontPath, file);
                     FontConfigEntry? configEntry = fontConfig?.FontConfigs.FirstOrDefault(e => e.Name == name);
                     Fonts.Add(name, new SpriteFont(graphicsDevice, file, configEntry?.Size ?? FontConfig.DefaultFontSize));
                 }
@@ -134,13 +162,12 @@ public class Assets {
             using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;
             Sounds.Add("error", new Sound(stream));
 
-            string soundPath = Path.Join(Config.RootFolder, Config.SoundFolder);
-            if (Directory.Exists(soundPath)) {
+            if (Directory.Exists(SoundPath)) {
                 string configPath = Path.Join(Config.RootFolder, Config.SoundConfig);
                 SoundConfig? soundConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.SoundConfig) : null;
 
-                foreach (string file in Directory.EnumerateFiles(soundPath, "*.*", SearchOption.AllDirectories).Where(e => SoundExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(soundPath, file);
+                foreach (string file in Directory.EnumerateFiles(SoundPath, "*.*", SearchOption.AllDirectories).Where(e => SoundExtensions.Any(e.EndsWith))) {
+                    string name = GetAssetName(SoundPath, file);
                     SoundConfigEntry? configEntry = soundConfig?.SoundConfigs.FirstOrDefault(e => e.Name == name);
                     Sounds.Add(name, new Sound(file, configEntry?.LoadingMethod ?? SoundConfig.DefaultLoadingMethod));
                 }
@@ -155,18 +182,16 @@ public class Assets {
 
             // Load shaders from config
             //      Shaders are built from more data than just files, so read directly off the config
-            string shaderPath = Path.Join(Config.RootFolder, Config.ShaderFolder);
-            string shaderConfigPath = Path.Join(Config.RootFolder, Config.ShaderConfig);
             string shaderExtension = graphicsDevice.Driver.GetShaderExtension(); graphicsDevice.Driver.GetShaderExtension();
-            if (Path.Exists(shaderConfigPath)) {
-                ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(shaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
+            if (Path.Exists(ShaderConfigPath)) {
+                ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(ShaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
 
                 if (shaderConfig != null) {
                     foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
                         // Find files from config entry
                         //! FIXME (Alex): Should the path extensions be more configurable?
-                        string vertexPath = Path.Join(shaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
-                        string fragmentPath = Path.Join(shaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
+                        string vertexPath = Path.Join(ShaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
+                        string fragmentPath = Path.Join(ShaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
                         if (!Path.Exists(vertexPath) || !Path.Exists(fragmentPath)) { continue; }
 
                         // Load files into bytes
@@ -204,28 +229,34 @@ public class Assets {
             Animations.Add("error", new(this));
 
             // Load all animations and groups from directory
-            string animationPath = Path.Join(config.RootFolder, config.AnimationFolder);
-            if (Directory.Exists(animationPath)) {
+            if (Directory.Exists(AnimationPath)) {
                 // Load single animations
-                foreach (string file in Directory.EnumerateFiles(animationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationExtension))) {
-                    string name = GetAssetName(animationPath, file);
-                    AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationConfig);
+                foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationExtension))) {
+                    string name = GetAssetName(AnimationPath, file);
+                    AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
+                    Console.WriteLine(File.ReadAllText(file));
                     if (data != null) {
                         AnimationData? anim = GetAnimationData(data);
-                        if (anim != null) { Animations.Add(name, (AnimationData)anim); }
+                        if (anim != null) { Animations.Add(name, anim); }
 
                     }
                 }
 
                 // Load animation group files
-                foreach (string file in Directory.EnumerateFiles(animationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationGroupExtension))) {
-                    AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(animationPath, file)), SourceGenerationContext.Default.AnimationGroupConfig);
+                foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationGroupExtension))) {
+                    AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationGroupConfig);
                     if (data != null) {
                         foreach (AnimationConfigEntry entry in data.Entries) {
                             AnimationData? anim = GetAnimationData(entry.Animation);
-                            if (anim != null) { Animations.Add(entry.Name, (AnimationData)anim); }
+                            if (anim != null) { Animations.Add(entry.Name, anim); }
                         }
                     }
+                }
+
+                // Load animations from aseprite files
+                foreach ((string name, Aseprite aseprite) in asepriteAnims) {
+                    AnimationData? anim = GetAnimationData(name, aseprite);
+                    if (anim != null) { Animations.Add(name, anim); }
                 }
             }
         }
@@ -260,9 +291,29 @@ public class Assets {
         return null;
     }
 
-    AnimationData? GetAnimationData(Aseprite aseprite) {
-        //! FIXME (Alex): Aseprite animations support
-        return null;
+    AnimationData? GetAnimationData(string name, Aseprite aseprite) {
+        float startDelay = 0;
+        bool looping = true;
+        Point2 positionOffset = Point2.Zero;
+        string path = Path.Join(TexturePath, $"{name}{Config.AsepriteConfigExtension}");
+        if (File.Exists(path)) {
+            AsepriteConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AsepriteConfig);
+            if (config != null) {
+                startDelay = config.StartDelay;
+                looping = config.Looping;
+                positionOffset = new(config.PositionOffsetX, config.PositionOffsetY);
+            }
+        }
+
+        return new(
+            frames: [.. aseprite.Frames.Select((e, i) => new AnimationFrame(
+                texture: GetTexture(GetFrameName(name, i)),
+                duration: e.Duration
+            ))],
+            startDelay: startDelay,
+            looping: looping,
+            positionOffset: positionOffset
+        );
     }
 
     /// <summary>
@@ -271,12 +322,16 @@ public class Assets {
     /// <param name="relativePath">The path elements to remove from the start of the path</param>
     /// <param name="assetPath">Full path to the asset</param>
     /// <returns></returns>
-    string GetAssetName(string relativePath, string assetPath) {
+    static string GetAssetName(string relativePath, string assetPath) {
         string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
         name = Path.GetRelativePath(relativePath, name);
         name = name.Replace("\\", "/");
         name = name.Replace("/", "/");
 
         return name;
+    }
+
+    static string GetFrameName(string name, int frame) {
+        return $"{name}{frame}";
     }
 }

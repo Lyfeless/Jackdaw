@@ -22,13 +22,12 @@ public class Actor {
     public ComponentContainer Components;
 
     public RenderablePosition Position = new();
-    //! FIXME (Alex): Only gives precise position because I can't image this will be rendered, is that a bad assumption?
+
     public Vector2 GlobalPosition {
         get => Parent.IsValid
             ? Position.Precise + Parent.GlobalPosition
             : Position.Precise;
     }
-    //! FIXME (Alex): Need utils for converting positions between local and global
 
     public ObjectIdentifier<Actor> Match;
 
@@ -67,7 +66,6 @@ public class Actor {
             }
         }
 
-        //! FIXME (Alex): Should children tick if parent isn't ticking?
         if (ChildrenTicking) {
             foreach (Actor child in Children.Elements) {
                 child.Update();
@@ -89,13 +87,14 @@ public class Actor {
         Components.QueueEvents = true;
         Children.QueueEvents = true;
 
+        //! FIXME (Alex): Define culling box for actor?
+
         if (Visible) {
             foreach (Component component in Components.Elements) {
                 if (component.Visible) { component.Render(batcher); }
             }
         }
 
-        //! FIXME (Alex): Should children render if parent isn't visible?
         if (ChildrenVisible) {
             foreach (Actor child in Children.Elements) {
                 child.Render(batcher);
@@ -212,6 +211,22 @@ public class Actor {
         if (this == check) { return true; }
         if (Parent.IsValid) { return Parent.ParentMatches(check); }
         return false;
+    }
+
+    public Vector2 LocalToGlobal(Vector2 position) {
+        return position + GlobalPosition;
+    }
+
+    public Vector2 GlobalToLocal(Vector2 position) {
+        return position - GlobalPosition;
+    }
+
+    public Vector2 FromOtherLocal(Actor originLocal, Vector2 position) {
+        return GlobalToLocal(originLocal.LocalToGlobal(position));
+    }
+
+    public Vector2 FromOtherLocal(Actor originLocal) {
+        return GlobalToLocal(originLocal.GlobalPosition);
     }
 
     public override string ToString() {

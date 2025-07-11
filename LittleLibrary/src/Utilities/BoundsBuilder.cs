@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Numerics;
 using Foster.Framework;
 
@@ -16,22 +15,18 @@ class BoundsBuilder {
 
     public BoundsBuilder(Rect rect) {
         Add(rect);
-        SetRect();
     }
 
     public BoundsBuilder(Vector2 point) {
         Add(point);
-        SetRect();
     }
 
     public BoundsBuilder(params Vector2[] points) {
         Add(points);
-        SetRect();
     }
 
     public BoundsBuilder(params Rect[] rects) {
         Add(rects);
-        SetRect();
     }
 
     public BoundsBuilder Add(Vector2 point) {
@@ -49,6 +44,7 @@ class BoundsBuilder {
         }
 
         PointCount++;
+        SetRect();
         return this;
     }
 
@@ -67,6 +63,7 @@ class BoundsBuilder {
         }
 
         PointCount += 4;
+        SetRect();
         return this;
     }
 
@@ -91,10 +88,11 @@ class BoundsBuilder {
         Right = float.NegativeInfinity;
         PointCount = 0;
 
+        SetRect();
         return this;
     }
 
     void SetRect() {
-        Rect = PointCount > 0 ? new(new Vector2(Left, Top), new Vector2(Right, Bottom)) : new(0, 0, 0, 0);
+        Rect = PointCount > 0 ? new(Left, Top, Right - Left, Bottom - Top) : new(0, 0, 0, 0);
     }
 }

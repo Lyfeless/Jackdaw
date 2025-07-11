@@ -52,8 +52,6 @@ public class LittleGame : App {
         Collision = new();
         Events = new();
         Audio = new();
-        //! FIXME (Alex): TEMP
-        CollisionManager.Game = this;
 
         //! FIXME (Alex): YUCK
         switch (config.Window.Renderer) {
