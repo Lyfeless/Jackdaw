@@ -3,82 +3,87 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class GridCollider(Vector2 position, Grid<int?> grid, Vector2 tileSize) : Collider {
-    Vector2 Position = position;
+//! FIXME (Alex): Implment spatial grid
+public class GridCollider(Vector2 position, Grid<ICollider?> grid, Vector2 tileSize) : ICollider, ISpatialGrid<ICollider?, ICollider?> {
+    readonly Grid<ICollider?> Grid = grid;
+    public readonly RectangleCollider FullCollider = new(tileSize);
 
-    readonly Grid<int?> Grid = grid;
-    readonly Vector2 TileSize = tileSize;
+    Vector2 position = position;
+    public Vector2 Position {
+        get => position;
+        set => position = value;
+    }
 
-    readonly List<Collider> colliders = [new RectangleCollider(tileSize)];
+    readonly Vector2 tileSize = tileSize;
+    public Vector2 TileSize {
+        get => tileSize;
+        set { }
+    }
 
-    public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<int?>(gridSize), tileSize) { }
-    public GridCollider(Point2 gridSize, Vector2 tileSize) : this(Vector2.Zero, new Grid<int?>(gridSize), tileSize) { }
-    public GridCollider(Grid<int?> grid, Vector2 tileSize) : this(Vector2.Zero, grid, tileSize) { }
+    public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<ICollider?>(gridSize), tileSize) { }
+    public GridCollider(Point2 gridSize, Vector2 tileSize) : this(Vector2.Zero, new Grid<ICollider?>(gridSize), tileSize) { }
+    public GridCollider(Grid<ICollider?> grid, Vector2 tileSize) : this(Vector2.Zero, grid, tileSize) { }
 
     public Point2 GridSize = grid.Size;
 
-    public override Rect Bounds => new(Position, Grid.Size * TileSize);
-    public override Vector2 Center => Bounds.Center;
+    public Rect Bounds => new(Position, Grid.Size * TileSize);
+    public Vector2 Center => Bounds.Center;
 
-    public override bool Multi => true;
-    public override Collider[] GetSubColliders(Rect bounds) {
+    public bool Multi => true;
+    public ICollider[] GetSubColliders(Rect bounds) {
         Vector2 min = Vector2.Max(bounds.TopLeft, Bounds.TopLeft);
         Vector2 max = Vector2.Min(bounds.BottomRight, Bounds.BottomRight);
         Vector2 diff = max - min;
         if (diff.X <= 0 || diff.Y <= 0) { return []; }
 
         //! FIXME (Alex): Would ideally like to use a fixed size array but that would leave empty space if any tiles are empty
-        List<Collider> overlaps = [];
+        List<ICollider> overlaps = [];
         int tileCountX = (int)MathF.Ceiling(diff.X / TileSize.X);
         int tileCountY = (int)MathF.Ceiling(diff.Y / TileSize.Y);
-        Point2 startingCoord = LocalToTileCoord(min);
+        Point2 startingCoord = this.LocalToTileCoord(min);
         for (int x = 0; x < tileCountX; ++x) {
             for (int y = 0; y < tileCountY; ++y) {
                 Point2 coord = startingCoord + new Point2(x, y);
-                Collider? tileCollider = GetCollider(coord);
-                if (tileCollider != null) { overlaps.Add(new OffsetCollider(tileCollider, TileCoordToLocal(coord))); }
+                ICollider? tileCollider = Grid.Get(coord);
+                if (tileCollider != null) { overlaps.Add(new OffsetCollider(tileCollider, this.TileCoordToLocal(coord))); }
             }
         }
         return [.. overlaps];
     }
 
-    public GridCollider AddCollider(Collider collider) {
-        if (!colliders.Any(e => e == collider)) { colliders.Add(collider); }
-        return this;
+    public Vector2 Support(Vector2 position, Vector2 direction) {
+        throw new NotImplementedException();
     }
 
-    public Point2 LocalToTileCoord(Vector2 localPosition) {
-        return (Point2)((localPosition - Position) / TileSize);
-    }
-
-    public Vector2 TileCoordToLocal(Point2 tileCoords) {
-        return (tileCoords * TileSize) + Position;
-    }
-
-    public Collider? GetCollider(Vector2 localPosition) => GetCollider(LocalToTileCoord(localPosition));
-    public Collider? GetCollider(Point2 tileCoord) {
-        int? index = Grid.Get(tileCoord);
-        if (index == null) { return null; }
-        return colliders[(int)index];
-    }
-
-    //! FIXME (Alex): Adds collider if it doesnt exist, do we want that?
-    public int GetColliderIndex(Collider collider) {
-        int index = colliders.IndexOf(collider);
-        if (index == -1) {
-            colliders.Add(collider);
-            return colliders.Count - 1;
-        }
-        return index;
-    }
-
-    public GridCollider Set(Collider collider, Point2 position) => Set(GetColliderIndex(collider), position);
-    public GridCollider Set(int? collider, Point2 position) {
+    public GridCollider Set(ICollider? collider, Point2 position) {
         Grid.Set(collider, position);
         return this;
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
-        throw new NotImplementedException();
+    public void SetTile(ICollider? collider, Point2 gridCoord) {
+        Grid.Set(collider, gridCoord);
+    }
+
+    public void AddTileStack(ICollider? element, Point2 gridCoord) {
+        if (element == null) { return; }
+        ICollider? current = Grid.Get(gridCoord);
+        if (current == null) { Grid.Set(element, gridCoord); return; }
+        if (current is MultiCollider currentMulti) { Grid.Set(new MultiCollider([.. currentMulti.Colliders, element]), gridCoord); return; }
+        Grid.Set(new MultiCollider([current, element]), gridCoord);
+    }
+
+    public void RemoveTileStack(Point2 gridCoord) {
+        ICollider? current = Grid.Get(gridCoord);
+        if (current == null) { return; }
+        if (current is not MultiCollider currentMulti) { Grid.Set(null, gridCoord); return; }
+        Grid.Set(new MultiCollider(currentMulti.Colliders[..^1]), gridCoord);
+    }
+
+    public void ClearTile(Point2 gridCoord) {
+        Grid.Set(null, gridCoord);
+    }
+
+    public ICollider? GetTile(Point2 gridCoord) {
+        return Grid.Get(gridCoord);
     }
 }

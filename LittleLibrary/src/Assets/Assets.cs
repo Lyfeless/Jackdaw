@@ -234,7 +234,6 @@ public class Assets {
                 foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationExtension))) {
                     string name = GetAssetName(AnimationPath, file);
                     AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
-                    Console.WriteLine(File.ReadAllText(file));
                     if (data != null) {
                         AnimationData? anim = GetAnimationData(data);
                         if (anim != null) { Animations.Add(name, anim); }

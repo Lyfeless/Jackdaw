@@ -145,7 +145,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="tagMask">The tags on other colliders the collisions should check.</param>
     /// <returns>Information about collision check results.</returns>
-    public AllCollisionsResult GetAllCollisions(Collider collider, Vector2 position, TagContainer tagMask) {
+    public AllCollisionsResult GetAllCollisions(ICollider collider, Vector2 position, TagContainer tagMask) {
         List<CollisionComponent> collisions = [];
         foreach (CollisionComponent other in Colliders) {
             if (
@@ -165,7 +165,7 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public AllCollisionsResult GetAllCollisions(Collider collider, Vector2 position) {
+    public AllCollisionsResult GetAllCollisions(ICollider collider, Vector2 position) {
         List<CollisionComponent> collisions = [];
         foreach (CollisionComponent other in Colliders) {
             if (ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)) {
@@ -217,7 +217,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="tagMask">The tags on other colliders the collisions should check.</param>
     /// <returns>Information about collision check results.</returns>
-    public SingleCollisionsResult GetFirstCollision(Collider collider, Vector2 position, TagContainer tagMask) {
+    public SingleCollisionsResult GetFirstCollision(ICollider collider, Vector2 position, TagContainer tagMask) {
         foreach (CollisionComponent other in Colliders) {
             if (
                 tagMask.Any(other.Tags) &&
@@ -237,7 +237,7 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public SingleCollisionsResult GetFirstCollision(Collider collider, Vector2 position) {
+    public SingleCollisionsResult GetFirstCollision(ICollider collider, Vector2 position) {
         foreach (CollisionComponent other in Colliders) {
             if (ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition)) {
                 return new(true, other);
@@ -266,7 +266,7 @@ public class CollisionManager {
         => GetSweptCollision(collider.Collider, collider.Actor.GlobalPosition, velocity, collider.Mask, allowNegative);
     public SweptCollisionResult GetSweptCollision(CollisionComponent collider, Vector2 position, Vector2 velocity, bool allowNegative = false)
         => GetSweptCollision(collider.Collider, position, velocity, collider.Mask, allowNegative);
-    public SweptCollisionResult GetSweptCollision(Collider collider, Vector2 position, Vector2 velocity, TagContainer tagMask, bool allowNegative = false) {
+    public SweptCollisionResult GetSweptCollision(ICollider collider, Vector2 position, Vector2 velocity, TagContainer tagMask, bool allowNegative = false) {
         // If object isn't moving just get the first collided object to avoid extra calculations
         if (velocity == Vector2.Zero) {
             SingleCollisionsResult collision = GetFirstCollision(collider, position, tagMask);
@@ -305,15 +305,14 @@ public class CollisionManager {
     #endregion
 
     #region 2 Collider Middleman Functions
-    static bool ColliderOverlapCheck(Collider colliderA, Vector2 positionA, Collider colliderB, Vector2 positionB) {
+    static bool ColliderOverlapCheck(ICollider colliderA, Vector2 positionA, ICollider colliderB, Vector2 positionB) {
         if (!colliderA.Bounds.Translate(positionA).Overlaps(colliderB.Bounds.Translate(positionB))) {
             return false;
         }
 
         if (colliderA.Multi) {
-            Collider[] subs = colliderA.GetSubColliders(new Rect(positionB - positionA + colliderB.Bounds.Position - colliderA.Bounds.Position, colliderB.Bounds.Size));
-            Console.WriteLine(subs.Length);
-            foreach (Collider collider in subs) {
+            ICollider[] subs = colliderA.GetSubColliders(new Rect(positionB - positionA + colliderB.Bounds.Position - colliderA.Bounds.Position, colliderB.Bounds.Size));
+            foreach (ICollider collider in subs) {
                 if (ColliderOverlapCheck(collider, positionA, colliderB, positionB)) { return true; }
             }
             return false;
@@ -326,7 +325,7 @@ public class CollisionManager {
         return GetCollisionSimplex(colliderA, positionA, colliderB, positionB).Collided;
     }
 
-    static Vector2 ColliderIntersectionFraction(Collider colliderA, Vector2 positionA, Vector2 velocityA, Collider colliderB, Vector2 positionB, Vector2 velocityB) {
+    static Vector2 ColliderIntersectionFraction(ICollider colliderA, Vector2 positionA, Vector2 velocityA, ICollider colliderB, Vector2 positionB, Vector2 velocityB) {
         Rect sweptBoundsA = SweptBounds(colliderA, velocityA);
         Rect sweptBoundsB = SweptBounds(colliderB, velocityB);
         if (!sweptBoundsA.Translate(positionA).Overlaps(sweptBoundsB.Translate(positionB))) {
@@ -335,7 +334,7 @@ public class CollisionManager {
 
         if (colliderA.Multi) {
             Vector2 fraction = Vector2.One;
-            foreach (Collider collider in colliderA.GetSubColliders(new Rect(positionB - positionA + sweptBoundsB.Position - sweptBoundsA.Position, sweptBoundsB.Size))) {
+            foreach (ICollider collider in colliderA.GetSubColliders(new Rect(positionB - positionA + sweptBoundsB.Position - sweptBoundsA.Position, sweptBoundsB.Size))) {
                 Vector2 newFraction = ColliderIntersectionFraction(collider, positionA, velocityA, colliderB, positionB, velocityB);
                 if (IsRayFractionSmaller(newFraction, fraction)) { fraction = newFraction; }
             }
@@ -358,9 +357,9 @@ public class CollisionManager {
 
     #region Primary Collision Functions
     static CollisionSimplexInfo GetCollisionSimplex(
-        Collider colliderA,
+        ICollider colliderA,
         Vector2 positionA,
-        Collider colliderB,
+        ICollider colliderB,
         Vector2 positionB
     ) {
         // Point A
@@ -410,9 +409,9 @@ public class CollisionManager {
 
     //! FIXME (Alex): Give back more info than just the pushout
     static Vector2 GetPushout(
-        Collider colliderA,
+        ICollider colliderA,
         Vector2 positionA,
-        Collider colliderB,
+        ICollider colliderB,
         Vector2 positionB,
         CollisionSimplexInfo simplex
     ) {
@@ -467,10 +466,10 @@ public class CollisionManager {
 
     //! FIXME (Alex): Give back more info than just the fraction
     static Vector2 GetRayIntersectionFraction(
-        Collider colliderA,
+        ICollider colliderA,
         Vector2 positionA,
         Vector2 velocityA,
-        Collider colliderB,
+        ICollider colliderB,
         Vector2 positionB,
         Vector2 velocityB
     ) {
@@ -540,9 +539,9 @@ public class CollisionManager {
     static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
 
     static Vector2 Support(
-        Collider colliderA,
+        ICollider colliderA,
         Vector2 positionA,
-        Collider colliderB,
+        ICollider colliderB,
         Vector2 positionB,
         Vector2 direction
     ) {
@@ -611,7 +610,7 @@ public class CollisionManager {
         return VectorFraction(intersection, velocity);
     }
 
-    static Rect SweptBounds(Collider collider, Vector2 velocity) {
+    static Rect SweptBounds(ICollider collider, Vector2 velocity) {
         Vector2 min = Vector2.Min(collider.Bounds.TopLeft, collider.Bounds.TopLeft + velocity);
         Vector2 max = Vector2.Max(collider.Bounds.BottomRight, collider.Bounds.BottomRight + velocity);
         return new(min, max - min);

@@ -4,7 +4,10 @@ namespace LittleLib.Loader.LDTK;
 
 public class TilesetSaveDefinition {
     [JsonPropertyName("uid")]
-    public int NameID { get; set; }
+    public int DefinitionID { get; set; }
+
+    [JsonPropertyName("identifier")]
+    public string Identifier { get; set; } = string.Empty;
 
     [JsonPropertyName("relPath")]
     public string TexturePath { get; set; } = string.Empty;

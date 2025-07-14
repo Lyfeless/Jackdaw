@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace LittleLib.Loader.LDTK;
 
-public class LevelSaveReference {
+internal class LevelSaveReference {
     [JsonPropertyName("identifier")]
     public string NameID { get; set; } = string.Empty;
 

@@ -8,7 +8,7 @@ public class SpriteComponent(LittleGame game, Sprite sprite, Vector2? offset = n
     Vector2 Offset = offset ?? Vector2.Zero;
 
     public SpriteComponent(LittleGame game, Subtexture sprite, Color color, Vector2? offset = null)
-        : this(game, new SpriteSingle(sprite, color), offset) { }
+        : this(game, new SpriteSingle(sprite) { Color = color }, offset) { }
 
     public SpriteComponent(LittleGame game, Subtexture sprite, Vector2? offset = null)
         : this(game, new SpriteSingle(sprite), offset) { }

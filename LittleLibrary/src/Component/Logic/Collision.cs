@@ -2,10 +2,10 @@ using System.Numerics;
 
 namespace LittleLib;
 
-public class CollisionComponent(LittleGame game, Collider collider) : Component(game) {
+public class CollisionComponent(LittleGame game, ICollider collider) : Component(game) {
     public record struct CollisionInfo(CollisionComponent Other, Vector2 Pushout);
 
-    public Collider Collider = collider;
+    public ICollider Collider = collider;
 
     public CollisionResolver? Resolver;
     public VelocityComponent? Velocity;

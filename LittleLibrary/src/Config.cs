@@ -4,19 +4,19 @@ namespace LittleLib;
 
 public struct LittleGameConfig() {
     [JsonPropertyName("applicationName")]
-    public string ApplicationName = "LittleGame";
+    public string ApplicationName { get; set; } = "LittleGame";
 
     [JsonPropertyName("windowTitle")]
-    public string WindowTitle = "Little Game";
+    public string WindowTitle { get; set; } = "Little Game";
 
     [JsonPropertyName("window")]
-    public LittleGameWindowConfig Window = new();
+    public LittleGameWindowConfig Window { get; set; } = new();
 
     [JsonPropertyName("content")]
-    public LittleGameContentConfig Content = new();
+    public LittleGameContentConfig Content { get; set; } = new();
 
     [JsonPropertyName("audio")]
-    public LittleGameAudioConfig Audio = new();
+    public LittleGameAudioConfig Audio { get; set; } = new();
 }
 
 public struct LittleGameWindowConfig() {
@@ -25,77 +25,80 @@ public struct LittleGameWindowConfig() {
         FIXED_VIEWPORT
     }
 
-    public RendererType Renderer = RendererType.FIXED_VIEWPORT;
+    [JsonPropertyName("Renderer")]
+    [JsonConverter(typeof(JsonStringEnumConverter<RendererType>))]
+    public RendererType Renderer { get; set; } = RendererType.FIXED_VIEWPORT;
 
     [JsonPropertyName("windowWidth")]
-    public int WindowWidth = 600;
+    public int WindowWidth { get; set; } = 600;
     [JsonPropertyName("windowHeight")]
-    public int WindowHeight = 600;
+    public int WindowHeight { get; set; } = 600;
     [JsonPropertyName("clearColor")]
-    public string ClearColor = "0xffffff";
+    public string ClearColor { get; set; } = "0x000000";
 
     // FIXED_VIEWPORT specific options
     [JsonPropertyName("viewportWidth")]
-    public int ViewportWidth = 352;
+    public int ViewportWidth { get; set; } = 352;
     [JsonPropertyName("viewportHeight")]
-    public int ViewportHeight = 256;
+    public int ViewportHeight { get; set; } = 256;
     //? Taking the color from foster's cornflower blue
     [JsonPropertyName("viewportColor")]
-    public string ViewportColor = "0x6495ed";
+    public string ViewportColor { get; set; } = "0x6495ed";
 }
 
 public struct LittleGameContentConfig() {
     [JsonPropertyName("rootFolder")]
-    public string RootFolder = "Content";
+    public string RootFolder { get; set; } = "Content";
 
     [JsonPropertyName("textureFolder")]
-    public string TextureFolder = "Textures";
+    public string TextureFolder { get; set; } = "Textures";
 
     [JsonPropertyName("fontFolder")]
-    public string FontFolder = "Fonts";
+    public string FontFolder { get; set; } = "Fonts";
 
     [JsonPropertyName("fontConfig")]
-    public string FontConfig = "Fonts/config.json";
+    public string FontConfig { get; set; } = "Fonts/config.json";
 
     [JsonPropertyName("soundFolder")]
-    public string SoundFolder = "Sounds";
+    public string SoundFolder { get; set; } = "Sounds";
 
     [JsonPropertyName("soundConfig")]
-    public string SoundConfig = "Sounds/config.json";
+    public string SoundConfig { get; set; } = "Sounds/config.json";
 
     [JsonPropertyName("shaderFolder")]
-    public string ShaderFolder = "Shaders";
+    public string ShaderFolder { get; set; } = "Shaders";
 
     [JsonPropertyName("shaderConfig")]
-    public string ShaderConfig = "Shaders/config.json";
+    public string ShaderConfig { get; set; } = "Shaders/config.json";
 
     [JsonPropertyName("animationFolder")]
-    public string AnimationFolder = "Animations";
+    public string AnimationFolder { get; set; } = "Animations";
 
     [JsonPropertyName("animationExtension")]
-    public string AnimationExtension = ".llanim";
+    public string AnimationExtension { get; set; } = ".llanim";
 
     [JsonPropertyName("animationGroupExtension")]
-    public string AnimationGroupExtension = ".llganim";
+    public string AnimationGroupExtension { get; set; } = ".llganim";
+
     [JsonPropertyName("asepriteConfigExtension")]
-    public string AsepriteConfigExtension = ".asedef";
+    public string AsepriteConfigExtension { get; set; } = ".asedef";
 }
 
 public struct LittleGameAudioConfig() {
     [JsonPropertyName("buses")]
-    public LittleGameAudioBusConfig[] Buses = [];
+    public LittleGameAudioBusConfig[] Buses { get; set; } = [];
 
     [JsonPropertyName("defaultBus")]
-    public string DefaultBus = string.Empty;
+    public string DefaultBus { get; set; } = string.Empty;
 }
 
 public struct LittleGameAudioBusConfig() {
     [JsonPropertyName("name")]
-    public string Name = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("parent")]
-    public string Parent = string.Empty;
+    public string Parent { get; set; } = string.Empty;
 
     [JsonPropertyName("defaultVolume")]
-    public float DefaultVolume = 0.5f;
+    public float DefaultVolume { get; set; } = 0.5f;
 }

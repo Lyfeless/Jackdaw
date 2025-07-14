@@ -7,5 +7,5 @@ class WorldSaveData {
     public LevelSaveReference[] Levels { get; set; } = [];
 
     [JsonPropertyName("defs")]
-    public WorldSaveDefinitions Definitions { get; set; }
+    public WorldSaveDefinitions Definitions { get; set; } = new();
 }

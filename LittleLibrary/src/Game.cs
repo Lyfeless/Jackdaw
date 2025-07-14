@@ -62,9 +62,12 @@ public class LittleGame : App {
             case LittleGameWindowConfig.RendererType.FIXED_VIEWPORT:
             default:
                 Viewspace = new(new(config.Window.ViewportWidth, config.Window.ViewportHeight));
-                Renderer = new FixedViewportRenderer(this, Viewspace.Size);
+                FixedViewportRenderer fixedViewport = new(this, Viewspace.Size);
+                fixedViewport.ViewportColor = Color.FromHexStringRGB(config.Window.ViewportColor);
+                Renderer = fixedViewport;
                 break;
         }
+        Renderer.ClearColor = Color.FromHexStringRGB(config.Window.ClearColor);
 
         foreach (LittleGameAudioBusConfig bus in config.Audio.Buses) {
             Audio.AddBus(bus.Name, bus.Parent != string.Empty ? bus.Parent : null, bus.DefaultVolume);

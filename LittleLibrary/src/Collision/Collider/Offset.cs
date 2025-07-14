@@ -4,19 +4,19 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): Not the most elegant thing ever
-public class OffsetCollider(Collider collider, Vector2 offset) : Collider() {
-    readonly Collider Collider = collider;
+public class OffsetCollider(ICollider collider, Vector2 offset) : ICollider {
+    readonly ICollider Collider = collider;
     readonly Vector2 Offset = offset;
 
-    public override Rect Bounds => new(Collider.Bounds.Position + Offset, Collider.Bounds.Size);
-    public override Vector2 Center => Collider.Bounds.Center + Offset;
+    public Rect Bounds => new(Collider.Bounds.Position + Offset, Collider.Bounds.Size);
+    public Vector2 Center => Collider.Bounds.Center + Offset;
 
-    public override bool Multi => Collider.Multi;
+    public bool Multi => Collider.Multi;
 
-    public override Collider[] GetSubColliders(Rect bounds) {
+    public ICollider[] GetSubColliders(Rect bounds) {
         if (!Collider.Multi) { return [this]; }
         return [.. Collider.GetSubColliders(new(bounds.Position - Offset, bounds.Size)).Select(e => new OffsetCollider(e, Offset))];
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) => Collider.Support(position + Offset, direction);
+    public Vector2 Support(Vector2 position, Vector2 direction) => Collider.Support(position + Offset, direction);
 }

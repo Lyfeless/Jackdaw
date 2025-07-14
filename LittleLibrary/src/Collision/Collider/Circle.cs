@@ -3,7 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class CircleCollider(Circle circle) : Collider {
+public class CircleCollider(Circle circle) : ICollider {
     Circle circle = circle;
     public Circle Circle {
         get => circle;
@@ -14,18 +14,18 @@ public class CircleCollider(Circle circle) : Collider {
     }
 
     Rect bounds = GetBounds(circle);
-    public override Rect Bounds => bounds;
+    public Rect Bounds => bounds;
 
-    public override Vector2 Center => circle.Position;
+    public Vector2 Center => circle.Position;
 
-    public override bool Multi => false;
-    public override Collider[] GetSubColliders(Rect bounds) => [this];
+    public bool Multi => false;
+    public ICollider[] GetSubColliders(Rect bounds) => [this];
 
     static Rect GetBounds(Circle circle) {
         return new Rect(-circle.Radius, -circle.Radius, circle.Radius + circle.Radius, circle.Radius + circle.Radius);
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
+    public Vector2 Support(Vector2 position, Vector2 direction) {
         return position + Circle.Position + (Circle.Radius * direction.Normalized());
     }
 }

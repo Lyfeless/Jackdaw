@@ -3,7 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public abstract class ConvexCollider(IConvexShape shape) : Collider {
+public abstract class ConvexCollider(IConvexShape shape) : ICollider {
     IConvexShape shape = shape;
     public IConvexShape Shape {
         get => shape;
@@ -14,11 +14,11 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
     }
 
     Rect bounds = GetBounds(shape);
-    public override Rect Bounds => bounds;
-    public override Vector2 Center => bounds.Center;
+    public Rect Bounds => bounds;
+    public Vector2 Center => bounds.Center;
 
-    public override bool Multi => false;
-    public override Collider[] GetSubColliders(Rect bounds) => [this];
+    public bool Multi => false;
+    public ICollider[] GetSubColliders(Rect bounds) => [this];
 
     static Rect GetBounds(IConvexShape shape) {
         BoundsBuilder builder = new();
@@ -28,7 +28,7 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
         return builder.Rect;
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
+    public Vector2 Support(Vector2 position, Vector2 direction) {
         float furthestDistance = float.NegativeInfinity;
         Vector2 furthestPoint = Vector2.Zero;
 

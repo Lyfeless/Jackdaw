@@ -12,6 +12,9 @@ public class LayerSaveData {
     [JsonPropertyName("iid")]
     public string InstanceID { get; set; } = string.Empty;
 
+    [JsonPropertyName("layerDefUid")]
+    public int LayerDefinitionID { get; set; }
+
     [JsonPropertyName("__cWid")]
     public int Width { get; set; }
 
@@ -20,6 +23,9 @@ public class LayerSaveData {
 
     [JsonPropertyName("__gridSize")]
     public int TileSize { get; set; }
+
+    [JsonPropertyName("visible")]
+    public bool Visible { get; set; }
 
     [JsonPropertyName("__tilesetDefUid")]
     public int? Tileset { get; set; }

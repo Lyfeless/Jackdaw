@@ -4,73 +4,125 @@ using Foster.Framework;
 namespace LittleLib.Loader.LDTK;
 
 public class LDTKLoader {
-    LittleGame Game;
+    const string EntityLayerDescriptor = "Entities";
+    const string IntGridLayerDescriptor = "IntGrid";
+    const string TileLayerDescriptor = "Tiles";
+    const string AutoLayerDescriptor = "AutoLayer";
 
-    static readonly Dictionary<int, TilesetSaveDefinition> tilesets = [];
+    record class LayerTileStack(List<TileSaveData> Tiles);
 
-    static readonly Dictionary<string, LevelSaveReference> levels = [];
-    public static string[] LevelNames => [.. levels.Keys];
+    readonly LittleGame Game;
+    readonly string LevelFolderPath;
 
-    readonly Dictionary<string, Func<EntitySaveData, Actor>> ActorRegistry = [];
+    readonly Dictionary<int, LDTKTileset> Tilesets = [];
+    readonly Dictionary<int, LayerSaveDefinition> LayerDefinitions = [];
+
+    readonly Dictionary<string, LevelSaveReference> Levels = [];
+    public string[] LevelNames => [.. Levels.Keys];
+
+    readonly Dictionary<string, Action<Actor, EntitySaveData>> ActorRegistry = [];
 
     public LDTKLoader(LittleGame game, string path) {
         Game = game;
+        LevelFolderPath = Path.Join(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
 
         if (!File.Exists(path)) { return; }
         WorldSaveData? data = JsonSerializer.Deserialize(File.ReadAllText(path), LDTKSourceGenerationContext.Default.WorldSaveData);
         if (data == null) { return; }
 
         foreach (TilesetSaveDefinition tileset in data.Definitions.Tilesets) {
-            tilesets.Add(tileset.NameID, tileset);
+            Tilesets.Add(
+                tileset.DefinitionID,
+                new(
+                    identifier: tileset.Identifier,
+                    atlas: GetTilesetTexture(tileset),
+                    tileCount: new(tileset.TileCountX, tileset.TileCountY),
+                    tileSize: tileset.GridSize
+                )
+            );
+        }
+
+        foreach (LayerSaveDefinition layer in data.Definitions.Layers) {
+            LayerDefinitions.Add(layer.DefinitionID, layer);
         }
 
         foreach (LevelSaveReference levelRef in data.Levels) {
-            levels.Add(levelRef.NameID, levelRef);
+            Levels.Add(levelRef.NameID, levelRef);
         }
     }
 
-    public Actor Load(LittleGame game, string name) {
-        if (!levels.TryGetValue(name, out LevelSaveReference? levelRef)) { throw new Exception("Attempt to access unidentified level"); }
-        LevelSaveData levelData = JsonSerializer.Deserialize(File.ReadAllText($"./Content/Levels/{levelRef.NameID}.ldtkl"), LDTKSourceGenerationContext.Default.LevelSaveData) ?? throw new Exception("Failed to load level");
+    public Actor Load(string name) {
+        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) { throw new Exception("Attempt to access unidentified level"); }
+        LevelSaveData levelData = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(LevelFolderPath, $"{levelRef.NameID}.ldtkl")), LDTKSourceGenerationContext.Default.LevelSaveData) ?? throw new Exception("Failed to load level");
 
-        Actor levelRoot = new(game);
+        Actor levelRoot = new(Game);
         levelRoot.Match.Name = $"Level_{levelRef.NameID}";
 
         Point2 levelPosition = new(levelRef.X, levelRef.Y);
         Point2 levelSize = new(levelRef.Width, levelRef.Height);
 
-        foreach (LayerSaveData layerData in levelData.Layers) {
-            switch (layerData.Type) {
-                case "Entities": {
-                        Actor newEntityLayer = new(game);
+        List<Actor> layers = [];
 
+        foreach (LayerSaveData layerData in levelData.Layers) {
+            LayerSaveDefinition layerDefinition = LayerDefinitions[layerData.LayerDefinitionID];
+
+            Actor newLayer = new(Game);
+            newLayer.Match.Name = layerDefinition.Identifier ?? layerData.InstanceID;
+            newLayer.Match.Guid = new Guid(layerData.InstanceID);
+            newLayer.Position.Set(layerData.OffsetX, layerData.OffsetY);
+            if (!layerData.Visible) {
+                newLayer.Ticking = false;
+                newLayer.Visible = false;
+            }
+
+            switch (layerData.Type) {
+                case EntityLayerDescriptor: {
                         foreach (EntitySaveData entityData in layerData.Entities) {
                             if (!ActorRegistry.ContainsKey(entityData.NameID)) {
                                 Console.WriteLine($"LDTKLoader: Unhandled entity creation for {entityData.NameID}, no generator defined");
+                                continue;
                             }
-                            Actor newActor = ActorRegistry[entityData.NameID](entityData);
-                            newActor.Match.Name = entityData.InstanceID;
-                            //! FIXME (Alex): Set Guid?
+                            Actor newEntity = new(Game);
+                            newEntity.Match.Name = entityData.InstanceID;
+                            newEntity.Match.Guid = new Guid(entityData.InstanceID);
+                            newEntity.Position.Set(new(entityData.Position[0], entityData.Position[1]));
+                            ActorRegistry[entityData.NameID](newEntity, entityData);
 
-                            newEntityLayer.Children.Add(newActor);
+                            newLayer.Children.Add(newEntity);
                         }
-
-                        levelRoot.Children.Add(newEntityLayer);
                     }
                     break;
-                case "IntGrid":
-                case "Tiles":
-                case "AutoLayer": {
-                        //! FIXME (Alex): Handle Tile Layer
+                case IntGridLayerDescriptor:
+                case TileLayerDescriptor:
+                case AutoLayerDescriptor: {
+                        if (layerData.Tileset == null) {
+                            Console.WriteLine($"LDTKLoader: Unable to load layer {newLayer.Match.Name}, no tileset assigned");
+                            continue;
+                        }
+                        LDTKTileset tileset = Tilesets[(int)layerData.Tileset];
+                        Actor newGrid = new(Game);
+                        LDTKTileLayer tiles = new(Game, tileset, new(layerData.Width, layerData.Height), layerData.TileSize, new(layerData.OffsetX, layerData.OffsetY));
+                        foreach (TileSaveData tile in layerData.Tiles) {
+                            tiles.AddTileStackLocal(tileset.GetLocalPosition(new(tile.Source[0], tile.Source[1])), new(tile.Position[0], tile.Position[1]));
+                        }
+                        newGrid.Components.Add(tiles);
+                        newLayer.Children.Add(newGrid);
                     }
                     break;
             }
+
+            layers.Add(newLayer);
         }
 
-        return Actor.Invalid;
+        // Add in reverse order, ldtk renders backwards compared to the engine
+        for (int i = layers.Count - 1; i >= 0; --i) {
+            levelRoot.Children.Add(layers[i]);
+        }
+
+        return levelRoot;
     }
 
-    public LDTKLoader RegisterActor(string id, Func<EntitySaveData, Actor> func) {
+    public LDTKLoader RegisterActor(string id, Action<Actor, EntitySaveData> func) {
         if (ActorRegistry.ContainsKey(id)) { throw new Exception($"LDTKLoader: Attempting to re-define actor id {id}"); }
         ActorRegistry.Add(id, func);
         return this;

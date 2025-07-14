@@ -38,7 +38,6 @@ public class AudioManager {
     }
 
     public void Startup() {
-        Console.WriteLine("Startup");
         Audio.Startup();
     }
     public void Update() => Audio.Update();

@@ -1,7 +1,7 @@
 namespace LittleLib;
 
 public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T : class {
-    public readonly Guid Guid = guid;
+    public Guid Guid = guid;
     public string? Name = name;
     T Obj = obj;
     Type ObjType = obj.GetType();

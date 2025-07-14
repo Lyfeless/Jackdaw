@@ -20,7 +20,6 @@ public class EventBus {
     }
 
     public void Dispatch<T>(T @event) where T : struct {
-        // Console.WriteLine("Dispatch");
         Type type = typeof(T);
         if (!Subsciptions.TryGetValue(type, out List<Delegate>? value)) { return; }
         foreach (Delegate callback in value) {
