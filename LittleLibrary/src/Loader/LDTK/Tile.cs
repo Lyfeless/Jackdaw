@@ -51,6 +51,8 @@ public class LDTKTile() {
 }
 
 public class LDTKTileElement() {
+    public int ID;
     public Sprite? Sprite;
     public ICollider? Collider;
+    public Dictionary<string, string> CustomData = [];
 }

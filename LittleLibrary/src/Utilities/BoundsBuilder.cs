@@ -2,10 +2,9 @@ using System.Numerics;
 using Foster.Framework;
 
 class BoundsBuilder {
-    float Top = float.PositiveInfinity;
-    float Bottom = float.NegativeInfinity;
-    float Left = float.PositiveInfinity;
-    float Right = float.NegativeInfinity;
+    Vector2 min = Vector2.NegativeInfinity;
+    Vector2 max = Vector2.PositiveInfinity;
+
     int PointCount = 0;
     public Rect Rect;
 
@@ -31,16 +30,12 @@ class BoundsBuilder {
 
     public BoundsBuilder Add(Vector2 point) {
         if (PointCount == 0) {
-            Top = point.Y;
-            Bottom = point.Y;
-            Left = point.X;
-            Right = point.X;
+            min = point;
+            max = point;
         }
         else {
-            Top = Math.Min(point.Y, Top);
-            Bottom = Math.Max(point.Y, Bottom);
-            Left = Math.Min(point.X, Left);
-            Right = Math.Max(point.X, Right);
+            min = Vector2.Min(min, point);
+            max = Vector2.Max(max, point);
         }
 
         PointCount++;
@@ -50,16 +45,12 @@ class BoundsBuilder {
 
     public BoundsBuilder Add(Rect rect) {
         if (PointCount == 0) {
-            Top = rect.Top;
-            Bottom = rect.Bottom;
-            Left = rect.Left;
-            Right = rect.Right;
+            min = rect.TopLeft;
+            min = rect.BottomRight;
         }
         else {
-            Top = Math.Min(rect.Top, Top);
-            Bottom = Math.Max(rect.Bottom, Bottom);
-            Left = Math.Min(rect.Left, Left);
-            Right = Math.Max(rect.Right, Right);
+            min = Vector2.Min(min, rect.TopLeft);
+            max = Vector2.Max(max, rect.BottomRight);
         }
 
         PointCount += 4;
@@ -82,10 +73,8 @@ class BoundsBuilder {
     }
 
     public BoundsBuilder Clear() {
-        Top = float.PositiveInfinity;
-        Bottom = float.NegativeInfinity;
-        Left = float.PositiveInfinity;
-        Right = float.NegativeInfinity;
+        min = Vector2.NegativeInfinity;
+        max = Vector2.PositiveInfinity;
         PointCount = 0;
 
         SetRect();
@@ -93,6 +82,6 @@ class BoundsBuilder {
     }
 
     void SetRect() {
-        Rect = PointCount > 0 ? new(Left, Top, Right - Left, Bottom - Top) : new(0, 0, 0, 0);
+        Rect = PointCount > 0 ? new(min, max - min) : new(0, 0, 0, 0);
     }
 }

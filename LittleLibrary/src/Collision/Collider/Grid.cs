@@ -37,9 +37,10 @@ public class GridCollider(Vector2 position, Grid<ICollider?> grid, Vector2 tileS
         if (diff.X <= 0 || diff.Y <= 0) { return []; }
 
         //! FIXME (Alex): Would ideally like to use a fixed size array but that would leave empty space if any tiles are empty
+        //! FIXME (Alex): I BROKE THIS SOMEHOW
         List<ICollider> overlaps = [];
-        int tileCountX = (int)MathF.Ceiling(diff.X / TileSize.X);
-        int tileCountY = (int)MathF.Ceiling(diff.Y / TileSize.Y);
+        int tileCountX = (int)MathF.Ceiling(diff.X / TileSize.X) + 1;
+        int tileCountY = (int)MathF.Ceiling(diff.Y / TileSize.Y) + 1;
         Point2 startingCoord = this.LocalToTileCoord(min);
         for (int x = 0; x < tileCountX; ++x) {
             for (int y = 0; y < tileCountY; ++y) {

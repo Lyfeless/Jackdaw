@@ -37,7 +37,8 @@ public class LDTKLoader {
                     identifier: tileset.Identifier,
                     atlas: GetTilesetTexture(tileset),
                     tileCount: new(tileset.TileCountX, tileset.TileCountY),
-                    tileSize: tileset.GridSize
+                    tileSize: tileset.GridSize,
+                    customData: tileset.CustomData
                 )
             );
         }
@@ -100,13 +101,11 @@ public class LDTKLoader {
                             continue;
                         }
                         LDTKTileset tileset = Tilesets[(int)layerData.Tileset];
-                        Actor newGrid = new(Game);
                         LDTKTileLayer tiles = new(Game, tileset, new(layerData.Width, layerData.Height), layerData.TileSize, new(layerData.OffsetX, layerData.OffsetY));
                         foreach (TileSaveData tile in layerData.Tiles) {
-                            tiles.AddTileStackLocal(tileset.GetLocalPosition(new(tile.Source[0], tile.Source[1])), new(tile.Position[0], tile.Position[1]));
+                            tiles.AddTileStackLocal(tileset.GetTileCoord(new Point2(tile.Source[0], tile.Source[1])), new(tile.Position[0], tile.Position[1]));
                         }
-                        newGrid.Components.Add(tiles);
-                        newLayer.Children.Add(newGrid);
+                        newLayer.Components.Add(tiles);
                     }
                     break;
             }

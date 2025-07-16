@@ -26,4 +26,15 @@ public class TilesetSaveDefinition {
 
     [JsonPropertyName("enumTags")]
     public TileTypeSaveTag[] TileTypes { get; set; } = [];
+
+    [JsonPropertyName("customData")]
+    public TilesetCustomData[] CustomData { get; set; } = [];
+}
+
+public class TilesetCustomData {
+    [JsonPropertyName("tileId")]
+    public int ID { get; set; } = 0;
+
+    [JsonPropertyName("data")]
+    public string Data { get; set; } = string.Empty;
 }

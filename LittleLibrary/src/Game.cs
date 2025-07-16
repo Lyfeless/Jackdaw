@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using Foster.Framework;
 
@@ -10,6 +11,7 @@ public class LittleGame : App {
     public CollisionManager Collision;
     public EventBus Events;
     public AudioManager Audio;
+    public SpaceConverter CoordSpace;
 
     public Rng Random = new(DateTime.Now.Millisecond);
 
@@ -52,6 +54,7 @@ public class LittleGame : App {
         Collision = new();
         Events = new();
         Audio = new();
+        CoordSpace = new(this);
 
         //! FIXME (Alex): YUCK
         switch (config.Window.Renderer) {
@@ -101,4 +104,7 @@ public class LittleGame : App {
     protected override void Render() => Renderer.Render(Batcher, Root);
 
     public void QueueInvalidate(Actor actor, bool invalidateChildren) => InvalidateQueue.Add(new(actor, invalidateChildren));
+
+    public Vector2 WindowToViewspace(Vector2 position) => Renderer.WindowToViewspace(position);
+    public Vector2 ViewspaceToWindow(Vector2 position) => Renderer.ViewspaceToWindow(position);
 }

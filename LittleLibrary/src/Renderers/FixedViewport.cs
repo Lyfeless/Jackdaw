@@ -10,9 +10,16 @@ internal class FixedViewportRenderer(LittleGame game, Point2 size) : LittleGameR
 
     public Color ViewportColor = Color.CornflowerBlue;
 
-    public override Vector2 ViewspaceToScreenSpace(Vector2 position) {
+    //! FIXME (Alex): I have no idea if either of these work
+    public override Vector2 WindowToViewspace(Vector2 position) {
         Matrix3x2.Invert(DisplayScale, out Matrix3x2 inv);
         return Vector2.Transform(position, inv);
+    }
+
+    public override Vector2 ViewspaceToWindow(Vector2 position) {
+        //! FIXME (Alex): UNTESTED
+        return Vector2.Transform(position, DisplayScale);
+
     }
 
     //! FIXME (Alex): There's redundancy here between different renderers, is that important?

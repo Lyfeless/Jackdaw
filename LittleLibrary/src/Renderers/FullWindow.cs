@@ -4,7 +4,8 @@ using Foster.Framework;
 namespace LittleLib;
 
 internal class FullWindowRenderer(LittleGame game) : LittleGameRenderer(game) {
-    public override Vector2 ViewspaceToScreenSpace(Vector2 position) => position;
+    public override Vector2 ViewspaceToWindow(Vector2 position) => position;
+    public override Vector2 WindowToViewspace(Vector2 position) => position;
 
     public override void Render(Batcher batcher, Actor root) {
         //! FIXME (Alex): Gross jank

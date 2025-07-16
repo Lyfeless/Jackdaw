@@ -22,7 +22,7 @@ public class CircleCollider(Circle circle) : ICollider {
     public ICollider[] GetSubColliders(Rect bounds) => [this];
 
     static Rect GetBounds(Circle circle) {
-        return new Rect(-circle.Radius, -circle.Radius, circle.Radius + circle.Radius, circle.Radius + circle.Radius);
+        return new Rect(circle.Position.X - circle.Radius, circle.Position.Y - circle.Radius, circle.Radius + circle.Radius, circle.Radius + circle.Radius);
     }
 
     public Vector2 Support(Vector2 position, Vector2 direction) {
