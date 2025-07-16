@@ -34,8 +34,6 @@ public class LDTKTileLayer : Component, ISpatialGrid<Point2, LDTKTile> {
 
         colliderGrid = new GridCollider(gridSize, this.tileSize);
         collider = new(game, colliderGrid);
-        //! FIXME (Alex): TEMPPPPP!
-        collider.Tags.Set(0);
         renderer = new(game, (Point2)position, gridSize, (Point2)this.tileSize);
     }
 

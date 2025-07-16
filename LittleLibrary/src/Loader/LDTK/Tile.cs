@@ -3,7 +3,7 @@ namespace LittleLib.Loader.LDTK;
 public class LDTKTile() {
     readonly List<LDTKTileElement> Elements = [];
     public Sprite? Sprite;
-    public ICollider? Collider;
+    public Collider? Collider;
 
     public LDTKTile(LDTKTileElement element) : this() {
         Add(element);
@@ -43,7 +43,7 @@ public class LDTKTile() {
         else if (sprites.Length == 1) { Sprite = sprites[0]; }
         else { Sprite = new SpriteStack(sprites); }
 
-        ICollider[] colliders = [.. Elements.Where(e => e.Collider != null).Select(e => e.Collider)];
+        Collider[] colliders = [.. Elements.Where(e => e.Collider != null).Select(e => e.Collider)];
         if (colliders.Length == 0) { Collider = null; }
         else if (colliders.Length == 1) { Collider = colliders[0]; }
         else { Collider = new MultiCollider(colliders); }
@@ -53,6 +53,6 @@ public class LDTKTile() {
 public class LDTKTileElement() {
     public int ID;
     public Sprite? Sprite;
-    public ICollider? Collider;
+    public Collider? Collider;
     public Dictionary<string, string> CustomData = [];
 }

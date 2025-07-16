@@ -3,15 +3,17 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-//! FIXME (Alex): Switch to interface so these can be structs?
-public interface ICollider {
-    public bool Multi { get; }
+public abstract class Collider {
+    public TagContainer Tags = new();
+    public TagContainer Mask = new();
+
+    public abstract bool Multi { get; }
 
     // Return all useful subcolliders for a given bound, local to collider
-    public ICollider[] GetSubColliders(Rect bounds);
+    public abstract Collider[] GetSubColliders(Rect bounds);
 
-    public Rect Bounds { get; }
-    public Vector2 Center { get; }
+    public abstract Rect Bounds { get; }
+    public abstract Vector2 Center { get; }
 
-    public Vector2 Support(Vector2 position, Vector2 direction);
+    public abstract Vector2 Support(Vector2 position, Vector2 direction);
 }

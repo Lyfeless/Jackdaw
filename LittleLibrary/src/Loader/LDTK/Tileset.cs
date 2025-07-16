@@ -12,7 +12,7 @@ public class LDTKTileset {
     readonly Grid<LDTKTileElement> tileElements;
     public readonly int TileSize;
 
-    readonly ICollider DefaultCollider;
+    readonly Collider DefaultCollider;
 
     public Point2 Size => tileElements.Size;
     public LDTKTileElement? Get(int id) => tileElements.Get(GetTileCoord(id));
@@ -66,7 +66,8 @@ public class LDTKTileset {
         }
     }
 
-    ICollider? ColliderFromData(string data) {
+    //! FIXME (Alex): Tags are temp!
+    Collider? ColliderFromData(string data) {
         if (data == string.Empty) { return null; }
         string[] args = data.Split(' ');
         switch (args[0]) {
@@ -79,7 +80,7 @@ public class LDTKTileset {
                         !float.TryParse(args[3], out float w) ||
                         !float.TryParse(args[4], out float h)
                     ) { return null; }
-                    return new RectangleCollider(new Rect(x, y, w, h));
+                    return new RectangleCollider(new Rect(x, y, w, h)) { Tags = new(0) };
                 }
             case "CIRCLE": {
                     if (
@@ -88,7 +89,7 @@ public class LDTKTileset {
                         !float.TryParse(args[2], out float y) ||
                         !float.TryParse(args[3], out float r)
                     ) { return null; }
-                    return new CircleCollider(new Circle(x, y, r));
+                    return new CircleCollider(new Circle(x, y, r)) { Tags = new(0) };
                 }
             case "POLYGON": {
                     if (args.Length % 2 != 0) { return null; }
@@ -101,7 +102,7 @@ public class LDTKTileset {
                         points[i] = new(x, y);
                     }
                     //! FIXME (Alex): I'm trusting that this polygon is convex, maybe a bad idea
-                    return new ConvexPolygonCollider(new ConvexPolygon() { Vertices = [.. points] });
+                    return new ConvexPolygonCollider(new ConvexPolygon() { Vertices = [.. points] }) { Tags = new(0) };
                 }
         }
         return null;

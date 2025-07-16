@@ -3,7 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : ICollider {
+public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Collider {
     Vector2 point1 = point1;
     public Vector2 Point1 {
         get => point1;
@@ -47,15 +47,15 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : ICo
         : this(position + delta, position - delta, radius) { }
 
     Rect bounds = GetBounds(point1, point2, radius);
-    public Rect Bounds => bounds;
+    public override Rect Bounds => bounds;
 
     Vector2 center = CalcExtra.LineMidpoint(point1, point2);
-    public Vector2 Center => center;
+    public override Vector2 Center => center;
 
-    public bool Multi => false;
-    public ICollider[] GetSubColliders(Rect bounds) => [this];
+    public override bool Multi => false;
+    public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public Vector2 Support(Vector2 position, Vector2 direction) {
+    public override Vector2 Support(Vector2 position, Vector2 direction) {
         return (Vector2.Dot(point2 - point1, direction) < 0 ? point1 : point2) + position + (radius * direction.Normalized());
     }
 

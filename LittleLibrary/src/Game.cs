@@ -99,6 +99,7 @@ public class LittleGame : App {
         foreach (QueuedInvalidation item in InvalidateQueue) {
             item.Actor.Invalidate(item.InvalidateChildren);
         }
+        InvalidateQueue.Clear();
     }
 
     protected override void Render() => Renderer.Render(Batcher, Root);

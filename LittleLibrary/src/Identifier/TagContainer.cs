@@ -2,6 +2,10 @@ namespace LittleLib;
 
 public struct TagContainer() {
     public long Tags;
+    public readonly bool Empty => Tags == 0;
+
+    public TagContainer(params Enum[] values) : this() => Set(values);
+    public TagContainer(params int[] values) : this() => Set(values);
 
     public void Set(params Enum[] values) => Set(EnumToTags(values));
     public void Set(params int[] values) => Set(IntToTags(values));
@@ -9,13 +13,16 @@ public struct TagContainer() {
         Tags = tags;
     }
 
-    public void Add(Enum tag) => Change(tag, true);
+    //! FIXME (Alex): params variations of Add and Remove
+    public void Add(Enum tag) => Add((int)(object)tag);
+    public void Add(int tag) {
+        Tags |= Single(tag);
+    }
 
-    public void Add(int tag) => Change(tag, true);
-
-    public void Remove(Enum tag) => Change(tag, false);
-
-    public void Remove(int tag) => Change(tag, false);
+    public void Remove(Enum tag) => Remove((int)(object)tag);
+    public void Remove(int tag) {
+        Tags &= ~Single(tag);
+    }
 
     //! FIXME (Alex): Unfinished
     public void Change(Enum tag, bool value) {
@@ -52,7 +59,7 @@ public struct TagContainer() {
     static long EnumToTags(params Enum[] values) {
         long tags = 0;
         for (int i = 0; i < values.Length; ++i) {
-            tags |= (long)1 << (int)(object)values[i];
+            tags |= Single((int)(object)values[i]);
         }
         return tags;
     }
@@ -60,8 +67,14 @@ public struct TagContainer() {
     static long IntToTags(params int[] values) {
         long tags = 0;
         for (int i = 0; i < values.Length; ++i) {
-            tags |= (long)1 << values[i];
+            tags |= Single(values[i]);
         }
         return tags;
     }
+
+    static long Single(int value) {
+        return (long)1 << value;
+    }
+
+    public override string ToString() => Convert.ToString(Tags, 2);
 }

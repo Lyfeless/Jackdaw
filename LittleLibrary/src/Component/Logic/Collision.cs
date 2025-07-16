@@ -2,16 +2,13 @@ using System.Numerics;
 
 namespace LittleLib;
 
-public class CollisionComponent(LittleGame game, ICollider collider) : Component(game) {
+public class CollisionComponent(LittleGame game, Collider collider) : Component(game) {
     public record struct CollisionInfo(CollisionComponent Other, Vector2 Pushout);
 
-    public ICollider Collider = collider;
+    public Collider Collider = collider;
 
     public CollisionResolver? Resolver;
     public VelocityComponent? Velocity;
-
-    public TagContainer Tags = new();
-    public TagContainer Mask = new();
 
     public readonly List<CollisionInfo> Collisions = [];
     public bool Collided => Collisions.Count > 0;

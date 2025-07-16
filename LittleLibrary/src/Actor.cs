@@ -159,6 +159,10 @@ public class Actor {
             }
         }
 
+        if (Parent.IsValid) {
+            Parent.Children.Remove(this);
+        }
+
         Children.Clear();
         Components.Clear();
         IsValid = false;
@@ -195,12 +199,56 @@ public class Actor {
         return null;
     }
 
+    public T? FindComponent<T>(Func<ObjectIdentifier<Component>, bool> func) where T : Component {
+        foreach (Component component in Components.Elements) {
+            if (func(component.Match) && component is T componentCast) {
+                return componentCast;
+            }
+        }
+
+        return null;
+    }
+
+    public T? FindComponent<T>() where T : Component {
+        foreach (Component component in Components.Elements) {
+            if (component is T componentCast) {
+                return componentCast;
+            }
+        }
+
+        return null;
+    }
+
     public Component? FindComponentRecursive(Func<ObjectIdentifier<Component>, bool> func) {
         Component? component = FindComponent(func);
         if (component != null) { return component; }
 
         foreach (Actor child in Children.Elements) {
             component = child.FindComponentRecursive(func);
+            if (component != null) { return component; }
+        }
+
+        return null;
+    }
+
+    public T? FindComponentRecursive<T>(Func<ObjectIdentifier<Component>, bool> func) where T : Component {
+        T? component = FindComponent<T>(func);
+        if (component != null) { return component; }
+
+        foreach (Actor child in Children.Elements) {
+            component = child.FindComponentRecursive<T>(func);
+            if (component != null) { return component; }
+        }
+
+        return null;
+    }
+
+    public T? FindComponentRecursive<T>() where T : Component {
+        T? component = FindComponent<T>();
+        if (component != null) { return component; }
+
+        foreach (Actor child in Children.Elements) {
+            component = child.FindComponentRecursive<T>();
             if (component != null) { return component; }
         }
 
