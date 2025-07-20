@@ -5,16 +5,20 @@ public class LDTKTile() {
     public Sprite? Sprite;
     public Collider? Collider;
 
-    public LDTKTile(LDTKTileElement element) : this() {
-        Add(element);
-    }
-
+    int Flip;
     public bool Empty => Elements.Count == 0;
 
-    public LDTKTile(params LDTKTileElement[] elements) : this() {
+    public LDTKTile(LDTKTileElement element, int flip = 0) : this() {
+        Add(element);
+        Flip = flip;
+    }
+
+    public LDTKTile(LDTKTileElement[] elements, int flip = 0) : this() {
         foreach (LDTKTileElement element in elements) {
             Add(element);
         }
+
+        Flip = flip;
     }
 
     public bool Add(LDTKTileElement element) {
@@ -47,6 +51,12 @@ public class LDTKTile() {
         if (colliders.Length == 0) { Collider = null; }
         else if (colliders.Length == 1) { Collider = colliders[0]; }
         else { Collider = new MultiCollider(colliders); }
+
+        //! FIXME (Alex): Untested
+        if (Sprite != null) {
+            Sprite.FlipX = (Flip & 1 << 0) != 0;
+            Sprite.FlipY = (Flip & 1 << 1) != 0;
+        }
     }
 }
 
@@ -54,5 +64,6 @@ public class LDTKTileElement() {
     public int ID;
     public Sprite? Sprite;
     public Collider? Collider;
+    public string[] EnumValues = [];
     public Dictionary<string, string> CustomData = [];
 }

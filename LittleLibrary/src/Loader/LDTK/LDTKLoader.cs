@@ -22,7 +22,8 @@ public class LDTKLoader {
 
     readonly Dictionary<string, Action<Actor, EntitySaveData>> ActorRegistry = [];
 
-    public LDTKLoader(LittleGame game, string path) {
+    //! FIXME (Alex): find a better way to set collision enums data
+    public LDTKLoader(LittleGame game, string path, Func<string, int?> collisionTagFunc) {
         Game = game;
         LevelFolderPath = Path.Join(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
 
@@ -38,7 +39,9 @@ public class LDTKLoader {
                     atlas: GetTilesetTexture(tileset),
                     tileCount: new(tileset.TileCountX, tileset.TileCountY),
                     tileSize: tileset.GridSize,
-                    customData: tileset.CustomData
+                    enumTags: tileset.TileTypes,
+                    customData: tileset.CustomData,
+                    collisionTagFunc: collisionTagFunc
                 )
             );
         }

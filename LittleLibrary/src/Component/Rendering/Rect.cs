@@ -7,7 +7,8 @@ public class RectComponent(LittleGame game, Rect rect, Color color) : Component(
     Color Color = color;
 
     public override void Render(Batcher batcher) {
-        if (!Game.Viewspace.Bounds.Contains(new Rect(Actor.GlobalPosition + Rect.Position, Rect.Size))) { return; }
+        //! FIXME (Alex): Verify culling is correct
+        if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Rect.Position, Rect.Size))) { return; }
         batcher.Rect(Rect, Color);
     }
 }

@@ -128,6 +128,7 @@ public class CollisionManager {
         foreach (CollisionComponent other in Colliders) {
             if (
                 collider != other &&
+                !ActorMatch(collider, other) &&
                 ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition)
             ) {
                 collisions.Add(other);
@@ -175,7 +176,7 @@ public class CollisionManager {
     /// <returns>Information about collision check results.</returns>
     public SingleCollisionsResult GetFirstCollision(CollisionComponent collider, Vector2 position) {
         foreach (CollisionComponent other in Colliders) {
-            if (collider != other && ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition)) {
+            if (collider != other && !ActorMatch(collider, other) && ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition)) {
                 return new(true, other);
             }
         }
@@ -228,7 +229,8 @@ public class CollisionManager {
         CollisionComponent? minCollider = null;
 
         foreach (CollisionComponent other in Colliders) {
-            if (collider == other) { continue; }
+            if (collider == other || ActorMatch(collider, other)) { continue; }
+
             Vector2 fraction = ColliderIntersectionFraction(collider.Collider, position, velocity, other.Collider, other.Actor.GlobalPosition, Vector2.Zero);
             if (IsRayFractionSmaller(fraction, minFraction)) {
                 minFraction = fraction;
@@ -596,6 +598,10 @@ public class CollisionManager {
     static bool TagMatch(Collider a, Collider b, bool reversed = false) {
         if (reversed) { return TagMatch(b, a); }
         return a.Mask.Empty || b.Tags.Empty || a.Mask.Any(b.Tags);
+    }
+
+    static bool ActorMatch(CollisionComponent a, CollisionComponent b) {
+        return a.ActorValid && b.ActorValid && a.Actor == b.Actor;
     }
     #endregion
 }

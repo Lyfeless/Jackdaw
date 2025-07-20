@@ -2,8 +2,8 @@ using System.Numerics;
 using Foster.Framework;
 
 class BoundsBuilder {
-    Vector2 min = Vector2.NegativeInfinity;
-    Vector2 max = Vector2.PositiveInfinity;
+    Vector2 min = Vector2.Zero;
+    Vector2 max = Vector2.Zero;
 
     int PointCount = 0;
     public Rect Rect;

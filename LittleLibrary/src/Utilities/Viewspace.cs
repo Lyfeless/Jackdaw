@@ -5,6 +5,8 @@ namespace LittleLib;
 
 public class Viewspace(Vector2 position, Point2 size) {
     RenderablePosition Position = new(position);
+    //! FIXME (Alex): This should be unsettable by the game? but the renderer needs it
+    // Possibly let the renderer generate the viewspace so it can manage it as it wants
     public Point2 Size = size;
 
     public Vector2 TopLeft {

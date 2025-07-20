@@ -6,12 +6,12 @@ namespace LittleLib;
 public class SpriteSingle(Subtexture texture) : Sprite() {
     readonly Subtexture Texture = texture;
 
-    public override Vector2 Size => Texture.Size;
-    public override Rect Bounds => new(Vector2.Zero, Texture.Size);
+    public override Point2 Size => (Point2)Texture.Size;
+    public override RectInt Bounds => new(Point2.Zero, Size);
 
     public SpriteSingle(Assets assets, string texture) : this(assets.GetTexture(texture)) { }
 
     public override void Render(Batcher batcher) {
-        batcher.Image(Texture, Color);
+        batcher.Image(Texture, Offset + (Bounds.Size / 2), Bounds.Center, FlipScale(), 0, Color);
     }
 }

@@ -65,8 +65,9 @@ public class LittleGame : App {
             case LittleGameWindowConfig.RendererType.FIXED_VIEWPORT:
             default:
                 Viewspace = new(new(config.Window.ViewportWidth, config.Window.ViewportHeight));
-                FixedViewportRenderer fixedViewport = new(this, Viewspace.Size);
-                fixedViewport.ViewportColor = Color.FromHexStringRGB(config.Window.ViewportColor);
+                FixedViewportRenderer fixedViewport = new(this, Viewspace.Size) {
+                    ViewportColor = Color.FromHexStringRGB(config.Window.ViewportColor)
+                };
                 Renderer = fixedViewport;
                 break;
         }

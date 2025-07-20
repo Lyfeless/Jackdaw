@@ -29,6 +29,12 @@ public class Actor {
             : Position.Precise;
     }
 
+    public Point2 GlobalPositionRounded {
+        get => Parent.IsValid
+            ? Position.Rounded + Parent.GlobalPositionRounded
+            : Position.Rounded;
+    }
+
     public ObjectIdentifier<Actor> Match;
 
     public bool Visible = true;
