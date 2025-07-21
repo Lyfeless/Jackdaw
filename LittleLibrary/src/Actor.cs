@@ -159,11 +159,13 @@ public class Actor {
     public void Invalidate(bool invalidateChildren = true) {
         if (!IsValid) { return; }
 
+        Children.QueueEvents = true;
         if (invalidateChildren) {
             foreach (Actor child in Children.Elements) {
                 child.Invalidate(true);
             }
         }
+        Children.QueueEvents = false;
 
         if (Parent.IsValid) {
             Parent.Children.Remove(this);

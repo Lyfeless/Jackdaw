@@ -60,7 +60,7 @@ public class LDTKLoader {
         LevelSaveData levelData = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(LevelFolderPath, $"{levelRef.NameID}.ldtkl")), LDTKSourceGenerationContext.Default.LevelSaveData) ?? throw new Exception("Failed to load level");
 
         Actor levelRoot = new(Game);
-        levelRoot.Match.Name = $"Level_{levelRef.NameID}";
+        levelRoot.Match.Name = levelRef.NameID;
 
         Point2 levelPosition = new(levelRef.X, levelRef.Y);
         Point2 levelSize = new(levelRef.Width, levelRef.Height);

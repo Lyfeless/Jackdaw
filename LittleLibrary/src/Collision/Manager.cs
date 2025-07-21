@@ -271,7 +271,7 @@ public class CollisionManager {
             minFraction = Vector2.Zero;
         }
 
-        return new(velocity * minFraction, minFraction, minCollider, minCollider == null);
+        return new(velocity * minFraction, minFraction, minCollider, minCollider != null);
     }
     #endregion
 

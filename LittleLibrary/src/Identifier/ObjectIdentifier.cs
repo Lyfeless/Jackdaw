@@ -3,9 +3,9 @@ namespace LittleLib;
 public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T : class {
     public Guid Guid = guid;
     public string? Name = name;
+    public TagContainer Tags = new();
     T Obj = obj;
     Type ObjType = obj.GetType();
-    TagContainer Tags = new();
 
     public ObjectIdentifier(T obj, string? name = null) : this(obj, Guid.NewGuid(), name) { }
 
