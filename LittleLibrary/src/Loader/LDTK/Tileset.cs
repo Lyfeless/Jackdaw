@@ -36,7 +36,6 @@ public class LDTKTileset {
         tileElements = new(tileCount);
 
         DefaultCollider = new RectangleCollider(new Rect(0, 0, TileSize, TileSize));
-        Console.WriteLine(DefaultCollider.Tags);
 
         for (int x = 0; x < tileElements.Size.X; ++x) {
             for (int y = 0; y < tileElements.Size.Y; ++y) {
@@ -69,13 +68,11 @@ public class LDTKTileset {
                 switch (dataID) {
                     case "collider":
                         element.Collider = ColliderFromData(dataValue);
-                        if (entry.ID == 33) { Console.WriteLine($"{element.Collider.Tags}"); }
                         if (element.Collider != null) {
                             foreach (string tag in element.EnumValues) {
                                 int? collisionTag = collisionTagFunc(tag);
                                 if (collisionTag != null) {
                                     element.Collider.Tags.Add((int)collisionTag);
-                                    if (entry.ID == 33) { Console.WriteLine($"add {tag} {collisionTag} {element.Collider.Tags}"); }
                                 }
                             }
                         }

@@ -26,14 +26,28 @@ public static class CalcExtra {
         return 0 <= t && t <= 1 && 0 <= u && u <= 1;
     }
 
-    public static LineIntersectionType LineAndLineSegmentIntersection(Vector2 line1, Vector2 line2, Vector2 segment1, Vector2 segment2, out Vector2 intersection) {
+    /// <summary>
+    /// Get intersection point between a line and a line segment.
+    /// </summary>
+    /// <param name="line1">The first point of the line.</param>
+    /// <param name="line2">The second point of the line.</param>
+    /// <param name="segment1">The first point of the line segment.</param>
+    /// <param name="segment2">The second point of the line segment.</param>
+    /// <param name="intersection">The intersection point between the two lines, Vector2.NaN if lines intersect infinitely many times.</param>
+    /// <returns>True if a collision exists</returns>
+    public static bool LineAndLineSegmentIntersection(Vector2 line1, Vector2 line2, Vector2 segment1, Vector2 segment2, out Vector2 intersection) {
+        intersection = Vector2.Zero;
+
         float denominator = ((line1.X - line2.X) * (segment1.Y - segment2.Y)) - ((line1.Y - line2.Y) * (segment1.X - segment2.X));
         if (denominator == 0) {
-            intersection = Vector2.Zero;
+            // Lines are ontop of one another
             if ((line1.X - segment1.X) * (segment1.Y - line2.Y) == (segment1.X - line2.X) * (line1.Y - segment1.Y)) {
-                return LineIntersectionType.INFINITE;
+                intersection = Vector2.NaN;
+                return true;
             }
-            return LineIntersectionType.NONE;
+
+            // Lines never intersect
+            return false;
         }
 
         float lineDiff = (line1.X * line2.Y) - (line1.Y * line2.X);
@@ -44,23 +58,16 @@ public static class CalcExtra {
         float y = numY / denominator;
 
         // If the intersection falls between either axis bounds of the segment it is contained
-        //  Checking the highest distancer axis to reduce the risk of floating point error
+        //  Checking the highest distance axis to reduce the risk of floating point error
         if (
             MathF.Abs(segment1.X - segment2.X) > MathF.Abs(segment1.Y - segment2.Y)
                 ? (x < MathF.Min(segment1.X, segment2.X) || x > MathF.Max(segment1.X, segment2.X))
                 : (y < MathF.Min(segment1.Y, segment2.Y) || y > MathF.Max(segment1.Y, segment2.Y))
         ) {
-            intersection = Vector2.Zero;
-            return LineIntersectionType.NONE;
+            return false;
         }
 
         intersection = new(x, y);
-        return LineIntersectionType.SINGLE;
+        return true;
     }
-}
-
-public enum LineIntersectionType {
-    NONE,
-    SINGLE,
-    INFINITE
 }

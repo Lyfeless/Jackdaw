@@ -62,5 +62,11 @@ public abstract class ChildContainer<T>() {
         }
         modifyActions.Clear();
     }
+
+    public void HandleClear() {
+        foreach (T child in Elements) {
+            HandleRemove(child);
+        }
+    }
     #endregion
 }

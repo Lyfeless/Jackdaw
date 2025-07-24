@@ -8,7 +8,7 @@ public class RaycastComponent(LittleGame game, Vector2 position, Vector2 directi
 
     public TagContainer Mask = new();
 
-    public CollisionManager.SweptCollisionResult Collisions;
+    public SweptCollisionInfo Collisions;
 
     public override void Update() {
         Collisions = Game.Collision.GetRayCollision(this);

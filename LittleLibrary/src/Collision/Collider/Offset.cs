@@ -15,7 +15,7 @@ public class OffsetCollider : Collider {
         Mask = collider.Mask;
     }
 
-    public override Rect Bounds => new(Collider.Bounds.Position + Offset, Collider.Bounds.Size);
+    public override Rect Bounds => Collider.Bounds.Translate(Offset);
     public override Vector2 Center => Collider.Bounds.Center + Offset;
 
     public override bool Multi => Collider.Multi;

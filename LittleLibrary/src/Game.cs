@@ -97,10 +97,12 @@ public class LittleGame : App {
         Root?.Update();
         Collision.Update();
 
-        foreach (QueuedInvalidation item in InvalidateQueue) {
-            item.Actor.Invalidate(item.InvalidateChildren);
+        if (InvalidateQueue.Count > 0) {
+            foreach (QueuedInvalidation item in InvalidateQueue) {
+                item.Actor.Invalidate(item.InvalidateChildren);
+            }
+            InvalidateQueue.Clear();
         }
-        InvalidateQueue.Clear();
     }
 
     protected override void Render() => Renderer.Render(Batcher, Root);
