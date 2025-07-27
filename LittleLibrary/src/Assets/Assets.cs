@@ -311,6 +311,7 @@ public class Assets {
 
         return new(
             frames: [.. aseprite.Frames.Select((e, i) => {
+                bool flipX = false;
                 bool flipY = false;
                 string embeddedData = string.Empty;
                 AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
