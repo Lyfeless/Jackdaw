@@ -19,6 +19,8 @@ public class LittleGame : App {
     public Batcher Batcher { get; private set; }
     public Viewspace Viewspace { get; private set; }
 
+    public bool LockContainers { get; private set; }
+
     //! FIXME (Alex): Need some way to dynamically store global systems, perhaps a childcontainer of components or actors?
 
     Actor root;
@@ -94,7 +96,11 @@ public class LittleGame : App {
         Timers.Update();
         Audio.Update();
 
+        LockContainers = true;
         Root?.Update();
+        LockContainers = false;
+        Root?.ApplyChanges();
+
         Collision.Update();
 
         if (InvalidateQueue.Count > 0) {

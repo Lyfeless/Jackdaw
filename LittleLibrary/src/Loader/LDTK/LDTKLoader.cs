@@ -62,8 +62,11 @@ public class LDTKLoader {
         Actor levelRoot = new(Game);
         levelRoot.Match.Name = levelRef.NameID;
 
+        //! FIXME (Alex): Do something with these?
         Point2 levelPosition = new(levelRef.X, levelRef.Y);
         Point2 levelSize = new(levelRef.Width, levelRef.Height);
+
+        //! FIXME (Alex): Load level fields
 
         List<Actor> layers = [];
 
@@ -138,5 +141,10 @@ public class LDTKLoader {
             ).Replace("\\", "/");
 
         return Game.Assets.GetTexture(path);
+    }
+
+    public FieldSaveData[] GetLevelFieldData(string name) {
+        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) { throw new Exception("Attempt to access unidentified level"); }
+        return levelRef.Fields;
     }
 }

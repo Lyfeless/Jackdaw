@@ -75,4 +75,13 @@ internal class AnimationConfigFrame {
 
     [JsonPropertyName("clipHeight")]
     public int ClipHeight { get; set; } = 0;
+
+    [JsonPropertyName("flipX")]
+    public bool FlipX { get; set; } = false;
+
+    [JsonPropertyName("flipY")]
+    public bool FlipY { get; set; } = false;
+
+    [JsonPropertyName("embeddedData")]
+    public string EmbeddedData { get; set; } = string.Empty;
 }

@@ -40,4 +40,8 @@ public abstract class Component {
     public virtual void EnterTreeFirst() { }
     public virtual void EnterTree() { }
     public virtual void ExitTree() { }
+
+    public override string ToString() {
+        return Match.ToString();
+    }
 }

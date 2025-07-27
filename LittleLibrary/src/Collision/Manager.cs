@@ -36,6 +36,7 @@ public class CollisionManager {
     /// <param name="collider">The collider to register.</param>
     public void Add(CollisionComponent collider) {
         Colliders.Add(collider);
+        // Console.WriteLine($"{Colliders.Count} Add {collider}");
     }
 
     /// <summary>
@@ -44,6 +45,7 @@ public class CollisionManager {
     /// <param name="collider">The collider to remove.</param>
     public void Remove(CollisionComponent collider) {
         Colliders.Remove(collider);
+        // Console.WriteLine($"{Colliders.Count} Remove {collider}");
     }
     #endregion
 
@@ -128,14 +130,10 @@ public class CollisionManager {
     public AllCollisionInfo GetAllCollisions(CollisionComponent collider, Vector2 position) {
         List<CollisionComponentInfo> collisions = [];
         foreach (CollisionComponent other in Colliders) {
-            if (
-                collider != other &&
-                !ActorMatch(collider, other)
-            ) {
-                SimplexColliderPair[] pairs = ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition);
-                if (pairs.Length == 0) { continue; }
-                collisions.Add(new(other, [.. pairs.Select(e => e.B)]));
-            }
+            if (!CheckComponent(collider, other)) { continue; }
+            SimplexColliderPair[] pairs = ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition);
+            if (pairs.Length == 0) { continue; }
+            collisions.Add(new(other, [.. pairs.Select(e => e.B)]));
         }
 
         return new(collisions.Count > 0, [.. collisions]);
@@ -150,6 +148,7 @@ public class CollisionManager {
     public AllCollisionInfo GetAllCollisions(Collider collider, Vector2 position) {
         List<CollisionComponentInfo> collisions = [];
         foreach (CollisionComponent other in Colliders) {
+            if (!CheckComponent(other)) { continue; }
             SimplexColliderPair[] pairs = ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition);
             if (pairs.Length == 0) { continue; }
             collisions.Add(new(other, [.. pairs.Select(e => e.B)]));
@@ -179,11 +178,10 @@ public class CollisionManager {
     /// <returns>Information about collision check results.</returns>
     public SingleCollisionInfo GetFirstCollision(CollisionComponent collider, Vector2 position) {
         foreach (CollisionComponent other in Colliders) {
-            if (collider != other && !ActorMatch(collider, other)) {
-                SimplexColliderPair[] pairs = ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition);
-                if (pairs.Length > 0) {
-                    return new(true, new(other, [.. pairs.Select(e => e.B)]));
-                }
+            if (!CheckComponent(collider, other)) { continue; }
+            SimplexColliderPair[] pairs = ColliderOverlapCheck(collider.Collider, position, other.Collider, other.Actor.GlobalPosition);
+            if (pairs.Length > 0) {
+                return new(true, new(other, [.. pairs.Select(e => e.B)]));
             }
         }
 
@@ -199,6 +197,7 @@ public class CollisionManager {
     /// <returns>Information about collision check results.</returns>
     public SingleCollisionInfo GetFirstCollision(Collider collider, Vector2 position) {
         foreach (CollisionComponent other in Colliders) {
+            if (!CheckComponent(other)) { continue; }
             SimplexColliderPair[] pairs = ColliderOverlapCheck(collider, position, other.Collider, other.Actor.GlobalPosition);
             if (pairs.Length > 0) {
                 return new(true, new(other, [.. pairs.Select(e => e.B)]));
@@ -229,7 +228,7 @@ public class CollisionManager {
         // If object isn't moving just get the first collided object to avoid extra calculations
         //! FIXME (Alex): Unsure of how this should be handled, throwing a warning to just avoid running this function with no velocity
         if (velocity == Vector2.Zero) {
-            Console.WriteLine("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
+            // Console.WriteLine("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
             SingleCollisionInfo collision = GetFirstCollision(collider, position);
             return new(collision.Collided, Vector2.Zero, Vector2.Zero, []);
         }
@@ -239,7 +238,7 @@ public class CollisionManager {
         List<SweptCollisionComponentInfo> componentInfo = [];
 
         foreach (CollisionComponent other in Colliders) {
-            if (collider == other || ActorMatch(collider, other)) { continue; }
+            if (!CheckComponent(collider, other)) { continue; }
             SweptCollisionComponentInfo? result = GetSweptCollisionComponentInfo(collider.Collider, position, velocity, other);
             if (result == null) { continue; }
             SweptCollisionComponentInfo resultCast = (SweptCollisionComponentInfo)result;
@@ -257,7 +256,7 @@ public class CollisionManager {
         //! FIXME (Alex): Unsure of how this should be handled, throwing a warning to just avoid running this function with no velocity
         //! FIXME (Alex): THis looks identical to the compnent version of the functions, but they call different overloads so no subfunction :(
         if (velocity == Vector2.Zero) {
-            Console.WriteLine("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
+            // Console.WriteLine("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
             SingleCollisionInfo collision = GetFirstCollision(collider, position);
             return new(collision.Collided, Vector2.Zero, Vector2.Zero, []);
         }
@@ -267,6 +266,7 @@ public class CollisionManager {
         List<SweptCollisionComponentInfo> componentInfo = [];
 
         foreach (CollisionComponent other in Colliders) {
+            if (!CheckComponent(other)) { continue; }
             SweptCollisionComponentInfo? result = GetSweptCollisionComponentInfo(collider, position, velocity, other);
             if (result == null) { continue; }
             SweptCollisionComponentInfo resultCast = (SweptCollisionComponentInfo)result;
@@ -350,7 +350,9 @@ public class CollisionManager {
 
         Rect sweptBoundsA = SweptBounds(colliderA, velocityA);
         Rect sweptBoundsB = SweptBounds(colliderB, velocityB);
-        if (!sweptBoundsA.Translate(positionA).Overlaps(sweptBoundsB.Translate(positionB))) {
+        Rect sweptBoundsAOffset = sweptBoundsA.Translate(positionA);
+        Rect sweptBoundsBOffset = sweptBoundsB.Translate(positionB);
+        if (!sweptBoundsAOffset.Overlaps(sweptBoundsBOffset)) {
             return [];
         }
 
@@ -526,8 +528,9 @@ public class CollisionManager {
 
         for (int i = 0; i < ITERATION_LIMIT; ++i) {
             // Get new point C
-            //! FIXME (Alex): Might have broken this by moving it to a function
             direction = PerpDirection(pointA, pointB, -velocityDifference);
+            // Exit immediately if the direction has no magnitude (lies exactly on the line AB)
+            if (direction == Vector2.Zero) { return SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength); }
             Vector2 pointC = Support(colliderA, positionA, colliderB, positionB, direction);
 
             // New support point is the same as one of the current points
@@ -579,7 +582,7 @@ public class CollisionManager {
 
     static bool IsRayFractionSmaller(Vector2 newFraction, Vector2 originalFraction) {
         // We can assume both axes will be smaller because the ray will always be along the original line
-        return newFraction.X < originalFraction.X && newFraction.Y < originalFraction.Y;
+        return newFraction.X <= originalFraction.X && newFraction.Y <= originalFraction.Y;
     }
 
     static Vector2 VectorFraction(Vector2 value, Vector2 max) {
@@ -657,6 +660,19 @@ public class CollisionManager {
 
     static bool ActorMatch(CollisionComponent a, CollisionComponent b) {
         return a.ActorValid && b.ActorValid && a.Actor == b.Actor;
+    }
+
+    static bool CheckComponent(CollisionComponent a, CollisionComponent b) {
+        return
+            a != b &&
+            !ActorMatch(a, b) &&
+            CheckComponent(b);
+    }
+
+    static bool CheckComponent(CollisionComponent component) {
+        return
+            component.Actor.GlobalTicking &&
+            component.Ticking;
     }
     #endregion
 }

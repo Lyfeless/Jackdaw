@@ -3,6 +3,8 @@ namespace LittleLib;
 public class ComponentContainer(Actor actor) : ChildContainer<Component>() {
     readonly Actor Actor = actor;
 
+    public override bool Locked() => Actor.InTree && Actor.Game.LockContainers;
+
     public override bool CanAdd(Component child) {
         if (!Actor.IsValid) {
             Console.WriteLine($"ActorContainer: Cannot add object {child}, Actor is invalid");

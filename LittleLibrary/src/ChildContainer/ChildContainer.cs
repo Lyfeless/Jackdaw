@@ -1,20 +1,19 @@
 namespace LittleLib;
 
 public abstract class ChildContainer<T>() {
-
     public List<T> Elements = [];
     public T this[int index] {
         get => Elements[index];
         set => Elements[index] = value;
     }
 
-    public bool QueueEvents = false;
     readonly List<ChildContainerModifyAction<T>> modifyActions = [];
 
     #region Overridable Functions
     public abstract void HandleAdd(T child);
     public abstract void HandleRemove(T child);
     public abstract bool CanAdd(T child);
+    public abstract bool Locked();
     public abstract string Printable(T child);
 
     #endregion
@@ -47,7 +46,7 @@ public abstract class ChildContainer<T>() {
 
     #region Internal Utilities
     void Action(ChildContainerModifyAction<T> action) {
-        if (QueueEvents) {
+        if (Locked()) {
             modifyActions.Add(action);
         }
         else {

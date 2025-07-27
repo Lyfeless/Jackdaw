@@ -5,7 +5,7 @@ namespace LittleLib;
 
 public class Actor {
     public static Actor Empty(LittleGame game) => new(game);
-    public readonly static Actor Invalid = new(null) { IsValid = false };
+    public readonly static Actor Invalid = new(null) { IsValid = false, Ticking = false, Visible = false };
 
     public LittleGame Game;
 
@@ -37,13 +37,38 @@ public class Actor {
 
     public ObjectIdentifier<Actor> Match;
 
-    public bool Visible = true;
+    public bool ComponentsVisible = true;
     public bool ChildrenVisible = true;
-    public bool Ticking = true;
+    public bool Visible {
+        get => ComponentsVisible && ChildrenVisible;
+        set {
+            ComponentsVisible = value;
+            ChildrenVisible = value;
+        }
+    }
+    public bool GlobalVisible {
+        get {
+            return Parent.IsValid ? Parent.GlobalVisible : Visible;
+        }
+    }
+
+    public bool ComponentsTicking = true;
     public bool ChildrenTicking = true;
+    public bool Ticking {
+        get => ComponentsTicking && ChildrenTicking;
+        set {
+            ComponentsTicking = value;
+            ChildrenTicking = value;
+        }
+    }
+    public bool GlobalTicking {
+        get {
+            return Parent.IsValid ? Parent.GlobalTicking : Ticking;
+        }
+    }
 
     public bool InTree {
-        get => ParentMatches(Game.Root);
+        get => Game != null && ParentMatches(Game.Root);
     }
 
     public bool addedToTree = false;
@@ -63,10 +88,7 @@ public class Actor {
     }
 
     public void Update() {
-        Components.QueueEvents = true;
-        Children.QueueEvents = true;
-
-        if (Ticking) {
+        if (ComponentsTicking) {
             foreach (Component component in Components.Elements) {
                 if (component.Ticking) { component.Update(); }
             }
@@ -78,9 +100,6 @@ public class Actor {
             }
         }
 
-        Components.QueueEvents = false;
-        Children.QueueEvents = false;
-
         Children.ApplyChanges();
         Components.ApplyChanges();
     }
@@ -90,12 +109,9 @@ public class Actor {
     public void Render(Batcher batcher) {
         batcher.PushMatrix(Position.Rounded);
 
-        Components.QueueEvents = true;
-        Children.QueueEvents = true;
-
         //! FIXME (Alex): Define culling box for actor?
 
-        if (Visible) {
+        if (ComponentsVisible) {
             foreach (Component component in Components.Elements) {
                 if (component.Visible) { component.Render(batcher); }
             }
@@ -107,16 +123,18 @@ public class Actor {
             }
         }
 
-        Components.QueueEvents = false;
-        Children.QueueEvents = false;
-
         batcher.PopMatrix();
     }
 
-    public void EnterTree() {
-        Components.QueueEvents = true;
-        Children.QueueEvents = true;
+    public void ApplyChanges() {
+        Components.ApplyChanges();
+        Children.ApplyChanges();
+        foreach (Actor child in Children.Elements) {
+            child.ApplyChanges();
+        }
+    }
 
+    public void EnterTree() {
         if (!AddedToTree) {
             EnterTreeFirst();
             AddedToTree = true;
@@ -133,17 +151,11 @@ public class Actor {
                 component.AddedToTree = true;
             }
         }
-
-        Components.QueueEvents = false;
-        Children.QueueEvents = false;
     }
 
     public void EnterTreeFirst() { }
 
     public void ExitTree() {
-        Components.QueueEvents = true;
-        Children.QueueEvents = true;
-
         foreach (Component component in Components.Elements) {
             component.ExitTree();
         }
@@ -151,9 +163,6 @@ public class Actor {
         foreach (Actor child in Children.Elements) {
             child.ExitTree();
         }
-
-        Components.QueueEvents = false;
-        Children.QueueEvents = false;
     }
 
     public void Invalidate(bool invalidateChildren = true) {
@@ -172,11 +181,9 @@ public class Actor {
     }
 
     void InvalidateChildren() {
-        Children.QueueEvents = true;
         foreach (Actor child in Children.Elements) {
             child.InvalidateChildren();
         }
-        Children.QueueEvents = false;
 
         IsValid = false;
     }
@@ -270,7 +277,7 @@ public class Actor {
 
     bool ParentMatches(Actor check) {
         if (this == check) { return true; }
-        if (Parent.IsValid) { return Parent.ParentMatches(check); }
+        if (Parent != null && Parent.IsValid) { return Parent.ParentMatches(check); }
         return false;
     }
 

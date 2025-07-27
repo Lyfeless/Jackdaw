@@ -46,7 +46,7 @@ class BoundsBuilder {
     public BoundsBuilder Add(Rect rect) {
         if (PointCount == 0) {
             min = rect.TopLeft;
-            min = rect.BottomRight;
+            max = rect.BottomRight;
         }
         else {
             min = Vector2.Min(min, rect.TopLeft);

@@ -278,8 +278,11 @@ public class Assets {
                 frames: [..config.Frames.Select(frame => new AnimationFrame(
                     texture: GetTexture(config.Textures[frame.Texture]),
                     duration: frame.Duration,
+                    flipX: frame.FlipX,
+                    flipY: frame.FlipY,
                     positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
-                    clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null
+                    clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null,
+                    embeddedData: frame.EmbeddedData
                 ))],
                 startDelay: config.StartDelay,
                 looping: config.Looping,
@@ -294,6 +297,7 @@ public class Assets {
         float startDelay = 0;
         bool looping = true;
         Point2 positionOffset = Point2.Zero;
+        AsepriteFrameConfig[] frameConfigs = [];
         string path = Path.Join(TexturePath, $"{name}{Config.AsepriteConfigExtension}");
         if (File.Exists(path)) {
             AsepriteConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AsepriteConfig);
@@ -301,14 +305,29 @@ public class Assets {
                 startDelay = config.StartDelay;
                 looping = config.Looping;
                 positionOffset = new(config.PositionOffsetX, config.PositionOffsetY);
+                frameConfigs = config.FrameData;
             }
         }
 
         return new(
-            frames: [.. aseprite.Frames.Select((e, i) => new AnimationFrame(
-                texture: GetTexture(GetFrameName(name, i)),
-                duration: e.Duration
-            ))],
+            frames: [.. aseprite.Frames.Select((e, i) => {
+                bool flipY = false;
+                string embeddedData = string.Empty;
+                AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
+                if(frameConfig != null) {
+                    flipX = frameConfig.FlipX;
+                    flipY = frameConfig.FlipY;
+                    embeddedData = frameConfig.EmbeddedData;
+                }
+
+                return new AnimationFrame(
+                    texture: GetTexture(GetFrameName(name, i)),
+                    duration: e.Duration,
+                    flipX: flipX,
+                    flipY: flipY,
+                    embeddedData: embeddedData
+                );
+            })],
             startDelay: startDelay,
             looping: looping,
             positionOffset: positionOffset

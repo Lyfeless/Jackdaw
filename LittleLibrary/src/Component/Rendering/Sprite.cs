@@ -23,7 +23,6 @@ public class SpriteComponent(LittleGame game, Sprite sprite, Point2? offset = nu
         if (!Game.Viewspace.Bounds.Overlaps(Sprite.Bounds.Translate(Actor.GlobalPositionRounded + Offset))) { return; }
 
         batcher.PushMatrix(Offset);
-        batcher.RectLine(Sprite.Bounds, 2, Color.Green);
         Sprite.Render(batcher);
         batcher.PopMatrix();
     }

@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Numerics;
 using Foster.Framework;
 
@@ -16,6 +17,9 @@ public struct RenderablePosition {
     }
 
     public RenderablePosition() : this(Vector2.Zero) { }
+    public RenderablePosition(float x, float y) : this(new Vector2(x, y)) { }
+    public RenderablePosition(int x, int y) : this(new(x, y)) { }
+    public RenderablePosition(Point2 position) : this((Vector2)position) { }
 
     /// <summary>
     /// Move current position by amount.
@@ -91,4 +95,7 @@ public struct RenderablePosition {
     public static RenderablePosition operator /(RenderablePosition a, RenderablePosition b) => new(a.Precise / b.Precise);
     public static RenderablePosition operator /(RenderablePosition a, Vector2 b) => new(a.Precise / b);
     public static RenderablePosition operator /(Vector2 a, RenderablePosition b) => new(a / b.Precise);
+
+    public static implicit operator RenderablePosition(Vector2 v) => new(v);
+    public static implicit operator RenderablePosition(Point2 v) => new(v);
 }

@@ -13,7 +13,8 @@ public abstract class Sprite {
     public abstract RectInt Bounds { get; }
     public abstract void Render(Batcher batcher);
 
-    protected Point2 FlipScale() {
-        return new(FlipX ? -1 : 1, FlipY ? -1 : 1);
+    protected Point2 FlipScale() => FlipScale(FlipX, FlipY);
+    protected static Point2 FlipScale(bool x, bool y) {
+        return new(x ? -1 : 1, y ? -1 : 1);
     }
 }

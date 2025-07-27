@@ -4,9 +4,9 @@ using Foster.Framework;
 namespace LittleLib;
 
 public class CircleComponent(LittleGame game, Circle circle, int steps, Color color) : Component(game) {
-    Circle Circle = circle;
-    int Steps = steps;
-    Color Color = color;
+    public Circle Circle = circle;
+    readonly int Steps = steps;
+    public Color Color = color;
 
     public override void Render(Batcher batcher) {
         //! FIXME (Alex): Verify culling is correct

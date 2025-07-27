@@ -41,6 +41,12 @@ public class LDTKTile() {
         return true;
     }
 
+    public int ElementCount => Elements.Count;
+    public LDTKTileElement? Element(int index) {
+        if (index < 0 || index >= Elements.Count) { return null; }
+        return Elements[index];
+    }
+
     void SetValues() {
         Sprite[] sprites = [.. Elements.Where(e => e.Sprite != null).Select(e => e.Sprite)];
         if (sprites.Length == 0) { Sprite = null; }
@@ -66,4 +72,9 @@ public class LDTKTileElement() {
     public Collider? Collider;
     public string[] EnumValues = [];
     public Dictionary<string, string> CustomData = [];
+
+    public string GetCustomData(string ID) {
+        if (!CustomData.TryGetValue(ID, out string? value)) { return string.Empty; }
+        return value;
+    }
 }

@@ -15,6 +15,7 @@ internal class ChildContainerModifyActionAddRelative<T>(ChildContainer<T> contai
             return;
         }
         int index = Container.Elements.IndexOf(Relative) + Offset;
+        Container.HandleAdd(Child);
         Container.Elements.Insert(index, Child);
     }
 }

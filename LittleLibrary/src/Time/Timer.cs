@@ -24,6 +24,8 @@ public class Timer {
     double Milliseconds {
         get {
             double millis = Game.Timers.GetTrackedTime(TimeTracker).TotalMilliseconds;
+            //! FIXME (Alex): These seems to not be looping correctly in all calses
+            //  Reproducing values: looping true, duration 400
             if (Looping) { millis %= Duration; }
             return millis;
         }
@@ -31,7 +33,7 @@ public class Timer {
 
     public double ElapsedTime => Milliseconds - StartTime - StartDelay;
     public double ElapsedTimeClamped => Math.Clamp(ElapsedTime, 0, Duration);
-    public float Percent => (float)(ElapsedTimeClamped / Duration);
+    public float Percent => (float)(ElapsedTime / Duration);
     public bool Done => ElapsedTime >= Duration;
 
     public void Restart() { StartTime = Milliseconds; }
