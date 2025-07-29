@@ -85,6 +85,25 @@ public class LittleGame : App {
         root = Actor.Invalid;
     }
 
+    public void Start() {
+#if DEBUG
+        // Crash normally in debug so error debugging still works
+        Run();
+#else
+        // Send to crashlog in release
+        try
+        {
+            Run();
+        }
+        catch (Exception e)
+        {
+            using FileStream stream = File.OpenWrite("crashlog.txt");
+            using StreamWriter writer = new(stream);
+            writer.WriteLine(e.ToString());
+        }
+#endif
+    }
+
     protected override void Startup() { }
 
     protected override void Shutdown() {
