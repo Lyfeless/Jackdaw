@@ -11,9 +11,11 @@ public class CollisionManager {
 
     record struct Edge(int Index, Vector2 Normal, float Distance);
     record struct CollisionSimplexInfo(Vector2 A, Vector2 B, Vector2 C, bool Collided);
+    record struct CollisionPushoutInfo(Vector2 Pushout, bool Collided);
     record struct CollisionSweepInfo(Vector2 Fraction, Vector2 Normal, bool Collided);
 
     record struct SimplexColliderPair(Collider A, Collider B);
+    record struct PushoutColliderPair(Collider A, Collider B, Vector2 Pushout);
     record struct SweepColliderPair(Collider A, Collider B, Vector2 Fraction, Vector2 Normal);
 
     public enum BroadPhaseState {
@@ -280,7 +282,7 @@ public class CollisionManager {
         return GetSweptCollisionResult([.. componentInfo], velocity, minFraction, minCollider, allowNegative);
     }
 
-    SweptCollisionComponentInfo? GetSweptCollisionComponentInfo(Collider collider, Vector2 position, Vector2 velocity, CollisionComponent other) {
+    static SweptCollisionComponentInfo? GetSweptCollisionComponentInfo(Collider collider, Vector2 position, Vector2 velocity, CollisionComponent other) {
         SweepColliderPair[] collisionPairs = ColliderIntersectionFraction(collider, position, velocity, other.Collider, other.Actor.GlobalPosition, Vector2.Zero);
         if (collisionPairs.Length == 0) { return null; }
         SweptColliderInfo[] colliders = new SweptColliderInfo[collisionPairs.Length];
@@ -296,6 +298,7 @@ public class CollisionManager {
         return new(other, closest, colliders);
     }
 
+    //! FIXME (Alex): Should include the minCollider in the result
     SweptCollisionInfo GetSweptCollisionResult(SweptCollisionComponentInfo[] colliderInfo, Vector2 velocity, Vector2 fraction, CollisionComponent? minCollider, bool allowNegative = false) {
         bool collided = colliderInfo.Length > 0;
 
@@ -313,11 +316,103 @@ public class CollisionManager {
     #endregion
 
     #region Manual Pushout Checks
-    //! FIXME (Alex): Need manual pushout functions
+    //! FIXME (Alex): Pushout doesn't do additional collision checks, only finds the shortest movement
+    //! FIXME (Alex): DOC COMMENTS
+    public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider)
+        => GetCollisionPushout(collider, collider.Actor.GlobalPosition);
+
+    public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Vector2 position) {
+        Vector2 smallestPushout = Vector2.Zero;
+        float smallestLength = float.PositiveInfinity;
+        CollisionComponent? minCollider = null;
+
+        List<PushoutCollisionComponentInfo> componentInfo = [];
+        foreach (CollisionComponent other in Colliders) {
+            if (!CheckComponent(collider, other)) { continue; }
+            PushoutCollisionComponentInfo? result = GetPushoutCollisionComponentInfo(collider.Collider, position, other);
+            if (result == null) { continue; }
+            PushoutCollisionComponentInfo resultCast = (PushoutCollisionComponentInfo)result;
+            float compareLength = resultCast.Colliders[resultCast.LargestPushout].Pushout.LengthSquared();
+            if (compareLength < smallestLength) {
+                smallestPushout = resultCast.Colliders[resultCast.LargestPushout].Pushout;
+                smallestLength = compareLength;
+                minCollider = other;
+            }
+            componentInfo.Add(resultCast);
+        }
+
+        //! FIXME (Alex): include mincollider possibly?
+        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo]);
+    }
+
+    public PushoutCollisionInfo GetCollisionPushout(Collider collider, Vector2 position) {
+        Vector2 smallestPushout = Vector2.Zero;
+        float smallestLength = float.PositiveInfinity;
+        CollisionComponent? minCollider = null;
+
+        List<PushoutCollisionComponentInfo> componentInfo = [];
+        foreach (CollisionComponent other in Colliders) {
+            if (!CheckComponent(other)) { continue; }
+            PushoutCollisionComponentInfo? result = GetPushoutCollisionComponentInfo(collider, position, other);
+            if (result == null) { continue; }
+            PushoutCollisionComponentInfo resultCast = (PushoutCollisionComponentInfo)result;
+
+            Console.WriteLine($"{resultCast.Colliders[resultCast.LargestPushout]}");
+
+            float compareLength = resultCast.Colliders[resultCast.LargestPushout].Pushout.LengthSquared();
+            if (compareLength < smallestLength) {
+                smallestPushout = resultCast.Colliders[resultCast.LargestPushout].Pushout;
+                smallestLength = compareLength;
+                minCollider = other;
+            }
+            componentInfo.Add(resultCast);
+        }
+
+        //! FIXME (Alex): include mincollider possibly?
+        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo]);
+    }
+
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, collider.Actor.GlobalPosition, direction);
+
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Vector2 position, Vector2 direction) {
+        if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction, true), direction);
+    }
+
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Vector2 position, Vector2 direction) {
+        if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction, true), direction);
+    }
+
+    static PushoutCollisionComponentInfo? GetPushoutCollisionComponentInfo(Collider collider, Vector2 position, CollisionComponent other) {
+        PushoutColliderPair[] collisionPairs = ColliderPushout(collider, position, other.Collider, other.Actor.GlobalPosition);
+        if (collisionPairs.Length == 0) { return null; }
+
+        PushoutColliderInfo[] colliders = new PushoutColliderInfo[collisionPairs.Length];
+        int closest = 0;
+        for (int i = 0; i < colliders.Length; ++i) {
+            PushoutColliderPair pair = collisionPairs[i];
+            colliders[i] = new(pair.B, pair.Pushout);
+            if (pair.Pushout.LengthSquared() < collisionPairs[closest].Pushout.LengthSquared()) {
+                closest = i;
+            }
+        }
+
+        return new(other, closest, colliders);
+    }
+
+    static PushoutCollisionInfo SweptToPushoutInfo(SweptCollisionInfo info, Vector2 direction) {
+        return new(info.Collided, info.AdjustedVelocity, [.. info.ColliderInfo.Select(e => {
+            return new PushoutCollisionComponentInfo(e.Component, e.ClosestCollider, [.. e.Colliders.Select(c => {
+                return new PushoutColliderInfo(c.Collider, c.Fraction * direction);
+            })]);
+        })]);
+    }
+
     #endregion
 
     #region 2 Collider Middleman Functions
-    //! FIXME (Alex): Probably has some wires crossed somewhere due to all the list reversals, make sure to test
     static SimplexColliderPair[] ColliderOverlapCheck(Collider colliderA, Vector2 positionA, Collider colliderB, Vector2 positionB, bool reversed = false) {
         if (!TagMatch(colliderA, colliderB, reversed)) { return []; }
 
@@ -343,6 +438,35 @@ public class CollisionManager {
             return [reversed ? new(colliderB, colliderA) : new(colliderA, colliderB)];
         }
         return [];
+    }
+
+    static PushoutColliderPair[] ColliderPushout(Collider colliderA, Vector2 positionA, Collider colliderB, Vector2 positionB, bool reversed = false) {
+        if (!TagMatch(colliderA, colliderB, reversed)) { return []; }
+
+        if (!colliderA.Bounds.Translate(positionA).Overlaps(colliderB.Bounds.Translate(positionB))) {
+            return [];
+        }
+
+        if (colliderA.Multi) {
+            Collider[] subs = colliderA.GetSubColliders(new Rect(positionB - positionA + colliderB.Bounds.Position - colliderA.Bounds.Position, colliderB.Bounds.Size));
+            List<PushoutColliderPair> pairs = [];
+            foreach (Collider collider in subs) {
+                PushoutColliderPair[] subCollisions = ColliderPushout(collider, positionA, colliderB, positionB, reversed);
+                if (subCollisions.Length > 0) { pairs.AddRange(subCollisions); }
+            }
+            return [.. pairs];
+        }
+
+        if (colliderB.Multi) {
+            return ColliderPushout(colliderB, positionB, colliderA, positionA, !reversed);
+        }
+
+        CollisionSimplexInfo simplex = GetCollisionSimplex(colliderA, positionA, colliderB, positionB);
+        if (!simplex.Collided) { return []; }
+
+        CollisionPushoutInfo info = GetPushout(colliderA, positionA, colliderB, positionB, simplex);
+        if (!info.Collided) { return []; }
+        return [reversed ? new(colliderB, colliderA, -info.Pushout) : new(colliderA, colliderB, info.Pushout)];
     }
 
     static SweepColliderPair[] ColliderIntersectionFraction(Collider colliderA, Vector2 positionA, Vector2 velocityA, Collider colliderB, Vector2 positionB, Vector2 velocityB, bool reversed = false) {
@@ -431,15 +555,14 @@ public class CollisionManager {
         }
     }
 
-    //! FIXME (Alex): Give back more info than just the pushout
-    static Vector2 GetPushout(
+    static CollisionPushoutInfo GetPushout(
         Collider colliderA,
         Vector2 positionA,
         Collider colliderB,
         Vector2 positionB,
         CollisionSimplexInfo simplex
     ) {
-        if (!simplex.Collided) { return Vector2.Zero; }
+        if (!simplex.Collided) { return new(Vector2.Zero, false); }
 
         List<Vector2> points = [
             simplex.A,
@@ -448,11 +571,11 @@ public class CollisionManager {
         ];
 
         bool clockwiseWinding = IsClockwiseWinding(simplex.A, simplex.B, simplex.C);
-        Edge closestEdge = new(0, Vector2.Zero, float.PositiveInfinity);
-
         Vector2 pushout = Vector2.Zero;
 
         for (int i = 0; i < ITERATION_LIMIT; ++i) {
+            Edge closestEdge = new(0, Vector2.Zero, float.PositiveInfinity);
+
             // Find edge closest to the origin
             for (int indexA = 0; indexA < points.Count; ++indexA) {
                 int indexB = (indexA + 1) % points.Count;
@@ -479,13 +602,13 @@ public class CollisionManager {
 
             // Return immediately if pushout is as close as possible
             supportDistance = MathF.Abs(supportDistance - closestEdge.Distance);
-            if (supportDistance <= PUSHOUT_TOLERANCE) { return pushout; }
+            if (supportDistance <= PUSHOUT_TOLERANCE) { return new(pushout, true); }
 
             points.Insert(closestEdge.Index, newSupport);
         }
 
         // Return closest approximate pushout if nothing better can be found in time
-        return pushout;
+        return new(pushout, true);
     }
 
     //! FIXME (Alex): Give back more info than just the fraction
