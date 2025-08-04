@@ -27,6 +27,7 @@ internal class FixedViewportRenderer(LittleGame game, Point2 size) : LittleGameR
         Game.Window.Clear(ClearColor);
 
         batcher.Clear();
+        batcher.PushBlend(BlendMode.NonPremultiplied);
         batcher.PushMatrix(Game.Viewspace.RenderPosition);
         root?.Render(batcher);
         batcher.PopMatrix();

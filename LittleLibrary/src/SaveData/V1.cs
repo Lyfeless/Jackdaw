@@ -70,6 +70,8 @@ public class SaveDataV1(string savePath) : SaveData(savePath) {
             bool value = reader.ReadBoolean();
             Bools.Add(key, value);
         }
+
+        reader.Close();
     }
 
     public override void Save() {
@@ -105,5 +107,7 @@ public class SaveDataV1(string savePath) : SaveData(savePath) {
             writer.Write(key);
             writer.Write(value);
         }
+
+        writer.Close();
     }
 }

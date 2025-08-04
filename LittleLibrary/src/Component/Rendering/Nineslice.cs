@@ -3,6 +3,7 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+//! FIXME (Alex): This should be a sprite?
 public class NinesliceComponent : Component {
     public enum ExtendBehavior {
         TILE,
@@ -24,7 +25,7 @@ public class NinesliceComponent : Component {
 
     public BoundsComponent Bounds;
 
-    public NinesliceComponent(LittleGame game, Subtexture texture, RectInt center, ExtendBehavior extendBehavior = ExtendBehavior.TILE, bool ConstrainSize = true) : base(game) {
+    public NinesliceComponent(LittleGame game, Subtexture texture, RectInt center, ExtendBehavior extendBehavior = ExtendBehavior.TILE, bool constrainSize = true) : base(game) {
         Game = game;
         Bounds = new(game, new(0, 0));
 
@@ -46,6 +47,7 @@ public class NinesliceComponent : Component {
         Center = new(texture.Texture, new(texture.Source.X + center.X, texture.Source.Y + center.Y, center.Width, center.Height));
 
         Extend = extendBehavior;
+        ConstrainSize = constrainSize;
     }
 
     public NinesliceComponent(LittleGame game, string texture, RectInt center, ExtendBehavior extendBehavior = ExtendBehavior.TILE, bool ConstrainSize = true)

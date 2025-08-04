@@ -3,7 +3,7 @@ namespace LittleLib;
 public class ActorContainer(Actor actor) : ChildContainer<Actor>() {
     Actor Actor = actor;
 
-    public override bool Locked() => Actor.InTree && Actor.Game.LockContainers;
+    public override bool Locked() => Actor.Game == null || Actor.Game.LockContainers;
 
     public override bool CanAdd(Actor child) {
         if (!Actor.IsValid) {

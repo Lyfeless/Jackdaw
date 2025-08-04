@@ -39,6 +39,12 @@ public class TimeManager(LittleGame game) {
         tracker.SetPaused(value);
     }
 
+    public void ResetScale(string name) => SetScale(name, 1);
+    public void SetScale(string name, float scale) {
+        if (!trackers.TryGetValue(name, out TimeTracker? tracker)) { return; }
+        tracker.SetScale(scale);
+    }
+
     public void Update() {
         foreach (TimeTracker tracker in trackers.Values) {
             tracker.Update(Game.Time.Delta);

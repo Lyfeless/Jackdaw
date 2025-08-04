@@ -19,18 +19,20 @@ public class Actor {
         protected set { if (!value) { isValid = false; } }
     }
 
+    public bool ParentValid => Parent != null && Parent.IsValid;
+
     public ComponentContainer Components;
 
     public RenderablePosition Position = new();
 
     public Vector2 GlobalPosition {
-        get => Parent.IsValid
+        get => ParentValid
             ? Position.Precise + Parent.GlobalPosition
             : Position.Precise;
     }
 
     public Point2 GlobalPositionRounded {
-        get => Parent.IsValid
+        get => ParentValid
             ? Position.Rounded + Parent.GlobalPositionRounded
             : Position.Rounded;
     }
@@ -48,7 +50,7 @@ public class Actor {
     }
     public bool GlobalVisible {
         get {
-            return Parent.IsValid ? Parent.GlobalVisible : Visible;
+            return ParentValid ? Parent.GlobalVisible : Visible;
         }
     }
 
@@ -63,7 +65,7 @@ public class Actor {
     }
     public bool GlobalTicking {
         get {
-            return Parent.IsValid ? Parent.GlobalTicking : Ticking;
+            return ParentValid ? Parent.GlobalTicking : Ticking;
         }
     }
 
@@ -99,9 +101,6 @@ public class Actor {
                 child.Update();
             }
         }
-
-        Children.ApplyChanges();
-        Components.ApplyChanges();
     }
 
     //! FIXME (Alex): batcher maybe doesnt need to be passed? They already have access to game
@@ -175,7 +174,7 @@ public class Actor {
         Children.Clear();
         Components.Clear();
 
-        if (Parent.IsValid) {
+        if (ParentValid) {
             Parent.Children.Remove(this);
         }
     }
@@ -197,6 +196,18 @@ public class Actor {
         }
 
         return null;
+    }
+
+    //! FIXME (Alex): Needs matching functions for components and recursive
+    public Actor[] FindAllChildren(Func<ObjectIdentifier<Actor>, bool> func) {
+        List<Actor> actors = [];
+        foreach (Actor child in Children.Elements) {
+            if (func(child.Match)) {
+                actors.Add(child);
+            }
+        }
+
+        return [.. actors];
     }
 
     public Actor? FindChildRecursive(Func<ObjectIdentifier<Actor>, bool> func) {
@@ -277,7 +288,7 @@ public class Actor {
 
     bool ParentMatches(Actor check) {
         if (this == check) { return true; }
-        if (Parent != null && Parent.IsValid) { return Parent.ParentMatches(check); }
+        if (ParentValid) { return Parent.ParentMatches(check); }
         return false;
     }
 

@@ -251,12 +251,12 @@ public class Assets {
                         }
                     }
                 }
+            }
 
-                // Load animations from aseprite files
-                foreach ((string name, Aseprite aseprite) in asepriteAnims) {
-                    AnimationData? anim = GetAnimationData(name, aseprite);
-                    if (anim != null) { Animations.Add(name, anim); }
-                }
+            // Load animations from aseprite files
+            foreach ((string name, Aseprite aseprite) in asepriteAnims) {
+                AnimationData? anim = GetAnimationData(name, aseprite);
+                if (anim != null) { Animations.Add(name, anim); }
             }
         }
     }

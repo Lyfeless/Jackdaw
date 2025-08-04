@@ -6,7 +6,7 @@ namespace LittleLib;
 public class SpaceConverter(LittleGame game) {
     LittleGame Game = game;
 
-    public Vector2 MouseToTile<Tin, Tout>(Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
+    public Point2 MouseToTile<Tin, Tout>(Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
         => WindowToTile(Game.Input.Mouse.Position, relativeActor, grid);
     public Vector2 MouseToLocal(Actor relativeActor)
         => WindowToLocal(Game.Input.Mouse.Position, relativeActor);
@@ -15,7 +15,7 @@ public class SpaceConverter(LittleGame game) {
     public Vector2 MouseToView()
         => WindowToView(Game.Input.Mouse.Position);
 
-    Vector2 WindowToTile<Tin, Tout>(Vector2 windowCoord, Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
+    public Point2 WindowToTile<Tin, Tout>(Vector2 windowCoord, Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
         => ViewToTile(WindowToView(windowCoord), relativeActor, grid);
     public Vector2 WindowToLocal(Vector2 windowCoord, Actor relativeActor)
         => ViewToLocal(WindowToView(windowCoord), relativeActor);
@@ -30,7 +30,7 @@ public class SpaceConverter(LittleGame game) {
         => GlobalToLocal(ViewToGlobal(viewCoord), relativeActor);
     public Vector2 ViewToGlobal(Vector2 viewCoord)
         => viewCoord + Game.Viewspace.TopLeft;
-    Vector2 ViewToWindow(Vector2 viewCoord)
+    public Vector2 ViewToWindow(Vector2 viewCoord)
         => Game.ViewspaceToWindow(viewCoord);
 
     public Point2 GlobalToTile<Tin, Tout>(Vector2 globalCoord, Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
@@ -39,7 +39,7 @@ public class SpaceConverter(LittleGame game) {
         => relativeActor.GlobalToLocal(globalCoord);
     public Vector2 GlobalToView(Vector2 globalCoord)
         => globalCoord - Game.Viewspace.TopLeft;
-    Vector2 GlobalToWindow(Vector2 globalCoord)
+    public Vector2 GlobalToWindow(Vector2 globalCoord)
         => ViewToWindow(GlobalToView(globalCoord));
 
     public Vector2 LocalToLocal(Actor originLocal, Actor targetLocal)
@@ -52,7 +52,7 @@ public class SpaceConverter(LittleGame game) {
         => relativeActor.LocalToGlobal(localCoord);
     public Vector2 LocalToView(Vector2 localCoord, Actor relativeActor)
         => GlobalToView(LocalToGlobal(localCoord, relativeActor));
-    Vector2 LocalToWindow(Vector2 localCoord, Actor relativeActor)
+    public Vector2 LocalToWindow(Vector2 localCoord, Actor relativeActor)
         => ViewToWindow(LocalToView(localCoord, relativeActor));
 
     public Vector2 TileToLocal<Tin, Tout>(Point2 tileCoord, ISpatialGrid<Tin, Tout> grid)
@@ -61,6 +61,6 @@ public class SpaceConverter(LittleGame game) {
         => LocalToGlobal(TileToLocal(tileCoord, grid), relativeActor);
     public Vector2 TileToView<Tin, Tout>(Point2 tileCoord, ISpatialGrid<Tin, Tout> grid, Actor relativeActor)
         => GlobalToView(TileToGlobal(tileCoord, grid, relativeActor));
-    Vector2 TileToWindow<Tin, Tout>(Point2 tileCoord, ISpatialGrid<Tin, Tout> grid, Actor relativeActor)
+    public Vector2 TileToWindow<Tin, Tout>(Point2 tileCoord, ISpatialGrid<Tin, Tout> grid, Actor relativeActor)
         => ViewToWindow(TileToView(tileCoord, grid, relativeActor));
 }

@@ -73,8 +73,8 @@ class BoundsBuilder {
     }
 
     public BoundsBuilder Clear() {
-        min = Vector2.NegativeInfinity;
-        max = Vector2.PositiveInfinity;
+        min = Vector2.Zero;
+        max = Vector2.Zero;
         PointCount = 0;
 
         SetRect();

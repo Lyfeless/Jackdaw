@@ -54,6 +54,6 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     }
 
     public override readonly string ToString() {
-        return Name ?? Guid.ToString();
+        return Name ?? $"{ObjType} {Guid}";
     }
 }

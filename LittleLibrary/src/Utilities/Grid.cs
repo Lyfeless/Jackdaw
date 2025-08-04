@@ -21,7 +21,7 @@ public class Grid<T>(Point2 gridSize) {
         return this;
     }
 
-    bool Contains(Point2 tile) {
+    public bool Contains(Point2 tile) {
         return tile.X >= 0 && tile.Y >= 0 && tile.X < Size.X && tile.Y < Size.Y;
     }
 

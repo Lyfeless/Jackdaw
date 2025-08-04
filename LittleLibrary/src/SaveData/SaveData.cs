@@ -22,6 +22,11 @@ public abstract class SaveData {
     public void SetFloat(string id, float value) => Floats[id] = value;
     public void SetBool(string id, bool value) => Bools[id] = value;
 
+    public string[] StringKeys() => [.. Strings.Keys];
+    public string[] IntKeys() => [.. Ints.Keys];
+    public string[] FloatKeys() => [.. Floats.Keys];
+    public string[] BoolKeys() => [.. Bools.Keys];
+
     public abstract void Load();
 
     public abstract void Save();
