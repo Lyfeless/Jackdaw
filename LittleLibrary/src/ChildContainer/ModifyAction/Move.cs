@@ -1,7 +1,7 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionMove<T>(ChildContainer<T> container, T child, int amount) : ChildContainerModifyAction<T>(container) {
-    readonly T Child = child;
+internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, int amount) : ChildContainerModifyAction<Telement, Towner>(container) {
+    readonly Telement Child = child;
     readonly int Amount = amount;
 
     public override void Execute() {

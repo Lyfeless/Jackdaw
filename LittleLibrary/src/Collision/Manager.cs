@@ -38,7 +38,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to register.</param>
     public void Add(CollisionComponent collider) {
         Colliders.Add(collider);
-        // Console.WriteLine($"{Colliders.Count} Add {collider}");
     }
 
     /// <summary>
@@ -47,7 +46,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to remove.</param>
     public void Remove(CollisionComponent collider) {
         Colliders.Remove(collider);
-        // Console.WriteLine($"{Colliders.Count} Remove {collider}");
     }
     #endregion
 
@@ -356,8 +354,6 @@ public class CollisionManager {
             PushoutCollisionComponentInfo? result = GetPushoutCollisionComponentInfo(collider, position, other);
             if (result == null) { continue; }
             PushoutCollisionComponentInfo resultCast = (PushoutCollisionComponentInfo)result;
-
-            Console.WriteLine($"{resultCast.Colliders[resultCast.LargestPushout]}");
 
             float compareLength = resultCast.Colliders[resultCast.LargestPushout].Pushout.LengthSquared();
             if (compareLength < smallestLength) {

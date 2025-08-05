@@ -311,4 +311,20 @@ public class Actor {
     public override string ToString() {
         return Match.ToString();
     }
+
+    public static Actor From(LittleGame game, params Actor[] children) => With(new(game), children);
+    public static Actor With(Actor actor, params Actor[] children) {
+        foreach (Actor child in children) {
+            actor.Children.Add(child);
+        }
+        return actor;
+    }
+
+    public static Actor From(LittleGame game, params Component[] components) => With(new(game), components);
+    public static Actor With(Actor actor, params Component[] components) {
+        foreach (Component component in components) {
+            actor.Components.Add(component);
+        }
+        return actor;
+    }
 }

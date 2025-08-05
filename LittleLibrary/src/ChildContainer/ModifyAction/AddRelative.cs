@@ -1,8 +1,8 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionAddRelative<T>(ChildContainer<T> container, T child, T relative, int offset) : ChildContainerModifyAction<T>(container) {
-    readonly T Child = child;
-    readonly T Relative = relative;
+internal class ChildContainerModifyActionAddRelative<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, Telement relative, int offset) : ChildContainerModifyAction<Telement, Towner>(container) {
+    readonly Telement Child = child;
+    readonly Telement Relative = relative;
     readonly int Offset = offset;
 
     public override void Execute() {

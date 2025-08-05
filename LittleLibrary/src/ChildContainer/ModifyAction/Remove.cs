@@ -1,7 +1,7 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionRemove<T>(ChildContainer<T> container, T child) : ChildContainerModifyAction<T>(container) {
-    readonly T Child = child;
+internal class ChildContainerModifyActionRemove<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyAction<Telement, Towner>(container) {
+    readonly Telement Child = child;
 
     public override void Execute() {
         Container.HandleRemove(Child);
