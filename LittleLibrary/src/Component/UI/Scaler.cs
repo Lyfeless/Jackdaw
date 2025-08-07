@@ -18,8 +18,8 @@ public class ScalerComponent(
     public ScalerElement? ScalerH = scalerH;
 
     public override void Added() {
-        ActorBounds ??= (BoundsComponent)(Actor.FindComponent(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
-        ParentBounds ??= (BoundsComponent)(Actor.Parent.FindComponent(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
+        ActorBounds ??= (BoundsComponent)(Actor.Components.Find(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
+        ParentBounds ??= (BoundsComponent)(Actor.Parent.Components.Find(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
     }
 
     public override void Update() {

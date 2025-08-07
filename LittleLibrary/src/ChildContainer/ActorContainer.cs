@@ -34,4 +34,16 @@ public class ActorContainer(Actor actor) : ChildContainer<Actor, Actor>(actor) {
             child.ExitTree();
         }
     }
+
+    public override ObjectIdentifier<Actor> Match(Actor element) {
+        return element.Match;
+    }
+
+    public override int RecurseCount() {
+        return Owner.Children.Elements.Count;
+    }
+
+    public override ChildContainer<Actor, Actor> RecurseItem(int index) {
+        return Owner.Children.Elements[index].Children;
+    }
 }

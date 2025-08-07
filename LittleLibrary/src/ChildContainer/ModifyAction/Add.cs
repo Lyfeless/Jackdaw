@@ -1,6 +1,6 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionAdd<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyAction<Telement, Towner>(container) {
+internal class ChildContainerModifyActionAdd<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
     readonly Telement Child = child;
 
     public override void Execute() {

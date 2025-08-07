@@ -1,6 +1,6 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, int amount) : ChildContainerModifyAction<Telement, Towner>(container) {
+internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, int amount) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
     readonly Telement Child = child;
     readonly int Amount = amount;
 
