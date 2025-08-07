@@ -54,8 +54,7 @@ public class NinesliceComponent : Component {
         : this(game, game.Assets.GetTexture(texture), center, extendBehavior, ConstrainSize) { }
 
     public override void Render(Batcher batcher) {
-        //! FIXME (Alex): Verify culling is correct
-        if (Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Bounds.Position, Bounds.Size))) { return; }
+        if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Bounds.Position, Bounds.Size))) { return; }
 
         batcher.PushMatrix(Bounds.Position);
 

@@ -1,7 +1,9 @@
 using System.Numerics;
 using Foster.Framework;
 
-class BoundsBuilder {
+namespace LittleLib;
+
+public struct BoundsBuilder {
     Vector2 min = Vector2.Zero;
     Vector2 max = Vector2.Zero;
 
