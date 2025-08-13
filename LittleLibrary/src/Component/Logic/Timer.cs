@@ -76,7 +76,7 @@ public class TimerComponent(LittleGame game, float duration, Action callback, st
         Timer.Stop();
     }
 
-    public override void Update() {
+    protected override void Update() {
         if (!Timer.Done) { return; }
 
         Callback();

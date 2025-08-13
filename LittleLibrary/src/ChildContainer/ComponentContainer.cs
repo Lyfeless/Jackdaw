@@ -23,25 +23,17 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
     public override void HandleAdd(Component child) {
         child.Actor = Owner;
 
-        if (!child.AddedToActor) {
-            child.AddedFirst();
-            child.AddedToActor = true;
-        }
-        child.Added();
+        child.OnAdded();
 
         if (Owner.InTree) {
-            if (Owner.Parent.IsValid && !child.AddedToTree) {
-                child.EnterTreeFirst();
-                child.AddedToTree = true;
-            }
-            child.EnterTree();
+            child.OnEnterTree();
         }
     }
 
     public override void HandleRemove(Component child) {
-        child.Removed();
+        child.OnRemoved();
         if (Owner.InTree) {
-            child.ExitTree();
+            child.OnExitTree();
         }
         child.Actor = Actor.Invalid;
     }

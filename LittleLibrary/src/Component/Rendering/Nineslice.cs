@@ -54,7 +54,7 @@ public class NinesliceComponent : Component {
     public NinesliceComponent(LittleGame game, string texture, RectInt center, ExtendBehavior extendBehavior = ExtendBehavior.TILE, bool ConstrainSize = true)
         : this(game, game.Assets.GetTexture(texture), center, extendBehavior, ConstrainSize) { }
 
-    public override void Render(Batcher batcher) {
+    protected override void Render(Batcher batcher) {
         if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Bounds.Position, Bounds.Size))) { return; }
 
         batcher.PushMatrix(Bounds.Position);

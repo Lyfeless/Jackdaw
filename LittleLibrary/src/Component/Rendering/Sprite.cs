@@ -57,7 +57,7 @@ public class SpriteComponent(LittleGame game, Sprite sprite, Point2? offset = nu
     public SpriteComponent(LittleGame game, string sprite, Point2? offset = null)
         : this(game, game.Assets.GetTexture(sprite), offset) { }
 
-    public override void Render(Batcher batcher) {
+    protected override void Render(Batcher batcher) {
         if (!Game.Viewspace.Bounds.Overlaps(Sprite.Bounds.Translate(Actor.GlobalPositionRounded + Offset))) { return; }
 
         batcher.PushMatrix(Offset);

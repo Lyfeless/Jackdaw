@@ -17,12 +17,12 @@ public class ScalerComponent(
     public ScalerElement? ScalerW = scalerW;
     public ScalerElement? ScalerH = scalerH;
 
-    public override void Added() {
+    protected override void Added() {
         ActorBounds ??= (BoundsComponent)(Actor.Components.Find(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
         ParentBounds ??= (BoundsComponent)(Actor.Parent.Components.Find(e => e.ByType<BoundsComponent>()) ?? new BoundsComponent(Game, new Rect()));
     }
 
-    public override void Update() {
+    protected override void Update() {
         //! FIXME (Alex): Cache these values to only update when needed?
         if (ScalerX != null) { Actor.Position.SetX(ScalerX.Get()); }
         if (ScalerY != null) { Actor.Position.SetY(ScalerY.Get()); }

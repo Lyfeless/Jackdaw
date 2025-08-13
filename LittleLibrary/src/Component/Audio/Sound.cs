@@ -18,11 +18,11 @@ public class SoundPlayerComponent(LittleGame game, Sound sound, string? bus = nu
         Player.Stop();
     }
 
-    public override void EnterTree() {
+    protected override void EnterTree() {
         if (Autostart) { Play(); }
     }
 
-    public override void ExitTree() {
+    protected override void ExitTree() {
         Stop();
     }
 }

@@ -55,14 +55,14 @@ public class LDTKTileLayer : Component, ISpatialGrid<Point2, LDTKTile> {
         renderer = new(game, (Point2)position, gridSize, (Point2)this.tileSize);
     }
 
-    public override void Added() {
+    protected override void Added() {
         if (collider.ActorValid) { collider.Actor.Components.Remove(collider); }
         if (renderer.ActorValid) { renderer.Actor.Components.Remove(renderer); }
         Actor.Components.Add(collider);
         Actor.Components.Add(renderer);
     }
 
-    public override void Removed() {
+    protected override void Removed() {
         Actor.Components.Remove(collider);
         Actor.Components.Remove(renderer);
     }

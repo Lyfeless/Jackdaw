@@ -52,7 +52,7 @@ public class Actor {
     public bool IsValid {
         get => isValid;
         //! FIXME (Alex): Stop actor from being re-validated, is this smart?
-        protected set { if (!value) { isValid = false; } }
+        private set { if (!value) { isValid = false; } }
     }
 
     /// <summary>
@@ -149,19 +149,9 @@ public class Actor {
     /// <summary>
     /// If the actor is currently in the game's node tree.
     /// </summary>
-    public bool InTree {
-        get => Game != null && ParentMatches(Game.Root);
-    }
+    public bool InTree => Game != null && ParentMatches(Game.Root);
 
     bool addedToTree = false;
-
-    /// <summary>
-    /// If the actor has already been in the tree before.
-    /// </summary>
-    public bool AddedToTree {
-        get => addedToTree;
-        protected set { if (value) { addedToTree = true; } }
-    }
 
     public Actor(LittleGame game) {
         Game = game;
@@ -178,7 +168,7 @@ public class Actor {
     /// Updates all children first, then updates all components. </br>
     /// Both are updated in the order they're stored in their container, from first to last.
     /// </summary>
-    public void Update() {
+    internal void Update() {
         if (ChildrenTicking) {
             foreach (Actor child in Children.Elements) {
                 child.Update();
@@ -187,7 +177,7 @@ public class Actor {
 
         if (ComponentsTicking) {
             foreach (Component component in Components.Elements) {
-                if (component.Ticking) { component.Update(); }
+                if (component.Ticking) { component.OnUpdate(); }
             }
         }
     }
@@ -199,12 +189,12 @@ public class Actor {
     /// Renders all components first, then renders all children. </br>
     /// Both are rendered in the order they're stored in their container, from first to last.
     /// </summary>
-    public void Render(Batcher batcher) {
+    internal void Render(Batcher batcher) {
         batcher.PushMatrix(Position.Rounded);
 
         if (ComponentsVisible) {
             foreach (Component component in Components.Elements) {
-                if (component.Visible) { component.Render(batcher); }
+                if (component.Visible) { component.OnRender(batcher); }
             }
         }
 
@@ -217,7 +207,7 @@ public class Actor {
         batcher.PopMatrix();
     }
 
-    public void ApplyChanges() {
+    internal void ApplyChanges() {
         Children.ApplyChanges();
         foreach (Actor child in Children.Elements) {
             child.ApplyChanges();
@@ -225,18 +215,14 @@ public class Actor {
         Components.ApplyChanges();
     }
 
-    public void EnterTree() {
-        if (!AddedToTree) {
+    internal void EnterTree() {
+        if (!addedToTree) {
             EnterTreeFirst();
-            AddedToTree = true;
+            addedToTree = true;
         }
 
         foreach (Component component in Components.Elements) {
-            if (!component.AddedToTree) {
-                component.EnterTreeFirst();
-                component.AddedToTree = true;
-            }
-            component.EnterTree();
+            component.OnEnterTree();
         }
 
         foreach (Actor child in Children.Elements) {
@@ -244,11 +230,11 @@ public class Actor {
         }
     }
 
-    public void EnterTreeFirst() { }
+    internal void EnterTreeFirst() { }
 
-    public void ExitTree() {
+    internal void ExitTree() {
         foreach (Component component in Components.Elements) {
-            component.ExitTree();
+            component.OnExitTree();
         }
 
         foreach (Actor child in Children.Elements) {
@@ -256,11 +242,7 @@ public class Actor {
         }
     }
 
-    /// <summary>
-    /// Invalidates the actor, removing it from the tree and marking it as inactive. </br>
-    /// Setting this value directly isn't advised. Use <seealso cref="QueueInvalidate(in LittleGame)"> for the most reliable results.
-    /// </summary>
-    public void Invalidate(bool invalidateChildren = true) {
+    internal void Invalidate(bool invalidateChildren = true) {
         if (!IsValid) { return; }
 
         if (invalidateChildren) {

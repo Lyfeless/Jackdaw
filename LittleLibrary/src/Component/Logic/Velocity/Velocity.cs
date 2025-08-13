@@ -10,7 +10,7 @@ public class VelocityComponent(LittleGame game) : Component(game) {
     public VelocityDampener? DampenerX;
     public VelocityDampener? DampenerY;
 
-    public override void Update() {
+    protected override void Update() {
         Delta = Value;
         Actor.Position += Value;
         if (DampenerX != null || DampenerY != null) {

@@ -42,24 +42,7 @@ public abstract class Component {
     public bool Visible = true;
 
     bool addedToActor = false;
-
-    /// <summary>
-    /// If the component has already been added to an actor before.
-    /// </summary>
-    public bool AddedToActor {
-        get => addedToActor;
-        set { if (value) { addedToActor = true; } }
-    }
-
     bool addedToTree = false;
-
-    /// <summary>
-    /// If the component has already been in the tree before.
-    /// </summary>
-    public bool AddedToTree {
-        get => addedToTree;
-        set { if (value) { addedToTree = true; } }
-    }
 
     public Component(LittleGame game) {
         Game = game;
@@ -70,52 +53,75 @@ public abstract class Component {
     /// Ticking function, called once per tree tick when attached to an actor in the node tree.
     /// Doesn't run if <see cref="Ticking"> is false.
     /// </summary>
-    public virtual void Update() { }
+    protected virtual void Update() { }
 
     /// <summary>
     /// Display function, called once per tree render when attached to an actor in the node tree.
     /// Doesn't run if <see cref="Visible"> is false.
     /// </summary>
     /// <param name="batcher"></param>
-    public virtual void Render(Batcher batcher) { }
+    protected virtual void Render(Batcher batcher) { }
 
     /// <summary>
     /// Runs the first time the component is added to an actor. Will not run if removed and re-added. </br>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree yet.
     /// </summary>
-    public virtual void AddedFirst() { }
+    protected virtual void AddedFirst() { }
 
     /// <summary>
     /// Runs any time the component is added to an actor. </br>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree yet.
     /// </summary>
-    public virtual void Added() { }
+    protected virtual void Added() { }
 
     /// <summary>
     /// Runs any time the component is removed to an actor. </br>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree.
     /// </summary>
-    public virtual void Removed() { }
+    protected virtual void Removed() { }
 
     /// <summary>
     /// Runs the first time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. </br>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
-    public virtual void EnterTreeFirst() { }
+    protected virtual void EnterTreeFirst() { }
 
     /// <summary>
     /// Runs any time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. </br>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
-    public virtual void EnterTree() { }
+    protected virtual void EnterTree() { }
 
     /// <summary>
     /// Runs any time the component exits the node tree, either by removing its owning actor from the tree or being removed from its owner. </br>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
-    public virtual void ExitTree() { }
+    protected virtual void ExitTree() { }
 
     public override string ToString() {
         return Match.ToString();
     }
+
+    internal void OnUpdate() => Update();
+    internal void OnRender(Batcher batcher) => Render(batcher);
+    internal void OnRemoved() => Removed();
+    internal void OnExitTree() => ExitTree();
+
+    internal void OnAdded() {
+        if (!addedToActor) {
+            addedToActor = true;
+            AddedFirst();
+        }
+        Added();
+    }
+
+
+    internal void OnEnterTree() {
+        if (!addedToTree) {
+            addedToTree = true;
+            EnterTreeFirst();
+        }
+        EnterTree();
+    }
+
 }

@@ -22,7 +22,7 @@ public class RaycastComponent(LittleGame game, Vector2 position, Vector2 directi
     /// </summary>
     public SweptCollisionInfo Collisions;
 
-    public override void Update() {
+    protected override void Update() {
         Collisions = Game.Collision.GetRayCollision(this);
     }
 }

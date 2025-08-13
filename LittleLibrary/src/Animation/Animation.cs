@@ -112,7 +112,7 @@ public class AnimationData {
     }
 
     // Only used for error fallback
-    public AnimationData(Assets assets) {
+    internal AnimationData(Assets assets) {
         Frames = [new(assets.GetTexture("error"), new())];
     }
 }

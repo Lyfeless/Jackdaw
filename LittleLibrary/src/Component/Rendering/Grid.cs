@@ -43,7 +43,7 @@ public class GridRendererComponent(LittleGame game, Point2 position, Grid<Sprite
     public GridRendererComponent(LittleGame game, Point2 position, Point2 gridSize, Point2 tileSize)
         : this(game, position, new Grid<Sprite>(gridSize), tileSize) { }
 
-    public override void Render(Batcher batcher) {
+    protected override void Render(Batcher batcher) {
         //! FIXME (Alex): NOT DONE! Needs culling
         for (int x = 0; x < Grid.Size.X; ++x) {
             for (int y = 0; y < Grid.Size.Y; ++y) {

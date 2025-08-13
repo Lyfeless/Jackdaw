@@ -42,7 +42,7 @@ public class TextComponent(LittleGame game, string text, SpriteFont font, Color 
     /// <param name="offset">The position offset.</param>
     public TextComponent(LittleGame game, string text, string font, Color color, Vector2? offset = null) : this(game, text, game.Assets.GetFont(font), color, offset) { }
 
-    public override void Render(Batcher batcher) {
+    protected override void Render(Batcher batcher) {
         //! FIXME (Alex): Cull
         batcher.Text(Font, Text, Offset, Color);
     }

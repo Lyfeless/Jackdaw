@@ -6,7 +6,7 @@ namespace LittleLib;
 public class MoveComponent(LittleGame game, Vector2 speed) : Component(game) {
     Vector2 Speed = speed;
 
-    public override void Update() {
+    protected override void Update() {
         Vector2 change = new();
         if (Actor.Game.Input.Keyboard.Down(Keys.Up)) { change += new Vector2(0, -Speed.Y); }
         if (Actor.Game.Input.Keyboard.Down(Keys.Down)) { change += new Vector2(0, Speed.Y); }
