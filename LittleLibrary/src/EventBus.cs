@@ -1,7 +1,8 @@
 namespace LittleLib;
 
-//! FIXME (Alex): TEST THIS!!! TEST IT!!!
-
+/// <summary>
+/// A simple event manager for subscribing and dispatching events.
+/// </summary>
 public class EventBus {
     record class Subscription(object? Subscriber, Delegate Callback);
 
@@ -12,7 +13,19 @@ public class EventBus {
     readonly List<QueueAction> addQueue = [];
     readonly List<QueueAction> removeQueue = [];
 
+    /// <summary>
+    /// Subscribe to an event with a callback.
+    /// </summary>
+    /// <typeparam name="T">The type of event to subscribe to.</typeparam>
+    /// <param name="callback">The action that should be run when an event is recieved.</param>
     public void Subscribe<T>(Action<T> callback) where T : struct => Subscribe(null, callback);
+
+    /// <summary>
+    /// Subscribe to an event with a callback.
+    /// </summary>
+    /// <typeparam name="T">The type of event to subscribe to.</typeparam>
+    /// <param name="subscriber">The object subscribing to the event, can be used to unsubscribe with.</param>
+    /// <param name="callback">The action that should be run when an event is recieved.</param>
     public void Subscribe<T>(object? subscriber, Action<T> callback) where T : struct {
         Type type = typeof(T);
         Subscription subscription = new(subscriber, callback);
@@ -29,6 +42,11 @@ public class EventBus {
         value.Add(subscription);
     }
 
+    /// <summary>
+    /// Unsubscribe from an event by subscriber object.
+    /// </summary>
+    /// <typeparam name="T">The type of event to unsubscribe from.</typeparam>
+    /// <param name="subscriber">The subscribed object.</param>
     public void Unsubscribe<T>(object? subscriber) where T : struct {
         Type type = typeof(T);
         if (!Subsciptions.TryGetValue(type, out List<Subscription>? value)) { return; }
@@ -39,6 +57,11 @@ public class EventBus {
         value.Remove(subscription);
     }
 
+    /// <summary>
+    /// Unsubscribe from an event by callback.
+    /// </summary>
+    /// <typeparam name="T">The type of event to unsubscribe from.</typeparam>
+    /// <param name="callback">The subscribed callback.</param>
     public void Unsubscribe<T>(Action<T> callback) where T : struct {
         Type type = typeof(T);
         if (!Subsciptions.TryGetValue(type, out List<Subscription>? value)) { return; }
@@ -49,6 +72,11 @@ public class EventBus {
         value.Remove(subscription);
     }
 
+    /// <summary>
+    /// Send an event to all subscriptions.
+    /// </summary>
+    /// <typeparam name="T">The type of event to send.</typeparam>
+    /// <param name="event">The event package.</param>
     public void Dispatch<T>(T @event) where T : struct {
         Type type = typeof(T);
         if (!Subsciptions.TryGetValue(type, out List<Subscription>? value)) { return; }

@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A rectangle-shaped collider.
+/// </summary>
+/// <param name="rect"></param>
 public class RectangleCollider(Rect rect) : Collider {
     public Rect Rect = rect;
 

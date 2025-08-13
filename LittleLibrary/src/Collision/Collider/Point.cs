@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A collider that takes up a single point.
+/// </summary>
+/// <param name="point">The point location.</param>
 public class PointCollider(Vector2 point) : Collider {
     Vector2 Point = point;
 

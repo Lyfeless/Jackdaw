@@ -3,6 +3,11 @@ using Foster.Framework;
 
 namespace LittleLib.Loader.LDTK;
 
+/// <summary>
+/// Imports files created by the LDTK level editor, automatically converting them to usable actor node structures. </br>
+/// Relies on LDTK's option to split levels into seperate files to avoid loading everything upfront.
+/// In the LDTK project settings select the options "Save levels to seperate files" to get a subfolder of all levels.
+/// </summary>
 public class LDTKLoader {
     const string EntityLayerDescriptor = "Entities";
     const string IntGridLayerDescriptor = "IntGrid";
@@ -18,11 +23,21 @@ public class LDTKLoader {
     readonly Dictionary<int, LayerSaveDefinition> LayerDefinitions = [];
 
     readonly Dictionary<string, LevelSaveReference> Levels = [];
+
+    /// <summary>
+    /// All valid loadable level names.
+    /// </summary>
     public string[] LevelNames => [.. Levels.Keys];
 
     readonly Dictionary<string, Action<Actor, EntitySaveData>> ActorRegistry = [];
 
     //! FIXME (Alex): find a better way to set collision enums data
+    /// <summary>
+    /// Create a loader from an LDTK level save file.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="path">The relative path to the root .ldtk file.</param>
+    /// <param name="collisionTagFunc">A callback function to convert LDTK enum strings into collision tags for tile info.</param>
     public LDTKLoader(LittleGame game, string path, Func<string, int?> collisionTagFunc) {
         Game = game;
         LevelFolderPath = Path.Join(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
@@ -35,6 +50,7 @@ public class LDTKLoader {
             Tilesets.Add(
                 tileset.DefinitionID,
                 new(
+                    Game,
                     identifier: tileset.Identifier,
                     atlas: GetTilesetTexture(tileset),
                     tileCount: new(tileset.TileCountX, tileset.TileCountY),
@@ -55,9 +71,30 @@ public class LDTKLoader {
         }
     }
 
-    public Actor Load(string name) {
-        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) { throw new Exception("Attempt to access unidentified level"); }
-        LevelSaveData levelData = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(LevelFolderPath, $"{levelRef.NameID}.ldtkl")), LDTKSourceGenerationContext.Default.LevelSaveData) ?? throw new Exception("Failed to load level");
+    /// <summary>
+    /// Create a new instance of save data.
+    /// </summary>
+    /// <param name="name">Name ID of level to load.</param>
+    /// <returns>Level instance.</returns>
+    public Actor? Load(string name) {
+        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) {
+            Console.WriteLine($"LDTKLoader: Level name {name} not found, load unsuccessful");
+            return null;
+        }
+
+        LevelSaveData? levelData;
+        try {
+            levelData = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(LevelFolderPath, $"{levelRef.NameID}.ldtkl")), LDTKSourceGenerationContext.Default.LevelSaveData);
+        } catch {
+            Console.WriteLine($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
+            return null;
+        }
+
+        if (levelData == null) {
+            //! FIXME (Alex): Don't like the duplicate error message here
+            Console.WriteLine($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
+            return null;
+        }
 
         Actor levelRoot = new(Game);
         levelRoot.Match.Name = levelRef.NameID;
@@ -65,8 +102,6 @@ public class LDTKLoader {
         //! FIXME (Alex): Do something with these?
         Point2 levelPosition = new(levelRef.X, levelRef.Y);
         Point2 levelSize = new(levelRef.Width, levelRef.Height);
-
-        //! FIXME (Alex): Load level fields
 
         List<Actor> layers = [];
 
@@ -127,8 +162,17 @@ public class LDTKLoader {
         return levelRoot;
     }
 
+    /// <summary>
+    /// Register a conversion function to create new actors out of LDTK entity data.
+    /// </summary>
+    /// <param name="id">The LDTK entity identifier.</param>
+    /// <param name="func">A conversion function to create an actor from the LDTK data.</param>
+    /// <returns>The loader instance</returns>
     public LDTKLoader RegisterActor(string id, Action<Actor, EntitySaveData> func) {
-        if (ActorRegistry.ContainsKey(id)) { throw new Exception($"LDTKLoader: Attempting to re-define actor id {id}"); }
+        if (ActorRegistry.ContainsKey(id)) {
+            Console.WriteLine($"LDTKLoader: Attempting to re-define actor id {id}, skipping.");
+            return this;
+        }
         ActorRegistry.Add(id, func);
         return this;
     }
@@ -143,8 +187,16 @@ public class LDTKLoader {
         return Game.Assets.GetTexture(path);
     }
 
+    /// <summary>
+    /// Get the LDTK field data of a level.
+    /// </summary>
+    /// <param name="name">Name ID of level to load.</param>
+    /// <returns>An array of data fields for the level.</returns>
     public FieldSaveData[] GetLevelFieldData(string name) {
-        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) { throw new Exception("Attempt to access unidentified level"); }
+        if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) {
+            Console.WriteLine($"Unable to find level {name}, no field data to return");
+            return [];
+        }
         return levelRef.Fields;
     }
 }

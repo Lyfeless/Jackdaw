@@ -3,6 +3,8 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+//! FIXME (Alex): Should this be a sprite?
+
 public class CircleComponent(LittleGame game, Circle circle, int steps, Color color) : Component(game) {
     public Circle Circle = circle;
     readonly int Steps = steps;

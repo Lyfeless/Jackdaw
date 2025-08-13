@@ -2,6 +2,8 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+//! FIXME (Alex): Should this be a sprite?
+
 public class RectComponent(LittleGame game, Rect rect, Color color) : Component(game) {
     public Rect Rect = rect;
     public Color Color = color;

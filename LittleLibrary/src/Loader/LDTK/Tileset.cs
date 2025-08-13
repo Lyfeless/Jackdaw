@@ -1,12 +1,11 @@
-using System.Drawing;
 using System.Numerics;
-using System.Xml.Linq;
 using Foster.Framework;
 
 namespace LittleLib.Loader.LDTK;
 
-//! FIXME (Alex): Include data and extract collision info
 public class LDTKTileset {
+    readonly LittleGame Game;
+
     public readonly string Identifier;
     public readonly Subtexture Atlas;
     readonly Grid<LDTKTileElement> tileElements;
@@ -22,6 +21,7 @@ public class LDTKTileset {
     public Point2 GetTileCoord(int id) => new(id % tileElements.Size.X, id / tileElements.Size.X);
 
     public LDTKTileset(
+        LittleGame game,
         string identifier,
         Subtexture atlas,
         Point2 tileCount,
@@ -30,6 +30,8 @@ public class LDTKTileset {
         TileTypeCustomData[] customData,
         Func<string, int?> collisionTagFunc
     ) {
+        Game = game;
+
         Identifier = identifier;
         Atlas = atlas;
         TileSize = tileSize;
@@ -44,7 +46,7 @@ public class LDTKTileset {
                 int id = (y * tileCount.X) + x;
                 tileElements.Set(new() {
                     ID = id,
-                    Sprite = new SpriteSingle(Atlas.Clip(new(gridCoord * TileSize, TileSize, TileSize))),
+                    Sprite = new SpriteSingle(Atlas.GetClipSubtexture(new(gridCoord * TileSize, TileSize, TileSize))),
                     EnumValues = [.. enumTags.Where(e => e.tileIDs.Contains(id)).Select(e => e.Value)]
                 }, gridCoord);
             }
@@ -67,6 +69,21 @@ public class LDTKTileset {
                 // Handle built-in tile information
                 switch (dataID) {
                     case "collider":
+                        /*
+                            Collider custom data format:
+                                identifier: collider
+                                formats:
+                                    Full tile: FULL
+                                        ex: collider: FULL
+                                    Rectangle: RECT [x] [y] [width] [height]
+                                        ex: collider: RECT 4 4 8 8
+                                    Circle: CIRCLE [x] [y] [radius]
+                                        ex: collider: CIRCLE 8 8 4
+                                    Polygon: POLY [x1] [y1] [x2] [y2] ...
+                                        Expects a confex collider but doesn't verify
+                                        ex: collider: POLY 0 8 16 8 8 16 0 8
+                        */
+
                         element.Collider = ColliderFromData(dataValue);
                         if (element.Collider != null) {
                             foreach (string tag in element.EnumValues) {
@@ -76,6 +93,18 @@ public class LDTKTileset {
                                 }
                             }
                         }
+                        break;
+                    case "anim":
+                        /*
+                            Animated sprite custom data format:
+                                identifier: anim
+                                format: [name]
+                                ex: anim: testAnim
+                        */
+
+                        //! FIXME (Alex): TEST THIS
+                        if (dataValue == string.Empty) { continue; }
+                        element.Sprite = new SpriteAnimated(Game, Game.Assets.GetAnimation(dataValue));
                         break;
                 }
             }
@@ -106,7 +135,7 @@ public class LDTKTileset {
                     ) { return null; }
                     return new CircleCollider(new Circle(x, y, r));
                 }
-            case "POLYGON": {
+            case "POLY": {
                     if (args.Length % 2 != 0) { return null; }
                     Vector2[] points = new Vector2[args.Length / 2];
                     for (int i = 0; i < points.Length; ++i) {

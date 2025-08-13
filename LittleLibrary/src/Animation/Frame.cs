@@ -2,6 +2,9 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A single frame of a sprite animation.
+/// </summary>
 public readonly struct AnimationFrame {
     public readonly Subtexture Texture;
     public readonly float Duration = 1;
@@ -10,6 +13,16 @@ public readonly struct AnimationFrame {
     public readonly bool FlipY = false;
     public readonly string EmbeddedData = string.Empty;
 
+    /// <summary>
+    /// Create a frame for a sprite animation.
+    /// </summary>
+    /// <param name="texture">The texture to use.</param>
+    /// <param name="duration">The length of the frame, in milliseconds.</param>
+    /// <param name="positionOffset">The amount to offset this frame's position from the rest of the animation.</param>
+    /// <param name="clip">The region of the texture to use for the frame. Defaults to the full texture.</param>
+    /// <param name="flipX">If the frame texture should be mirrored horizontally.</param>
+    /// <param name="flipY">If the frame texture should be mirrored vertically.</param>
+    /// <param name="embeddedData">Metadata to include in the frame.</param>
     public AnimationFrame(
         Subtexture texture,
         float duration,
@@ -26,22 +39,25 @@ public readonly struct AnimationFrame {
         EmbeddedData = embeddedData ?? string.Empty;
         if (clip != null) {
             RectInt clipRect = (RectInt)clip;
-            Texture = texture.Clip(clipRect);
+            Texture = texture.GetClipSubtexture(clipRect);
         }
         else {
             Texture = texture;
         }
     }
 
+    /// <summary>
+    /// Create a frame for a sprite animation by clipping a spritesheet texture.
+    /// </summary>
+    /// <param name="texture">The base texture.</param>
+    /// <param name="clip">The region of the texture to use for the frame.</param>
+    /// <param name="duration">The length of the frame, in milliseconds.</param>
     public AnimationFrame(
         Subtexture texture,
-        int x,
-        int y,
-        int width,
-        int height,
-        float duration
+        float duration,
+        Rect clip
     ) {
         Duration = duration;
-        Texture = texture.Clip(x, y, width, height);
+        Texture = texture.GetClipSubtexture(clip);
     }
 }

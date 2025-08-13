@@ -6,7 +6,15 @@ namespace LittleLib;
 public record struct MultiSegmentPathPosition(Vector2 Position, IPathSegment Segment, float SegmentPercent);
 
 //! FIXME (Alex): Deadful name, but calling it just path is also bad
+/// <summary>
+/// A utility for creating and navigating static paths made of multiple segments.
+/// </summary>
 public readonly struct MultiSegmentPath {
+    /// <summary>
+    /// Create a new path from premade segments.
+    /// </summary>
+    /// <param name="start">The start position of the path.</param>
+    /// <param name="segments">The segments, all are positioned relative to the end of the previous path.</param>
     public MultiSegmentPath(Vector2 start, params IPathSegment[] segments) {
         Start = start;
         Segments = segments;
@@ -35,7 +43,19 @@ public readonly struct MultiSegmentPath {
     public readonly float[] SegmentLengths;
     public readonly float Length;
 
-    public MultiSegmentPathPosition Position(float percent) {
+    /// <summary>
+    /// Get the positional information of the path at distance along the distance.
+    /// </summary>
+    /// <param name="distance">The percent along the path from the start, range 0-1.</param>
+    /// <returns>The positional information at the given point in the path</returns>
+    public MultiSegmentPathPosition DistancePosition(float distance) => PercentPosition(Calc.Clamp(distance, 0, Length) / Length);
+
+    /// <summary>
+    /// Get the positional information of the path at a percent of the distance.
+    /// </summary>
+    /// <param name="percent">The percent along the path from the start, range 0-1.</param>
+    /// <returns>The positional information at the given point in the path</returns>
+    public MultiSegmentPathPosition PercentPosition(float percent) {
         percent = Calc.Clamp(percent, 0, 1);
 
         float length = 0;
@@ -60,16 +80,53 @@ public readonly struct MultiSegmentPath {
     }
 }
 
+/// <summary>
+/// A segment on a multi-segment path.
+/// </summary>
 public interface IPathSegment {
+    /// <summary>
+    /// The Relative offset from the start of the path to the end.
+    /// </summary>
     public Vector2 EndOffset { get; }
+
+    /// <summary>
+    /// The overall length of the path segment.
+    /// </summary>
     public float Length { get; }
+
+    /// <summary>
+    /// Get the position of the path at the given percent.
+    /// </summary>
+    /// <param name="percent">The percent distance along the segment.</param>
+    /// <returns>The position at the given percent.</returns>
     public Vector2 Position(float percent);
+
+    /// <summary>
+    /// Get the tangent of the path at the given percent, facing towards the end of the path.
+    /// </summary>
+    /// <param name="percent">The percent distance along the segment.</param>
+    /// <returns>The tangent at the given percent.</returns>
     public Vector2 Tangent(float percent);
 }
 
+/// <summary>
+/// A simple linear path segment, goes directly from the start to the end.
+/// </summary>
+/// <param name="offset">The end point of the segment, relative to the start.</param>
 public readonly struct PathSegmentLinear(Vector2 offset) : IPathSegment {
+    /// <summary>
+    /// Create a full path made out of linear segments, with all points being relative to the start point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the origin.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromAbsolute(params Vector2[] points)
         => FromRelative(MultiSegmentPath.AbsoluteToRelative(points));
+
+    /// <summary>
+    /// Create a full path made out of linear segments, with all points being relative to the previous point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the previous point.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 2) {
             Console.WriteLine("PATH: Not enough points provided to make a path of segments");
@@ -98,9 +155,23 @@ public readonly struct PathSegmentLinear(Vector2 offset) : IPathSegment {
 
 // Derivative math adapted from https://pomax.github.io/bezierinfo
 
+/// <summary>
+/// A quadradic bezier segment, goes from the start to the end with 1 control point.
+/// </summary>
 public readonly struct PathSegmentQuadraticBezier : IPathSegment {
+    /// <summary>
+    /// Create a full path made out of quadratic bezier segments, with all points being relative to the start point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the origin.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromAbsolute(params Vector2[] points)
         => FromRelative(MultiSegmentPath.AbsoluteToRelative(points));
+
+    /// <summary>
+    /// Create a full path made out of quadratic bezier segments, with all points being relative to the previous point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the previous point.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 3) {
             Console.WriteLine("PATH: Not enough points provided to make a path of quadratic beziers");
@@ -157,9 +228,23 @@ public readonly struct PathSegmentQuadraticBezier : IPathSegment {
     }
 }
 
+/// <summary>
+/// A cubic bezier segment, goes from the start to the end with 2 control points.
+/// </summary>
 public readonly struct PathSegmentCubicBezier : IPathSegment {
+    /// <summary>
+    /// Create a full path made out of cubic bezier segments, with all points being relative to the start point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the origin.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromAbsolute(params Vector2[] points)
         => FromRelative(MultiSegmentPath.AbsoluteToRelative(points));
+
+    /// <summary>
+    /// Create a full path made out of cubic bezier segments, with all points being relative to the previous point.
+    /// </summary>
+    /// <param name="points">The points of the path, all relative to the previous point.</param>
+    /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 4) {
             Console.WriteLine("PATH: Not enough points provided to make a path of cubic beziers");

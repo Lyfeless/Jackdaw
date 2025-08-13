@@ -8,7 +8,7 @@ internal class ChildContainerModifyActionAddTop<Telement, Towner>(ChildContainer
             Console.WriteLine($"ActorContainer: Failed to add child {Container.Printable(Child)}");
             return;
         }
-        Container.HandleAdd(Child);
         Container.Elements.Insert(0, Child);
+        Container.HandleAdd(Child);
     }
 }

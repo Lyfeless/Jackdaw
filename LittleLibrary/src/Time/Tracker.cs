@@ -1,9 +1,9 @@
 namespace LittleLib;
 
-internal class TimeTracker(TimeSpan startTime, bool paused = false) {
+internal class TimeTracker(TimeSpan startTime, bool paused = false, float scale = 1) {
     public TimeSpan CurrentTime { get; private set; } = startTime;
     public bool Paused { get; private set; } = paused;
-    public float Scale { get; private set; } = 1;
+    public float Scale { get; private set; } = scale;
 
     public void Update(float delta) {
         if (Paused) { return; }

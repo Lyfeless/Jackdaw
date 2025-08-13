@@ -4,6 +4,7 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): This should be a sprite?
+//! FIXME (Alex): And make a sprite for tiling texture so I can make this less terrible
 public class NinesliceComponent : Component {
     public enum ExtendBehavior {
         TILE,

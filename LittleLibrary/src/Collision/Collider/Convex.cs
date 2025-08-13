@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A generic collider structure for any convex shape.
+/// </summary>
+/// <param name="shape">The collider's shape.</param>
 public abstract class ConvexCollider(IConvexShape shape) : Collider {
     IConvexShape shape = shape;
     public IConvexShape Shape {

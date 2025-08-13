@@ -1,5 +1,9 @@
 namespace LittleLib;
 
+/// <summary>
+/// A container for storing components on an actor.
+/// </summary>
+/// <param name="actor">The owning actor.</param>
 public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(actor) {
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
@@ -18,39 +22,39 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
 
     public override void HandleAdd(Component child) {
         child.Actor = Owner;
-        child.Added();
+
         if (!child.AddedToActor) {
             child.AddedFirst();
             child.AddedToActor = true;
         }
+        child.Added();
+
         if (Owner.InTree) {
-            child.EnterTree();
-            //! FIXME (Alex): Redundant with actor check, does that matter?
-            //      I already don't remember what this means
             if (Owner.Parent.IsValid && !child.AddedToTree) {
                 child.EnterTreeFirst();
                 child.AddedToTree = true;
             }
+            child.EnterTree();
         }
     }
 
     public override void HandleRemove(Component child) {
-        child.Actor = Actor.Invalid;
         child.Removed();
         if (Owner.InTree) {
             child.ExitTree();
         }
+        child.Actor = Actor.Invalid;
     }
 
-    public override ObjectIdentifier<Component> Match(Component element) {
+    protected override ObjectIdentifier<Component> Match(Component element) {
         return element.Match;
     }
 
-    public override int RecurseCount() {
+    protected override int RecurseCount() {
         return Owner.Children.Elements.Count;
     }
 
-    public override ChildContainer<Component, Actor> RecurseItem(int index) {
+    protected override ChildContainer<Component, Actor> RecurseItem(int index) {
         return Owner.Children.Elements[index].Components;
     }
 }

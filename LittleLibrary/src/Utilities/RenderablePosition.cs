@@ -6,7 +6,7 @@ namespace LittleLib;
 
 /// <summary>
 /// Position control that stores both an exact location and a location rounded to the nearest int,
-/// to avoid any floating point imprecision when rendering
+/// to avoid any floating point imprecision when rendering.
 /// </summary>
 public struct RenderablePosition {
     public Vector2 Precise { get; private set; }

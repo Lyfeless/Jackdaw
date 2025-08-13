@@ -3,8 +3,14 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A gneral-purpose utility for converting coordinates between several common spaces.
+/// </summary>
+/// <param name="game">The game instance.</param>
 public class SpaceConverter(LittleGame game) {
-    LittleGame Game = game;
+    readonly LittleGame Game = game;
+
+    //! FIXME (Alex): Doc comments
 
     public Point2 MouseToTile<Tin, Tout>(Actor relativeActor, ISpatialGrid<Tin, Tout> grid)
         => WindowToTile(Game.Input.Mouse.Position, relativeActor, grid);

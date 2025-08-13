@@ -3,7 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib.Loader.LDTK;
 
-public static class FieldGetter {
+/// <summary>
+/// Utility class for getting custom values out of level savedata.
+/// </summary>
+public static class LDTKFieldGetter {
     #region Reference Types
     /// <summary>
     /// Displayable tile reference, stores the position and size of a texture source on a tileset.

@@ -3,6 +3,9 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+//! FIXME (Alex): Doc comments
+//! FIXME (Alex): make a few premade spatial grids
+
 public interface ISpatialGrid<TIn, TOut> {
     public Vector2 Position { get; set; }
     public Vector2 TileSize { get; protected set; }

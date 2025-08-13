@@ -1,10 +1,18 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// An animated sprite, begins animated when created.
+/// </summary>
+/// <param name="game">The current game instance.</param>
+/// <param name="animation">The sprite animation to use.</param>
 public class SpriteAnimated(LittleGame game, AnimationData animation) : Sprite {
     readonly AnimationData Animation = animation;
+
+    /// <summary>
+    /// The timer controlling the animation playback.
+    /// </summary>
     public readonly Timer Timer = new(
         game: game,
         duration: animation.Duration,
@@ -18,8 +26,16 @@ public class SpriteAnimated(LittleGame game, AnimationData animation) : Sprite {
 
     public bool Done => Timer.Done;
 
+    /// <summary>
+    /// The current animation frame.
+    /// </summary>
     public AnimationFrame Frame => Animation.GetFrame((float)Timer.ElapsedTimeClamped);
 
+    /// <summary>
+    /// An animated sprite, begins animated when created.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="animation">The animation name.</param>
     public SpriteAnimated(LittleGame game, string animation) : this(game, game.Assets.GetAnimation(animation)) { }
 
     public override void Render(Batcher batcher) {

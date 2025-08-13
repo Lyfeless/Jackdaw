@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A circle-shaped collider, defined by a position and radius.
+/// </summary>
+/// <param name="circle">The collision circle.</param>
 public class CircleCollider(Circle circle) : Collider {
     Circle circle = circle;
     public Circle Circle {

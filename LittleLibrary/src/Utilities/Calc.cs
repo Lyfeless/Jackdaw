@@ -19,6 +19,16 @@ public static class CalcExtra {
         return ((a - b) / 2) + b;
     }
 
+    //! FIXME (Alex): Can this also get NAN collisions?
+    /// <summary>
+    /// Get intersection between two line segments.
+    /// </summary>
+    /// <param name="a1">The first point of segment a.</param>
+    /// <param name="a2">The second point of segment a.</param>
+    /// <param name="b1">The first point of segment b.</param>
+    /// <param name="b2">The second point of segment b.</param>
+    /// <param name="intersection">The intersection point between the two lines.</param>
+    /// <returns>True if a collision exists</returns>
     public static bool LineSegmentIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, out Vector2 intersection) {
         float t = (((a1.X - b1.X) * (b1.Y - b2.Y)) - ((a1.Y - b1.Y) * (b1.X - b2.X))) / (((a1.X - a2.X) * (b1.Y - b2.Y)) - ((a1.Y - a2.Y) * (b1.X - b2.X)));
         float u = -((((a1.X - a2.X) * (a1.Y - b1.Y)) - ((a1.Y - a2.Y) * (a1.X - b1.X))) / (((a1.X - a2.X) * (b1.Y - b2.Y)) - ((a1.Y - a2.Y) * (b1.X - b2.X))));

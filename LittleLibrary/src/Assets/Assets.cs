@@ -28,6 +28,11 @@ public class Assets {
 
     #region Assets storage and accessors
     readonly Dictionary<string, Subtexture> Textures = [];
+    /// <summary>
+    /// Find a texture from the loaded texture data.
+    /// </summary>
+    /// <param name="name">The asset name.</param>
+    /// <returns>The requested texture, or the default texture if nothing was found.</returns>
     public Subtexture GetTexture(string name) {
         if (Textures.TryGetValue(name, out Subtexture output)) { return output; }
         Console.WriteLine($"ASSETS: Failed to find texture {name}, returning default");
@@ -36,6 +41,11 @@ public class Assets {
     const string TextureFallbackName = "Fallback.texture.png";
 
     readonly Dictionary<string, SpriteFont> Fonts = [];
+    /// <summary>
+    /// Find a font from the loaded font data.
+    /// </summary>
+    /// <param name="name">The asset name.</param>
+    /// <returns>The requested font, or the default font if nothing was found.</returns>
     public SpriteFont GetFont(string name) {
         if (Fonts.TryGetValue(name, out SpriteFont? output)) { return output; }
         Console.WriteLine($"ASSETS: Failed to find font {name}, returning default");
@@ -44,6 +54,11 @@ public class Assets {
     const string FontFallbackName = "Fallback.font.ttf";
 
     readonly Dictionary<string, Shader> Shaders = [];
+    /// <summary>
+    /// Find a shader from the loaded shader data.
+    /// </summary>
+    /// <param name="name">The asset name.</param>
+    /// <returns>The requested shader, or the default shader if nothing was found.</returns>
     public Shader GetShader(string name) {
         if (Shaders.TryGetValue(name, out Shader? output)) { return output; }
         Console.WriteLine($"ASSETS: Failed to find shader {name}, returning default");
@@ -51,6 +66,11 @@ public class Assets {
     }
 
     readonly Dictionary<string, AnimationData> Animations = [];
+    /// <summary>
+    /// Find a animation from the loaded animation data.
+    /// </summary>
+    /// <param name="name">The asset name.</param>
+    /// <returns>The requested animation, or the default animation if nothing was found.</returns>
     public AnimationData GetAnimation(string name) {
         if (Animations.TryGetValue(name, out AnimationData? output)) { return output; }
         Console.WriteLine($"ASSETS: Failed to find animation {name}, returning default");
@@ -58,6 +78,11 @@ public class Assets {
     }
 
     readonly Dictionary<string, Sound> Sounds = [];
+    /// <summary>
+    /// Find a sound from the loaded sound data.
+    /// </summary>
+    /// <param name="name">The asset name.</param>
+    /// <returns>The requested sound, or the default sound if nothing was found.</returns>
     public Sound GetSound(string name) {
         if (Sounds.TryGetValue(name, out Sound? output)) { return output; }
         Console.WriteLine($"ASSETS: Failed to find sound {name}, returning default");
@@ -156,7 +181,6 @@ public class Assets {
 
         // Sounds
         {
-            //! FIXME (Alex): Load config for sound settings, mostly for sounds that should be streamed
 
             // Load fallback sound
             using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;

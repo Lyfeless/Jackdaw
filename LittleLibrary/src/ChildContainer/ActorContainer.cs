@@ -1,5 +1,9 @@
 namespace LittleLib;
 
+/// <summary>
+/// A container for storing child actors on an actor.
+/// </summary>
+/// <param name="actor">The owning actor.</param>
 public class ActorContainer(Actor actor) : ChildContainer<Actor, Actor>(actor) {
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
@@ -29,21 +33,22 @@ public class ActorContainer(Actor actor) : ChildContainer<Actor, Actor>(actor) {
     }
 
     public override void HandleRemove(Actor child) {
-        child.Parent = Actor.Invalid;
         if (Owner.InTree) {
             child.ExitTree();
         }
+
+        child.Parent = Actor.Invalid;
     }
 
-    public override ObjectIdentifier<Actor> Match(Actor element) {
+    protected override ObjectIdentifier<Actor> Match(Actor element) {
         return element.Match;
     }
 
-    public override int RecurseCount() {
+    protected override int RecurseCount() {
         return Owner.Children.Elements.Count;
     }
 
-    public override ChildContainer<Actor, Actor> RecurseItem(int index) {
+    protected override ChildContainer<Actor, Actor> RecurseItem(int index) {
         return Owner.Children.Elements[index].Children;
     }
 }

@@ -26,7 +26,7 @@ public class ScalerComponent(
         //! FIXME (Alex): Cache these values to only update when needed?
         if (ScalerX != null) { Actor.Position.SetX(ScalerX.Get()); }
         if (ScalerY != null) { Actor.Position.SetY(ScalerY.Get()); }
-        if (ScalerW != null) { ActorBounds.SetWidth(ScalerW.Get()); }
-        if (ScalerH != null) { ActorBounds.SetHeight(ScalerH.Get()); }
+        if (ScalerW != null) { ActorBounds.Size = new(ScalerW.Get(), 0); }
+        if (ScalerH != null) { ActorBounds.Size = new(0, ScalerH.Get()); }
     }
 }

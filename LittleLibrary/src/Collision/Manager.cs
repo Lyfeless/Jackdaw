@@ -1,4 +1,3 @@
-using System.Collections.Specialized;
 using System.Numerics;
 using Foster.Framework;
 
@@ -254,7 +253,7 @@ public class CollisionManager {
     public SweptCollisionInfo GetSweptCollision(Collider collider, Vector2 position, Vector2 velocity, bool allowNegative = false) {
         // If object isn't moving just get the first collided object to avoid extra calculations
         //! FIXME (Alex): Unsure of how this should be handled, throwing a warning to just avoid running this function with no velocity
-        //! FIXME (Alex): THis looks identical to the compnent version of the functions, but they call different overloads so no subfunction :(
+        //! FIXME (Alex): This looks identical to the compnent version of the functions, but they call different overloads so no subfunction :(
         if (velocity == Vector2.Zero) {
             // Console.WriteLine("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
             SingleCollisionInfo collision = GetFirstCollision(collider, position);
@@ -607,7 +606,6 @@ public class CollisionManager {
         return new(pushout, true);
     }
 
-    //! FIXME (Alex): Give back more info than just the fraction
     static CollisionSweepInfo GetRayIntersectionFraction(
         Collider colliderA,
         Vector2 positionA,
@@ -661,7 +659,6 @@ public class CollisionManager {
 
             // pointC lies exactly on the line
             if (crossC == 0) {
-                //! FIXME (Alex): NOT A FRACTION
                 return new(VectorFraction(pointC, velocityDifference), PerpDirection(pointA, pointB, -velocityDifference), true);
             }
 

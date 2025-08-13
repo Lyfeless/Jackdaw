@@ -1,8 +1,11 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A sprite made up of multiple sprites displayed on top of one another.
+/// </summary>
+/// <param name="sprites">All the sprites to display in the stack.</param>
 public class SpriteStack(params Sprite[] sprites) : Sprite() {
     public readonly Sprite[] Sprites = sprites;
 

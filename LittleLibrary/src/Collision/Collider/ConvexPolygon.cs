@@ -2,6 +2,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A convex polygon-shaped collider.
+/// </summary>
+/// <param name="polygon">The polygon shape.</param>
 public class ConvexPolygonCollider(ConvexPolygon polygon) : ConvexCollider(polygon) {
     //! FIXME (Alex): Should this just be a child type of TriangleCollider? Might be wiser in the long run
     public ConvexPolygonCollider(Triangle triangle) : this(new ConvexPolygon() {

@@ -3,8 +3,18 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A capsule-shaped collider, defined as two circles connected by a rectangle.
+/// </summary>
+/// <param name="point1">The center of the first circle.</param>
+/// <param name="point2">The center of the second circle.</param>
+/// <param name="radius">The circle radius.</param>
 public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Collider {
     Vector2 point1 = point1;
+
+    /// <summary>
+    /// The center of the first circle.
+    /// </summary>
     public Vector2 Point1 {
         get => point1;
         set {
@@ -15,6 +25,10 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     }
 
     Vector2 point2 = point2;
+
+    /// <summary>
+    /// The center of the second circle.
+    /// </summary>
     public Vector2 Point2 {
         get => point2;
         set {
@@ -25,6 +39,10 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     }
 
     float radius = radius;
+
+    /// <summary>
+    /// The radius of both circles.
+    /// </summary>
     public float Radius {
         get => radius;
         set {
@@ -34,12 +52,39 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
         }
     }
 
+    /// <summary>
+    /// A capsule-shaped collider, defined as two circles connected by a rectangle.
+    /// </summary>
+    /// <param name="height">The distance between the two circles.</param>
+    /// <param name="radius">The radius of the circles.</param>
     public CapsuleCollider(float height, float radius)
         : this(Vector2.Zero, height, radius) { }
+
+    /// <summary>
+    /// A capsule-shaped collider, defined as two circles connected by a rectangle.
+    /// </summary>
+    /// <param name="position">The position in the middle of the two circles.</param>
+    /// <param name="height">The distance between the two circles.</param>
+    /// <param name="radius">The radius of the circles.</param>
     public CapsuleCollider(Vector2 position, float height, float radius)
         : this(position + new Vector2(0, height / 2), position - new Vector2(0, height / 2), radius) { }
+
+    /// <summary>
+    /// A capsule-shaped collider, defined as two circles connected by a rectangle.
+    /// </summary>
+    /// <param name="height">The distance between the two circles.</param>
+    /// <param name="rotation">The capsule's rotation.</param>
+    /// <param name="radius">The radius of the circles.</param>
     public CapsuleCollider(float height, float rotation, float radius)
         : this(Vector2.Zero, height, rotation, radius) { }
+
+    /// <summary>
+    /// A capsule-shaped collider, defined as two circles connected by a rectangle.
+    /// </summary>
+    /// <param name="position">The position in the middle of the two circles.</param>
+    /// <param name="height">The distance between the two circles.</param>
+    /// <param name="rotation">The capsule's rotation.</param>
+    /// <param name="radius">The radius of the circles.</param>
     public CapsuleCollider(Vector2 position, float height, float rotation, float radius)
         : this(position, radius, Calc.AngleToVector(rotation, height / 2)) { }
     //! FIXME (Alex): Kinda jank to avoid constructor overlap like this but it's internal so it probably won't matter

@@ -3,7 +3,12 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-//! FIXME (Alex): Implment spatial grid
+/// <summary>
+/// A grid of colliders, designed to reduce total collision checks for tilemaps.
+/// </summary>
+/// <param name="position">The position of the grid.</param>
+/// <param name="grid">The grid object.</param>
+/// <param name="tileSize">The size of each tile.</param>
 public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSize) : Collider, ISpatialGrid<Collider?, Collider?> {
     readonly Grid<Collider?> Grid = grid;
     public readonly RectangleCollider FullCollider = new(tileSize);
@@ -20,10 +25,31 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         set { }
     }
 
+    /// <summary>
+    /// A grid of colliders, designed to reduce total collision checks for tilemaps.
+    /// </summary>
+    /// <param name="position">The position of the grid.</param>
+    /// <param name="gridSize">The grid tile dimensions.</param>
+    /// <param name="tileSize">The size of each tile.</param>
     public GridCollider(Vector2 position, Point2 gridSize, Vector2 tileSize) : this(position, new Grid<Collider?>(gridSize), tileSize) { }
+
+    /// <summary>
+    /// A grid of colliders, designed to reduce total collision checks for tilemaps.
+    /// </summary>
+    /// <param name="gridSize">The grid tile dimensions.</param>
+    /// <param name="tileSize">The size of each tile.</param>
     public GridCollider(Point2 gridSize, Vector2 tileSize) : this(Vector2.Zero, new Grid<Collider?>(gridSize), tileSize) { }
+
+    /// <summary>
+    /// A grid of colliders, designed to reduce total collision checks for tilemaps.
+    /// </summary>
+    /// <param name="grid">The grid object.</param>
+    /// <param name="tileSize">The size of each tile.</param>
     public GridCollider(Grid<Collider?> grid, Vector2 tileSize) : this(Vector2.Zero, grid, tileSize) { }
 
+    /// <summary>
+    /// The grid tile dimensions.
+    /// </summary>
     public Point2 GridSize = grid.Size;
 
     public override Rect Bounds => new(Position, Grid.Size * TileSize);
@@ -37,7 +63,6 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         if (diff.X <= 0 || diff.Y <= 0) { return []; }
 
         //! FIXME (Alex): Would ideally like to use a fixed size array but that would leave empty space if any tiles are empty
-        //! FIXME (Alex): I BROKE THIS SOMEHOW
         List<Collider> overlaps = [];
         int tileCountX = (int)MathF.Ceiling(diff.X / TileSize.X) + 1;
         int tileCountY = (int)MathF.Ceiling(diff.Y / TileSize.Y) + 1;
@@ -56,23 +81,46 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Set the collider for a tile.
+    /// </summary>
+    /// <param name="collider">The collider to set.</param>
+    /// <param name="position">The position on the grid in local space.</param>
+    /// <returns></returns>
     public GridCollider Set(Collider? collider, Point2 position) {
         Grid.Set(collider, position);
         return this;
     }
 
+    /// <summary>
+    /// Set the collider for a tile.
+    /// </summary>
+    /// <param name="collider">The collider to set.</param>
+    /// <param name="gridCoord">The tile location.</param>
+    /// <returns></returns>
     public void SetTile(Collider? collider, Point2 gridCoord) {
         Grid.Set(collider, gridCoord);
     }
 
-    public void AddTileStack(Collider? element, Point2 gridCoord) {
-        if (element == null) { return; }
+    /// <summary>
+    /// Add a collider onto a tile, combining it with other existing colliders.
+    /// </summary>
+    /// <param name="collider">The collider to add.</param>
+    /// <param name="gridCoord">The tile location.</param>
+    /// <returns></returns>
+    public void AddTileStack(Collider? collider, Point2 gridCoord) {
+        if (collider == null) { return; }
         Collider? current = Grid.Get(gridCoord);
-        if (current == null) { Grid.Set(element, gridCoord); return; }
-        if (current is MultiCollider currentMulti) { Grid.Set(new MultiCollider([.. currentMulti.Colliders, element]), gridCoord); return; }
-        Grid.Set(new MultiCollider([current, element]), gridCoord);
+        if (current == null) { Grid.Set(collider, gridCoord); return; }
+        if (current is MultiCollider currentMulti) { Grid.Set(new MultiCollider([.. currentMulti.Colliders, collider]), gridCoord); return; }
+        Grid.Set(new MultiCollider([current, collider]), gridCoord);
     }
 
+    /// <summary>
+    /// Remove the most recent collider from a tile's stack.
+    /// </summary>
+    /// <param name="gridCoord">The tile location.</param>
+    /// <returns></returns>
     public void RemoveTileStack(Point2 gridCoord) {
         Collider? current = Grid.Get(gridCoord);
         if (current == null) { return; }
@@ -80,10 +128,19 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         Grid.Set(new MultiCollider(currentMulti.Colliders[..^1]), gridCoord);
     }
 
+    /// <summary>
+    /// Remove all colliders from a tile.
+    /// </summary>
+    /// <param name="gridCoord">The tile location.</param>
     public void ClearTile(Point2 gridCoord) {
         Grid.Set(null, gridCoord);
     }
 
+    /// <summary>
+    /// Get the collider at a grid coordinate.
+    /// </summary>
+    /// <param name="gridCoord">The tile location.</param>
+    /// <returns>The tile at the given location, null if the coord is out of bounds or the tile doesn't exist.</returns>
     public Collider? GetTile(Point2 gridCoord) {
         return Grid.Get(gridCoord);
     }

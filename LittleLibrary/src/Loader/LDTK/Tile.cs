@@ -1,10 +1,15 @@
 namespace LittleLib.Loader.LDTK;
 
+/// <summary>
+/// An instance of a single tile loaded from an LDTK level.
+/// Natively supports sprite rendering and tile collision.
+/// </summary>
 public class LDTKTile() {
     readonly List<LDTKTileElement> Elements = [];
     public Sprite? Sprite;
     public Collider? Collider;
 
+    //! FIXME (Alex): Flip should probably be more editable?
     int Flip;
     public bool Empty => Elements.Count == 0;
 
@@ -59,6 +64,7 @@ public class LDTKTile() {
         else { Collider = new MultiCollider(colliders); }
 
         //! FIXME (Alex): Untested
+        //! FIXME (Alex): Sprite flipping should be able to flip the collider as well
         if (Sprite != null) {
             Sprite.FlipX = (Flip & 1 << 0) != 0;
             Sprite.FlipY = (Flip & 1 << 1) != 0;

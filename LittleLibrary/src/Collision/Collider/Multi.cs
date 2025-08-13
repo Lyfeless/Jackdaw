@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A collider made up of multiple colliders.
+/// </summary>
+/// <param name="colliders">A list of colliders.</param>
 public class MultiCollider(params Collider[] colliders) : Collider {
     public readonly Collider[] Colliders = colliders;
 
