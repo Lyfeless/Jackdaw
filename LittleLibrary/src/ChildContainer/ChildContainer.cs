@@ -18,7 +18,7 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         set => Elements[index] = value;
     }
 
-    readonly List<ChildContainerModifyAction<Telement, Towner>> modifyActions = [];
+    internal readonly List<ChildContainerModifyAction<Telement, Towner>> modifyActions = [];
 
     #region Overridable Functions
     /// <summary>
@@ -196,6 +196,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
             if (func(Match(element))) { return element; }
         }
 
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (func(Match(addAction.Child))) { return addAction.Child; }
+            }
+        }
+
         return null;
     }
 
@@ -208,6 +214,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     public T? Find<T>(Func<ObjectIdentifier<Telement>, bool> func) where T : class, Telement {
         foreach (Telement element in Elements) {
             if (element is T typeElement && func(Match(typeElement))) { return typeElement; }
+        }
+
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (addAction.Child is T typeElement && func(Match(typeElement))) { return typeElement; }
+            }
         }
 
         return null;
@@ -223,6 +235,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
             if (element is T typeElement) { return typeElement; }
         }
 
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (addAction.Child is T typeElement) { return typeElement; }
+            }
+        }
+
         return null;
     }
 
@@ -235,6 +253,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         List<Telement> foundElements = [];
         foreach (Telement element in Elements) {
             if (func(Match(element))) { foundElements.Add(element); }
+        }
+
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (func(Match(addAction.Child))) { foundElements.Add(addAction.Child); }
+            }
         }
 
         return [.. foundElements];
@@ -252,6 +276,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
             if (element is T typeElement && func(Match(typeElement))) { foundElements.Add(typeElement); }
         }
 
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (addAction.Child is T typeElement && func(Match(typeElement))) { foundElements.Add(typeElement); }
+            }
+        }
+
         return [.. foundElements];
     }
 
@@ -264,6 +294,12 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         List<T> foundElements = [];
         foreach (Telement element in Elements) {
             if (element is T typeElement) { foundElements.Add(typeElement); }
+        }
+
+        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Telement, Towner> addAction) {
+                if (addAction.Child is T typeElement) { foundElements.Add(typeElement); }
+            }
         }
 
         return [.. foundElements];
@@ -391,15 +427,15 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
 
     public void ApplyChanges() {
         if (modifyActions.Count == 0) { return; }
-        foreach (ChildContainerModifyAction<Telement, Towner> action in modifyActions) {
-            action.Execute();
+        for (int i = 0; i < modifyActions.Count; ++i) {
+            modifyActions[i].Execute();
         }
         modifyActions.Clear();
     }
 
     public void HandleClear() {
-        foreach (Telement child in Elements) {
-            HandleRemove(child);
+        for (int i = 0; i < Elements.Count; ++i) {
+            HandleRemove(Elements[i]);
         }
     }
     #endregion

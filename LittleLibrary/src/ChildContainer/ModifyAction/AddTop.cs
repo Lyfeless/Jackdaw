@@ -1,8 +1,6 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionAddTop<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
-    readonly Telement Child = child;
-
+internal class ChildContainerModifyActionAddTop<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyActionAdd<Telement, Towner>(container, child) where Telement : class {
     public override void Execute() {
         if (!Container.CanAdd(Child) || Container.Elements.Contains(Child)) {
             Console.WriteLine($"ActorContainer: Failed to add child {Container.Printable(Child)}");

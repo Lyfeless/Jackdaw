@@ -56,7 +56,7 @@ public class LittleGame : App {
     public Batcher Batcher { get; private set; }
     public Viewspace Viewspace { get; private set; }
 
-    public bool LockContainers { get; private set; }
+    public bool LockContainers { get; private set; } = false;
 
     Actor root;
 
@@ -131,6 +131,8 @@ public class LittleGame : App {
     /// Automatically handles crashlog creation when running in release.
     /// </summary>
     public void Start() {
+        LockContainers = true;
+
 #if DEBUG
         // Crash normally in debug so error debugging still works
         Run();
@@ -158,10 +160,7 @@ public class LittleGame : App {
         Timers.Update();
         Audio.Update();
 
-        LockContainers = true;
         Root?.Update();
-        LockContainers = false;
-        Root?.ApplyChanges();
 
         Collision.Update();
 
@@ -171,6 +170,8 @@ public class LittleGame : App {
             }
             InvalidateQueue.Clear();
         }
+
+        Root?.ApplyChanges();
     }
 
     protected override void Render() => Renderer.Render(Batcher, Root);

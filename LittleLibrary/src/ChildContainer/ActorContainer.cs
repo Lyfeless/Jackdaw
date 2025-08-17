@@ -45,10 +45,25 @@ public class ActorContainer(Actor actor) : ChildContainer<Actor, Actor>(actor) {
     }
 
     protected override int RecurseCount() {
-        return Owner.Children.Elements.Count;
+        if (modifyActions.Count == 0) { return Owner.Children.Elements.Count; }
+        int addCount = 0;
+        foreach (ChildContainerModifyAction<Actor, Actor> action in modifyActions) {
+            if (action is ChildContainerModifyActionAdd<Actor, Actor>) { addCount++; }
+        }
+        return Owner.Children.Elements.Count + addCount;
     }
 
     protected override ChildContainer<Actor, Actor> RecurseItem(int index) {
+        if (index >= Owner.Children.Elements.Count) {
+            index -= Owner.Children.Elements.Count;
+            foreach (ChildContainerModifyAction<Actor, Actor> action in modifyActions) {
+                if (action is ChildContainerModifyActionAdd<Actor, Actor> addAction) {
+                    if (index == 0) { return addAction.Child.Children; }
+                    index--;
+                }
+            }
+        }
+
         return Owner.Children.Elements[index].Children;
     }
 }

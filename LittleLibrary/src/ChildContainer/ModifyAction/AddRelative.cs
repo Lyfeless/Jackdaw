@@ -1,7 +1,6 @@
 namespace LittleLib;
 
-internal class ChildContainerModifyActionAddRelative<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, Telement relative, int offset) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
-    readonly Telement Child = child;
+internal class ChildContainerModifyActionAddRelative<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, Telement relative, int offset) : ChildContainerModifyActionAdd<Telement, Towner>(container, child) where Telement : class {
     readonly Telement Relative = relative;
     readonly int Offset = offset;
 
