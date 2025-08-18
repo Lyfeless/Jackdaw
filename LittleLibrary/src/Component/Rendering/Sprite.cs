@@ -58,6 +58,7 @@ public class SpriteComponent(LittleGame game, Sprite sprite, Point2? offset = nu
         : this(game, game.Assets.GetTexture(sprite), offset) { }
 
     protected override void Render(Batcher batcher) {
+        //! FIXME (Alex): This clips tiling sprites for some reason
         if (!Game.Viewspace.Bounds.Overlaps(Sprite.Bounds.Translate(Actor.GlobalPositionRounded + Offset))) { return; }
 
         batcher.PushMatrix(Offset);

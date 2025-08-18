@@ -213,7 +213,6 @@ public class Assets {
                 if (shaderConfig != null) {
                     foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
                         // Find files from config entry
-                        //! FIXME (Alex): Should the path extensions be more configurable?
                         string vertexPath = Path.Join(ShaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
                         string fragmentPath = Path.Join(ShaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
                         if (!Path.Exists(vertexPath) || !Path.Exists(fragmentPath)) { continue; }

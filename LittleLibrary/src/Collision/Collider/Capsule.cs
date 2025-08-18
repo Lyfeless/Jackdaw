@@ -87,7 +87,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     /// <param name="radius">The radius of the circles.</param>
     public CapsuleCollider(Vector2 position, float height, float rotation, float radius)
         : this(position, radius, Calc.AngleToVector(rotation, height / 2)) { }
-    //! FIXME (Alex): Kinda jank to avoid constructor overlap like this but it's internal so it probably won't matter
+
     CapsuleCollider(Vector2 position, float radius, Vector2 delta)
         : this(position + delta, position - delta, radius) { }
 

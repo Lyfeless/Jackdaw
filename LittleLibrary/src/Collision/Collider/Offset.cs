@@ -3,7 +3,6 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-//! FIXME (Alex): Not the most elegant thing ever
 /// <summary>
 /// A collider used to offset an existing collider.
 /// Mostly used for internal systems.
