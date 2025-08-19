@@ -16,6 +16,8 @@ public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite 
 
     //! FIXME (Alex): Doesn't support flipping
     public override void Render(Batcher batcher) {
+        if (Width == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+
         if (Width < 0) {
             Render(batcher, Width, !PadOrigin);
         }
@@ -54,6 +56,8 @@ public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
 
     //! FIXME (Alex): Doesn't support flipping
     public override void Render(Batcher batcher) {
+        if (Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+
         if (Height < 0) {
             Render(batcher, Height, !PadOrigin);
         }
@@ -96,6 +100,8 @@ public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     //! FIXME (Alex): Doesn't support flipping
 
     public override void Render(Batcher batcher) {
+        if (Width == 0 || Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+
         bool padLeft = PadOriginX;
         bool padTop = PadOriginY;
         int offsetX = 0;
