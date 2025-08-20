@@ -3,18 +3,12 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>LDTK_Loader</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Foster\Framework\Foster.Framework.csproj" />
+    <ProjectReference Include="..\..\..\LittleLibrary\LittleLibrary.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Fallback/font.ttf" />
-    <EmbeddedResource Include="Fallback/texture.png" />
-  </ItemGroup>
-
 </Project>

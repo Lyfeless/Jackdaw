@@ -1,11 +1,11 @@
-using System;
 using System.Numerics;
 using Foster.Audio;
 
-namespace LittleLib;
+namespace LittleLib.Audio.FosterAudio;
 
-public class SoundPlayerComponent(LittleGame game, Sound sound, string? bus = null) : Component(game) {
-    protected readonly Sound Sound = sound;
+public class SoundPlayerComponent(AudioManager manager, Sound sound, string? bus = null) : Component(manager.Game) {
+    protected readonly AudioManager Manager = manager;
+    protected Sound Sound = sound;
     protected readonly string? Bus = bus;
     public SoundInstance Player;
 
@@ -59,7 +59,8 @@ public class SoundPlayerComponent(LittleGame game, Sound sound, string? bus = nu
     int? pinnedListenerIndex;
     public int? PinnedListenerIndex { get => pinnedListenerIndex; set => pinnedListenerIndex = value; }
 
-    //! FIXME (Alex): Position and direction
+    Vector3? position;
+    public Vector3? Position { get => position; set => position = value; }
 
     Vector3? velocity;
     public Vector3? Velocity { get => velocity; set => velocity = value; }
@@ -82,10 +83,12 @@ public class SoundPlayerComponent(LittleGame game, Sound sound, string? bus = nu
     ulong? loopEndPcmFrames;
     public ulong? LoopEndPcmFrames { get => loopEndPcmFrames; set => loopEndPcmFrames = value; }
 
+    public SoundPlayerComponent(AudioManager manager, string sound, string? bus = null) : this(manager, manager.GetSound(sound), bus) { }
+
     public virtual void Play() {
         paused = false;
         Stop();
-        Player = Game.Audio.Play(Sound, Bus);
+        Player = Manager.Play(Sound, Bus);
 
         // Assign default values.
         if (volume != null) { Player.Volume = (float)volume; }
@@ -101,6 +104,7 @@ public class SoundPlayerComponent(LittleGame game, Sound sound, string? bus = nu
         if (spatialized != null) {
             Player.Spatialized = (bool)spatialized;
             if (positioning != null) { Player.Positioning = (SoundPositioning)positioning; }
+            if (position != null) { Player.Position = (Vector3)position; }
             if (pinnedListenerIndex != null) { Player.PinnedListenerIndex = (int)pinnedListenerIndex; }
             if (attenuationModel != null) { Player.AttenuationModel = (SoundAttenuationModel)attenuationModel; }
             if (rolloff != null) { Player.Rolloff = (float)rolloff; }

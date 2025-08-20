@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Text.Json;
-using Foster.Audio;
 using Foster.Framework;
 
 namespace LittleLib;
@@ -15,11 +14,9 @@ public class Assets {
     public readonly string[] TextureExtensions = [".png", ".jpg"];
     public readonly string[] AsepriteExtensions = [".aseprite", ".ase"];
     public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
-    public readonly string[] SoundExtensions = [".wav", ".mp3", ".ogg"];
 
     string TexturePath;
     string FontPath;
-    string SoundPath;
     string ShaderPath;
     string ShaderConfigPath;
     string AnimationPath;
@@ -77,19 +74,6 @@ public class Assets {
         return Animations["error"];
     }
 
-    readonly Dictionary<string, Sound> Sounds = [];
-    /// <summary>
-    /// Find a sound from the loaded sound data.
-    /// </summary>
-    /// <param name="name">The asset name.</param>
-    /// <returns>The requested sound, or the default sound if nothing was found.</returns>
-    public Sound GetSound(string name) {
-        if (Sounds.TryGetValue(name, out Sound? output)) { return output; }
-        Console.WriteLine($"ASSETS: Failed to find sound {name}, returning default");
-        return Sounds["error"];
-    }
-    const string SoundFallbackName = "Fallback.sound.ogg";
-
     #endregion
 
     /// <summary>
@@ -104,7 +88,6 @@ public class Assets {
 
         TexturePath = Path.Join(Config.RootFolder, Config.TextureFolder);
         FontPath = Path.Join(Config.RootFolder, Config.FontFolder);
-        SoundPath = Path.Join(Config.RootFolder, Config.SoundFolder);
         ShaderPath = Path.Join(Config.RootFolder, Config.ShaderFolder);
         ShaderConfigPath = Path.Join(Config.RootFolder, Config.ShaderConfig);
         AnimationPath = Path.Join(config.RootFolder, config.AnimationFolder);
@@ -175,25 +158,6 @@ public class Assets {
                     string name = GetAssetName(FontPath, file);
                     FontConfigEntry? configEntry = fontConfig?.FontConfigs.FirstOrDefault(e => e.Name == name);
                     Fonts.Add(name, new SpriteFont(graphicsDevice, file, configEntry?.Size ?? FontConfig.DefaultFontSize));
-                }
-            }
-        }
-
-        // Sounds
-        {
-
-            // Load fallback sound
-            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{SoundFallbackName}")!;
-            Sounds.Add("error", new Sound(stream));
-
-            if (Directory.Exists(SoundPath)) {
-                string configPath = Path.Join(Config.RootFolder, Config.SoundConfig);
-                SoundConfig? soundConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.SoundConfig) : null;
-
-                foreach (string file in Directory.EnumerateFiles(SoundPath, "*.*", SearchOption.AllDirectories).Where(e => SoundExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(SoundPath, file);
-                    SoundConfigEntry? configEntry = soundConfig?.SoundConfigs.FirstOrDefault(e => e.Name == name);
-                    Sounds.Add(name, new Sound(file, configEntry?.LoadingMethod ?? SoundConfig.DefaultLoadingMethod));
                 }
             }
         }
@@ -364,7 +328,7 @@ public class Assets {
     /// <param name="relativePath">The path elements to remove from the start of the path</param>
     /// <param name="assetPath">Full path to the asset</param>
     /// <returns></returns>
-    static string GetAssetName(string relativePath, string assetPath) {
+    public static string GetAssetName(string relativePath, string assetPath) {
         string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
         name = Path.GetRelativePath(relativePath, name);
         name = name.Replace("\\", "/");

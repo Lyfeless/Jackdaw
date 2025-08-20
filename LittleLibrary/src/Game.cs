@@ -37,12 +37,6 @@ public class LittleGame : App {
     public EventBus Events;
 
     /// <summary>
-    /// Audio manager. <br/>
-    /// Note: Likely to be moved to an external utility to enable support for more audio libraries.
-    /// </summary>
-    public AudioManager Audio;
-
-    /// <summary>
     /// Conversion functions between many common coordinate spaces.
     /// </summary>
     public SpaceConverter CoordSpace;
@@ -95,7 +89,6 @@ public class LittleGame : App {
         Timers = new(this);
         Collision = new();
         Events = new();
-        Audio = new();
         CoordSpace = new(this);
 
         //! FIXME (Alex): YUCK
@@ -115,11 +108,6 @@ public class LittleGame : App {
         }
         Renderer.ClearColor = Color.FromHexStringRGB(config.Window.ClearColor);
         Window.Resizable = config.Window.Resizable;
-
-        foreach (LittleGameAudioBusConfig bus in config.Audio.Buses) {
-            Audio.AddBus(bus.Name, bus.Parent != string.Empty ? bus.Parent : null, bus.DefaultVolume);
-        }
-        if (config.Audio.DefaultBus != string.Empty) { Audio.SetDefaultBus(config.Audio.DefaultBus); }
 
         Batcher = new(GraphicsDevice);
 
@@ -151,14 +139,11 @@ public class LittleGame : App {
 
     protected override void Startup() { }
 
-    protected override void Shutdown() {
-        Audio.Shutdown();
-    }
+    protected override void Shutdown() { }
 
     protected override void Update() {
         Controls.Update();
         Timers.Update();
-        Audio.Update();
 
         Root?.Update();
 

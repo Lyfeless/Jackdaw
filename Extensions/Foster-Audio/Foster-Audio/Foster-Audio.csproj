@@ -3,18 +3,18 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>Foster-Audio</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Foster\Framework\Foster.Framework.csproj" />
+    <ProjectReference Include="..\..\..\LittleLibrary\LittleLibrary.csproj" />
+    <ProjectReference Include="..\Foster.Audio\Foster.Audio\Foster.Audio.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Fallback/font.ttf" />
-    <EmbeddedResource Include="Fallback/texture.png" />
+    <EmbeddedResource Include="Fallback/sound.ogg" />
   </ItemGroup>
 
 </Project>

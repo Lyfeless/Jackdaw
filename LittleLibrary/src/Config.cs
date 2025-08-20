@@ -31,12 +31,6 @@ public struct LittleGameConfig() {
     /// </summary>
     [JsonPropertyName("content")]
     public LittleGameContentConfig Content { get; set; } = new();
-
-    /// <summary>
-    /// Configuration data for audio systems.
-    /// </summary>
-    [JsonPropertyName("audio")]
-    public LittleGameAudioConfig Audio { get; set; } = new();
 }
 
 public struct LittleGameWindowConfig() {
@@ -144,22 +138,6 @@ public struct LittleGameContentConfig() {
     public string FontConfig { get; set; } = "Fonts/config.json";
 
     /// <summary>
-    /// The folder to search for sound files. </br>
-    /// Defaults to "Sounds".
-    /// Relative to root folder.
-    /// </summary>
-    [JsonPropertyName("soundFolder")]
-    public string SoundFolder { get; set; } = "Sounds";
-
-    /// <summary>
-    /// The location of the sound config data.
-    /// Defaults to "Sounds/config.json".
-    /// Relative to root folder.
-    /// </summary>
-    [JsonPropertyName("soundConfig")]
-    public string SoundConfig { get; set; } = "Sounds/config.json";
-
-    /// <summary>
     /// The folder to search for shader files. </br>
     /// Defaults to "Shaders".
     /// Relative to root folder.
@@ -203,23 +181,4 @@ public struct LittleGameContentConfig() {
     /// </summary>
     [JsonPropertyName("asepriteConfigExtension")]
     public string AsepriteConfigExtension { get; set; } = ".asedef";
-}
-
-public struct LittleGameAudioConfig() {
-    [JsonPropertyName("buses")]
-    public LittleGameAudioBusConfig[] Buses { get; set; } = [];
-
-    [JsonPropertyName("defaultBus")]
-    public string DefaultBus { get; set; } = string.Empty;
-}
-
-public struct LittleGameAudioBusConfig() {
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
-
-    [JsonPropertyName("parent")]
-    public string Parent { get; set; } = string.Empty;
-
-    [JsonPropertyName("defaultVolume")]
-    public float DefaultVolume { get; set; } = 0.5f;
 }

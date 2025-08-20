@@ -7,12 +7,7 @@ namespace LittleLib;
     ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
     PropertyNameCaseInsensitive = true
 )]
-[JsonSerializable(typeof(LittleGameConfig))]
-[JsonSerializable(typeof(FontConfig))]
-[JsonSerializable(typeof(ShaderConfig))]
-[JsonSerializable(typeof(AnimationConfig))]
-[JsonSerializable(typeof(AnimationGroupConfig))]
-[JsonSerializable(typeof(AsepriteConfig))]
+[JsonSerializable(typeof(SoundConfig))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(float))]
