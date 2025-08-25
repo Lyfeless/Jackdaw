@@ -5,7 +5,7 @@ internal class ChildContainerModifyActionAdd<Telement, Towner>(ChildContainer<Te
 
     public override void Execute() {
         if (!Container.CanAdd(Child) || Container.Elements.Contains(Child)) {
-            Console.WriteLine($"ActorContainer: Failed to add child {Container.Printable(Child)}");
+            Console.WriteLine($"ChildContainer: Failed to add child {Container.Printable(Child)}");
             return;
         }
         Container.Elements.Add(Child);

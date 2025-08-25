@@ -45,15 +45,9 @@ public class Actor {
     public ComponentContainer Components;
 
     /// <summary>
-    /// Is the current actor valid and usable. False once the actor has been invalidated. </br>
-    /// Setting this value directly isn't advised. Use <seealso cref="QueueInvalidate(in LittleGame)"> for the most reliable results.
+    /// Is the current actor valid and usable. False once the actor has been invalidated.
     /// </summary>
-    bool isValid = true;
-    public bool IsValid {
-        get => isValid;
-        //! FIXME (Alex): Stop actor from being re-validated, is this smart?
-        private set { if (!value) { isValid = false; } }
-    }
+    public bool IsValid { get; private set; } = true;
 
     /// <summary>
     /// Whether or not the current parent object is an active instance.
@@ -242,11 +236,22 @@ public class Actor {
         }
     }
 
-    internal void Invalidate(bool invalidateChildren = true) {
+    public void QueueInvalidate(bool invalidateChildren = true) {
+        if (!IsValid) { return; }
+        Game.QueueInvalidate(this, invalidateChildren);
+    }
+
+    internal void Invalidate(bool invalidateChildren = true, bool invalidateComponents = true) {
         if (!IsValid) { return; }
 
         if (invalidateChildren) {
-            InvalidateChildren();
+            InvalidateChildren(invalidateComponents);
+        }
+
+        if (invalidateComponents) {
+            foreach (Component component in Components.Elements) {
+                component.OnInvalidated();
+            }
         }
 
         Children.Clear();
@@ -257,9 +262,9 @@ public class Actor {
         }
     }
 
-    void InvalidateChildren() {
+    void InvalidateChildren(bool invalidateComponents = true) {
         foreach (Actor child in Children.Elements) {
-            child.InvalidateChildren();
+            child.Invalidate(false, invalidateComponents);
         }
 
         IsValid = false;

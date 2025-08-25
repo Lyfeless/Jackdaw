@@ -6,11 +6,11 @@ internal class ChildContainerModifyActionAddRelative<Telement, Towner>(ChildCont
 
     public override void Execute() {
         if (!Container.CanAdd(Child) || Container.Elements.Contains(Child)) {
-            Console.WriteLine($"ActorContainer: Failed to add child {Container.Printable(Child)}");
+            Console.WriteLine($"ChildContainer: Failed to add child {Container.Printable(Child)}");
             return;
         }
         if (!Container.Elements.Contains(Relative)) {
-            Console.WriteLine($"ActorContainer: Relative object {Container.Printable(Relative)} is not a child, can't add {Child}");
+            Console.WriteLine($"ChildContainer: Relative object {Container.Printable(Relative)} is not a child, can't add {Child}");
             return;
         }
         int index = Container.Elements.IndexOf(Relative) + Offset;

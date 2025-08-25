@@ -8,8 +8,13 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
     public override bool CanAdd(Component child) {
+        if (!child.IsValid) {
+            Console.WriteLine($"ComponentContainer: Cannot add object {child}, Component is invalid");
+            return false;
+        }
+
         if (!Owner.IsValid) {
-            Console.WriteLine($"ActorContainer: Cannot add object {child}, Actor is invalid");
+            Console.WriteLine($"ComponentContainer: Cannot add object {child}, Actor is invalid");
             return false;
         }
 
@@ -21,6 +26,10 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
     }
 
     public override void HandleAdd(Component child) {
+        if (child.ActorValid) {
+            child.Actor.Components.Remove(child);
+        }
+
         child.Actor = Owner;
 
         child.OnAdded();
@@ -31,9 +40,11 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
     }
 
     public override void HandleRemove(Component child) {
-        child.OnRemoved();
-        if (Owner.InTree) {
-            child.OnExitTree();
+        if (child.IsValid) {
+            child.OnRemoved();
+            if (Owner.InTree) {
+                child.OnExitTree();
+            }
         }
         child.Actor = Actor.Invalid;
     }

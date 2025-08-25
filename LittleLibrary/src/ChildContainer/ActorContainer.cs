@@ -26,6 +26,10 @@ public class ActorContainer(Actor actor) : ChildContainer<Actor, Actor>(actor) {
     }
 
     public override void HandleAdd(Actor child) {
+        if (child.ParentValid) {
+            child.Parent.Children.Remove(child);
+        }
+
         child.Parent = Owner;
         if (Owner.InTree) {
             child.EnterTree();

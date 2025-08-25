@@ -71,8 +71,10 @@ public class LittleGame : App {
         }
     }
 
-    record struct QueuedInvalidation(Actor Actor, bool InvalidateChildren);
-    readonly List<QueuedInvalidation> InvalidateQueue = [];
+    record struct ComponentInvalidation(Component Component);
+    record struct ActorInvalidation(Actor Actor, bool InvalidateChildren, bool InvalidateComponents);
+    readonly List<ComponentInvalidation> ComponentInvalidateQueue = [];
+    readonly List<ActorInvalidation> ActorInvalidateQueue = [];
 
     public LittleGame(string configPath)
         : this(JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.LittleGameConfig)) { }
@@ -149,26 +151,24 @@ public class LittleGame : App {
 
         Collision.Update();
 
-        if (InvalidateQueue.Count > 0) {
-            foreach (QueuedInvalidation item in InvalidateQueue) {
-                item.Actor.Invalidate(item.InvalidateChildren);
+        if (ComponentInvalidateQueue.Count > 0) {
+            foreach (ComponentInvalidation item in ComponentInvalidateQueue) {
+                item.Component.OnInvalidated();
             }
-            InvalidateQueue.Clear();
+            ComponentInvalidateQueue.Clear();
+        }
+
+        if (ActorInvalidateQueue.Count > 0) {
+            foreach (ActorInvalidation item in ActorInvalidateQueue) {
+                item.Actor.Invalidate(item.InvalidateChildren, item.InvalidateComponents);
+            }
+            ActorInvalidateQueue.Clear();
         }
 
         Root?.ApplyChanges();
     }
 
     protected override void Render() => Renderer.Render(Batcher, Root);
-
-    /// <summary>
-    /// Schedule an actor for cleanup at the end of the current tick.
-    /// Once all actors have ticked and rendered, all queued actors will be removed from the tree and marked as invalid.
-    /// It's recommended to dispose of actors this way to avoid issues with the actor's update order.
-    /// </summary>
-    /// <param name="actor">The actor to invalidate.</param>
-    /// <param name="invalidateChildren">Whether or not all children currently under the actor in the tree should also be invalidated.</param>
-    public void QueueInvalidate(Actor actor, bool invalidateChildren) => InvalidateQueue.Add(new(actor, invalidateChildren));
 
     /// <summary>
     /// Convert a coordinate from a window coordinate to a position in the current viewspace.
@@ -187,4 +187,7 @@ public class LittleGame : App {
     /// <param name="position">The position relative to the viewport.</param>
     /// <returns>The position transformed to be local to the full window.</returns>
     public Vector2 ViewspaceToWindow(Vector2 position) => Renderer.ViewspaceToWindow(position);
+
+    internal void QueueInvalidate(Component component) => ComponentInvalidateQueue.Add(new(component));
+    internal void QueueInvalidate(Actor actor, bool invalidateChildren = true, bool invalidateComponents = true) => ActorInvalidateQueue.Add(new(actor, invalidateChildren, invalidateComponents));
 }

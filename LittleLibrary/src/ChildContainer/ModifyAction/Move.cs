@@ -6,7 +6,7 @@ internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<T
 
     public override void Execute() {
         if (!Container.Elements.Contains(Child)) {
-            Console.WriteLine($"ActorContainer: Object {Child} is not child, can't move");
+            Console.WriteLine($"ChildContainer: Object {Child} is not child, can't move");
             return;
         }
 

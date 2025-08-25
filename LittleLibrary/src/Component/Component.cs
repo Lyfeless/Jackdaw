@@ -17,6 +17,11 @@ public abstract class Component {
     public Actor Actor = Actor.Invalid;
 
     /// <summary>
+    /// If the component is a valid, usable instance.
+    /// </summary>
+    public bool IsValid { get; private set; } = true;
+
+    /// <summary>
     /// If the actor is a currently active, non-invalidated instance.
     /// </summary>
     public bool ActorValid => Actor.IsValid;
@@ -98,6 +103,11 @@ public abstract class Component {
     /// </summary>
     protected virtual void ExitTree() { }
 
+    /// <summary>
+    /// Runs when the component is invalidated, meaning it cannot be added to any actors. Useful for cleaning up any stored resources.
+    /// </summary>
+    protected virtual void Invalidated() { }
+
     public override string ToString() {
         return Match.ToString();
     }
@@ -106,6 +116,15 @@ public abstract class Component {
     internal void OnRender(Batcher batcher) => Render(batcher);
     internal void OnRemoved() => Removed();
     internal void OnExitTree() => ExitTree();
+    internal void OnInvalidated() {
+        if (!IsValid) { return; }
+
+        Invalidated();
+
+        if (ActorValid) {
+            Actor.Components.Remove(this);
+        }
+    }
 
     internal void OnAdded() {
         if (!addedToActor) {
@@ -124,4 +143,6 @@ public abstract class Component {
         EnterTree();
     }
 
+    //! FIXME (Alex): DOC COMMENT
+    public void QueueInvalidate() => Game.QueueInvalidate(this);
 }
