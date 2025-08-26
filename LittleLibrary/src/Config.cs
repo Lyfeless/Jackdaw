@@ -80,29 +80,6 @@ public struct LittleGameWindowConfig() {
     /// </summary>
     [JsonPropertyName("clearColor")]
     public string ClearColor { get; set; } = "0x000000";
-
-    //? FIXED_VIEWPORT specific options
-
-    /// <summary>
-    /// The width of the viewport. </br>
-    /// Only used when rending with fixed viewport
-    /// </summary>
-    [JsonPropertyName("viewportWidth")]
-    public int ViewportWidth { get; set; } = 352;
-
-    /// <summary>
-    /// The height of the viewport. </br>
-    /// Only used when rending with fixed viewport
-    /// </summary>
-    [JsonPropertyName("viewportHeight")]
-    public int ViewportHeight { get; set; } = 256;
-
-    /// <summary>
-    /// The background color of the viewport. </br>
-    /// Only used when rending with fixed viewport
-    /// </summary>
-    [JsonPropertyName("viewportColor")]
-    public string ViewportColor { get; set; } = Color.CornflowerBlue.ToHexStringRGB();
 }
 
 public struct LittleGameContentConfig() {

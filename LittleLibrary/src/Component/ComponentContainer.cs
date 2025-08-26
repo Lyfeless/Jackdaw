@@ -4,7 +4,7 @@ namespace LittleLib;
 /// A container for storing components on an actor.
 /// </summary>
 /// <param name="actor">The owning actor.</param>
-public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(actor) {
+public class ComponentContainer(Actor actor) : SearchableChildContainer<Component, Actor>(actor) {
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
     public override bool CanAdd(Component child) {
@@ -62,7 +62,7 @@ public class ComponentContainer(Actor actor) : ChildContainer<Component, Actor>(
         return Owner.Children.Elements.Count + addCount;
     }
 
-    protected override ChildContainer<Component, Actor> RecurseItem(int index) {
+    protected override SearchableChildContainer<Component, Actor> RecurseItem(int index) {
         if (index >= Owner.Children.Elements.Count) {
             index -= Owner.Children.Elements.Count;
             foreach (ChildContainerModifyAction<Actor, Actor> action in Owner.Children.modifyActions) {

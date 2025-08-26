@@ -27,6 +27,7 @@ public class CachedRenderComponent : Component {
     }
 
     protected override void Render(Batcher batcher) {
+        //! FIXME (Alex): Cull
         batcher.Image(RenderedComponent, position, Color.White);
     }
 }

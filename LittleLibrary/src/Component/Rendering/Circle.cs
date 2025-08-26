@@ -12,7 +12,8 @@ public class CircleComponent(LittleGame game, Circle circle, int steps, Color co
 
     protected override void Render(Batcher batcher) {
         //! FIXME (Alex): Verify culling is correct
-        if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Circle.Position - new Vector2(Circle.Radius), new(Circle.Radius * 2)))) { return; }
+        //! FIXME (Alex): Disabled because of viewport changes
+        // if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Circle.Position - new Vector2(Circle.Radius), new(Circle.Radius * 2)))) { return; }
         batcher.Circle(Circle, Steps, Color);
     }
 }

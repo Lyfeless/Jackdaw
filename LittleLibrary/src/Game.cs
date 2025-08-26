@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Numerics;
 using System.Text.Json;
 using Foster.Framework;
@@ -46,9 +47,9 @@ public class LittleGame : App {
     /// </summary>
     public Rng Random = new(DateTime.Now.Millisecond);
 
-    readonly LittleGameRenderer Renderer;
+    Color BackgroundColor;
+
     public Batcher Batcher { get; private set; }
-    public Viewspace Viewspace { get; private set; }
 
     public bool LockContainers { get; private set; } = false;
 
@@ -93,22 +94,7 @@ public class LittleGame : App {
         Events = new();
         CoordSpace = new(this);
 
-        //! FIXME (Alex): YUCK
-        switch (config.Window.Renderer) {
-            case LittleGameWindowConfig.RendererType.FULL_WINDOW:
-                Viewspace = new(new(config.Window.WindowWidth, config.Window.WindowHeight));
-                Renderer = new FullWindowRenderer(this);
-                break;
-            case LittleGameWindowConfig.RendererType.FIXED_VIEWPORT:
-            default:
-                Viewspace = new(new(config.Window.ViewportWidth, config.Window.ViewportHeight));
-                FixedViewportRenderer fixedViewport = new(this, Viewspace.Size) {
-                    ViewportColor = Color.FromHexStringRGB(config.Window.ViewportColor)
-                };
-                Renderer = fixedViewport;
-                break;
-        }
-        Renderer.ClearColor = Color.FromHexStringRGB(config.Window.ClearColor);
+        BackgroundColor = Color.FromHexStringRGB(config.Window.ClearColor);
         Window.Resizable = config.Window.Resizable;
 
         Batcher = new(GraphicsDevice);
@@ -168,7 +154,14 @@ public class LittleGame : App {
         Root?.ApplyChanges();
     }
 
-    protected override void Render() => Renderer.Render(Batcher, Root);
+    protected override void Render() {
+        Window.Clear(BackgroundColor);
+        Batcher.Clear();
+
+        Batcher.PushBlend(BlendMode.NonPremultiplied);
+        root?.Render(Batcher);
+        Batcher.Render(Window);
+    }
 
     /// <summary>
     /// Convert a coordinate from a window coordinate to a position in the current viewspace.
@@ -177,7 +170,7 @@ public class LittleGame : App {
     /// </summary>
     /// <param name="position">The position relative to the full window.</param>
     /// <returns>The position transformed to be local to the adjusted viewport.</returns>
-    public Vector2 WindowToViewspace(Vector2 position) => Renderer.WindowToViewspace(position);
+    // public Vector2 WindowToViewspace(Vector2 position) => Renderer.WindowToViewspace(position);
 
     /// <summary>
     /// Convert a coordinate from a coordinate in the current viewspace to a window coordinate.
@@ -186,7 +179,7 @@ public class LittleGame : App {
     /// </summary>
     /// <param name="position">The position relative to the viewport.</param>
     /// <returns>The position transformed to be local to the full window.</returns>
-    public Vector2 ViewspaceToWindow(Vector2 position) => Renderer.ViewspaceToWindow(position);
+    // public Vector2 ViewspaceToWindow(Vector2 position) => Renderer.ViewspaceToWindow(position);
 
     internal void QueueInvalidate(Component component) => ComponentInvalidateQueue.Add(new(component));
     internal void QueueInvalidate(Actor actor, bool invalidateChildren = true, bool invalidateComponents = true) => ActorInvalidateQueue.Add(new(actor, invalidateChildren, invalidateComponents));

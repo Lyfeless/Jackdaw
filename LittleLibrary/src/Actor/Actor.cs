@@ -45,6 +45,11 @@ public class Actor {
     public ComponentContainer Components;
 
     /// <summary>
+    /// All custom rendering actions to run on the actor.
+    /// </summary>
+    public RenderActionContainer RenderActions;
+
+    /// <summary>
     /// Is the current actor valid and usable. False once the actor has been invalidated.
     /// </summary>
     public bool IsValid { get; private set; } = true;
@@ -155,6 +160,7 @@ public class Actor {
 
         Children = new(this);
         Components = new(this);
+        RenderActions = new(this);
     }
 
     /// <summary>
@@ -184,19 +190,31 @@ public class Actor {
     /// Both are rendered in the order they're stored in their container, from first to last.
     /// </summary>
     internal void Render(Batcher batcher) {
+        if (!Visible) { return; }
+
         batcher.PushMatrix(Position.Rounded);
 
+        RenderActions.PreRender(batcher);
+
         if (ComponentsVisible) {
+            RenderActions.PreRenderComponents();
+            Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Component component in Components.Elements) {
-                if (component.Visible) { component.OnRender(batcher); }
+                if (component.Visible) { component.OnRender(currentBatcher); }
             }
+            RenderActions.PostRenderComponents();
         }
 
         if (ChildrenVisible) {
+            RenderActions.PreRenderChildren();
+            Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Actor child in Children.Elements) {
-                child.Render(batcher);
+                child.Render(currentBatcher);
             }
+            RenderActions.PostRenderChildren();
         }
+
+        RenderActions.PostRender();
 
         batcher.PopMatrix();
     }
