@@ -18,7 +18,5 @@ public class PointCollider(Vector2 point) : Collider {
 
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
-        return Point + position;
-    }
+    public override Vector2 Support(Vector2 direction) => Point;
 }

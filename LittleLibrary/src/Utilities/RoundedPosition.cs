@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Numerics;
 using Foster.Framework;
 
@@ -8,18 +7,18 @@ namespace LittleLib;
 /// Position control that stores both an exact location and a location rounded to the nearest int,
 /// to avoid any floating point imprecision when rendering.
 /// </summary>
-public struct RenderablePosition {
+public struct RoundedPosition {
     public Vector2 Precise { get; private set; }
     public Point2 Rounded { get; private set; }
 
-    public RenderablePosition(Vector2 position) {
+    public RoundedPosition(Vector2 position) {
         Set(position);
     }
 
-    public RenderablePosition() : this(Vector2.Zero) { }
-    public RenderablePosition(float x, float y) : this(new Vector2(x, y)) { }
-    public RenderablePosition(int x, int y) : this(new(x, y)) { }
-    public RenderablePosition(Point2 position) : this((Vector2)position) { }
+    public RoundedPosition() : this(Vector2.Zero) { }
+    public RoundedPosition(float x, float y) : this(new Vector2(x, y)) { }
+    public RoundedPosition(int x, int y) : this(new(x, y)) { }
+    public RoundedPosition(Point2 position) : this((Vector2)position) { }
 
     /// <summary>
     /// Move current position by amount.
@@ -79,23 +78,23 @@ public struct RenderablePosition {
     /// <param name="value">Target y position.</param>
     public void SetY(float value) => Set(Precise.X, value);
 
-    public static RenderablePosition operator +(RenderablePosition a, RenderablePosition b) => new(a.Precise + b.Precise);
-    public static RenderablePosition operator +(RenderablePosition a, Vector2 b) => new(a.Precise + b);
-    public static RenderablePosition operator +(Vector2 a, RenderablePosition b) => new(a + b.Precise);
+    public static RoundedPosition operator +(RoundedPosition a, RoundedPosition b) => new(a.Precise + b.Precise);
+    public static RoundedPosition operator +(RoundedPosition a, Vector2 b) => new(a.Precise + b);
+    public static RoundedPosition operator +(Vector2 a, RoundedPosition b) => new(a + b.Precise);
 
-    public static RenderablePosition operator -(RenderablePosition a) => new(-a.Precise);
-    public static RenderablePosition operator -(RenderablePosition a, RenderablePosition b) => a + (-b);
-    public static RenderablePosition operator -(RenderablePosition a, Vector2 b) => a + (-b);
-    public static RenderablePosition operator -(Vector2 a, RenderablePosition b) => a + (-b);
+    public static RoundedPosition operator -(RoundedPosition a) => new(-a.Precise);
+    public static RoundedPosition operator -(RoundedPosition a, RoundedPosition b) => a + (-b);
+    public static RoundedPosition operator -(RoundedPosition a, Vector2 b) => a + (-b);
+    public static RoundedPosition operator -(Vector2 a, RoundedPosition b) => a + (-b);
 
-    public static RenderablePosition operator *(RenderablePosition a, Vector2 b) => new(a.Precise * b);
-    public static RenderablePosition operator *(Vector2 a, RenderablePosition b) => new(a * b.Precise);
-    public static RenderablePosition operator *(RenderablePosition a, RenderablePosition b) => new(a.Precise * b.Precise);
+    public static RoundedPosition operator *(RoundedPosition a, Vector2 b) => new(a.Precise * b);
+    public static RoundedPosition operator *(Vector2 a, RoundedPosition b) => new(a * b.Precise);
+    public static RoundedPosition operator *(RoundedPosition a, RoundedPosition b) => new(a.Precise * b.Precise);
 
-    public static RenderablePosition operator /(RenderablePosition a, RenderablePosition b) => new(a.Precise / b.Precise);
-    public static RenderablePosition operator /(RenderablePosition a, Vector2 b) => new(a.Precise / b);
-    public static RenderablePosition operator /(Vector2 a, RenderablePosition b) => new(a / b.Precise);
+    public static RoundedPosition operator /(RoundedPosition a, RoundedPosition b) => new(a.Precise / b.Precise);
+    public static RoundedPosition operator /(RoundedPosition a, Vector2 b) => new(a.Precise / b);
+    public static RoundedPosition operator /(Vector2 a, RoundedPosition b) => new(a / b.Precise);
 
-    public static implicit operator RenderablePosition(Vector2 v) => new(v);
-    public static implicit operator RenderablePosition(Point2 v) => new(v);
+    public static implicit operator RoundedPosition(Vector2 v) => new(v);
+    public static implicit operator RoundedPosition(Point2 v) => new(v);
 }

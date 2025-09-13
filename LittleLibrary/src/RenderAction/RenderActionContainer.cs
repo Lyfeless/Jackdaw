@@ -12,58 +12,16 @@ public class RenderActionContainer(Actor owner) : ChildContainer<ActorRenderActi
         batcherStack.Clear();
         batcherStack.Push(batcher);
 
+        Active = true;
+
         for (int i = 0; i < Elements.Count; ++i) {
-            if (!Elements[i].ApplyToComponents) { continue; }
-            Elements[i].PreRender(this, CurrentBatcher);
+            Elements[i].PreRender(this);
         }
     }
 
     internal void PostRender() {
         for (int i = Elements.Count - 1; i >= 0; --i) {
-            if (!Elements[i].ApplyToComponents) { continue; }
-            Elements[i].PostRender(this, CurrentBatcher);
-        }
-    }
-
-    internal void PreRenderComponents() {
-        Active = true;
-
-        while (batcherStack.Count > 2) {
-            batcherStack.Pop();
-        }
-
-        for (int i = 0; i < Elements.Count; ++i) {
-            if (!Elements[i].ApplyToComponents) { continue; }
-            Elements[i].PreRenderPhase(this, CurrentBatcher);
-        }
-    }
-
-    internal void PostRenderComponents() {
-        for (int i = Elements.Count - 1; i >= 0; --i) {
-            if (!Elements[i].ApplyToComponents) { continue; }
-            Elements[i].PostRenderPhase(this, CurrentBatcher);
-        }
-
-        Active = false;
-    }
-
-    internal void PreRenderChildren() {
-        Active = true;
-
-        while (batcherStack.Count > 1) {
-            batcherStack.Pop();
-        }
-
-        for (int i = 0; i < Elements.Count; ++i) {
-            if (!Elements[i].ApplyToChildren) { continue; }
-            Elements[i].PreRenderPhase(this, batcherStack.Peek());
-        }
-    }
-
-    internal void PostRenderChildren() {
-        for (int i = Elements.Count - 1; i >= 0; --i) {
-            if (!Elements[i].ApplyToChildren) { continue; }
-            Elements[i].PostRenderPhase(this, batcherStack.Peek());
+            Elements[i].PostRender(this);
         }
 
         Active = false;

@@ -34,6 +34,8 @@ public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor
         if (Owner.InTree) {
             child.EnterTree();
         }
+
+        child.Parent.Position.Cache();
     }
 
     public override void HandleRemove(Actor child) {
@@ -42,6 +44,8 @@ public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor
         }
 
         child.Parent = Actor.Invalid;
+
+        child.Parent.Position.Cache();
     }
 
     protected override ObjectIdentifier<Actor> Match(Actor element) {

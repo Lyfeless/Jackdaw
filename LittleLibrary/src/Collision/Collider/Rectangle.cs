@@ -20,8 +20,8 @@ public class RectangleCollider(Rect rect) : Collider {
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
+    public override Vector2 Support(Vector2 direction) {
         Vector2 halfRect = Rect.Size / 2;
-        return position + Rect.Position + halfRect + (halfRect * new Vector2(MathF.Sign(direction.X), MathF.Sign(direction.Y)));
+        return Rect.Position + halfRect + (halfRect * new Vector2(MathF.Sign(direction.X), MathF.Sign(direction.Y)));
     }
 }

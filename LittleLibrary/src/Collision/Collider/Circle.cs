@@ -29,7 +29,7 @@ public class CircleCollider(Circle circle) : Collider {
         return new Rect(circle.Position.X - circle.Radius, circle.Position.Y - circle.Radius, circle.Radius + circle.Radius, circle.Radius + circle.Radius);
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
-        return position + Circle.Position + (Circle.Radius * direction.Normalized());
+    public override Vector2 Support(Vector2 direction) {
+        return Circle.Position + (Circle.Radius * direction.Normalized());
     }
 }

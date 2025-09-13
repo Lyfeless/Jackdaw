@@ -32,12 +32,12 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
         return builder.Rect;
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
+    public override Vector2 Support(Vector2 direction) {
         float furthestDistance = float.NegativeInfinity;
         Vector2 furthestPoint = Vector2.Zero;
 
         for (int i = 0; i < Shape.Points; ++i) {
-            Vector2 comparePoint = Shape.GetPoint(i) + position;
+            Vector2 comparePoint = Shape.GetPoint(i);
             float compareDistance = Vector2.Dot(comparePoint, direction);
             if (compareDistance > furthestDistance) {
                 furthestDistance = compareDistance;

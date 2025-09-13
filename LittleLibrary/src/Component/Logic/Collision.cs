@@ -17,7 +17,6 @@ public class CollisionComponent(LittleGame game, Collider collider) : Component(
     public Collider Collider = collider;
 
     public CollisionResolver? Resolver;
-    public VelocityComponent? Velocity;
 
     public readonly List<CollisionInfo> Collisions = [];
     public bool Collided => Collisions.Count > 0;

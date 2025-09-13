@@ -62,26 +62,7 @@ public class Actor {
     /// <summary>
     /// The position of the actor. Relative to its current parent.
     /// </summary>
-    public RenderablePosition Position = new();
-
-    /// <summary>
-    /// The actor's position in world space.
-    /// </summary>
-    public Vector2 GlobalPosition {
-        get => ParentValid
-            ? Position.Precise + Parent.GlobalPosition
-            : Position.Precise;
-    }
-
-    /// <summary>
-    /// The actors position in world space, rounded to the nearest integer value.
-    /// Used primarily for rendering.
-    /// </summary>
-    public Point2 GlobalPositionRounded {
-        get => ParentValid
-            ? Position.Rounded + Parent.GlobalPositionRounded
-            : Position.Rounded;
-    }
+    public ActorPosition Position;
 
     /// <summary>
     /// If the actor's components should render.
@@ -156,8 +137,8 @@ public class Actor {
         Game = game;
         Parent = Invalid;
 
+        Position = new(this);
         Match = new(this);
-
         Children = new(this);
         Components = new(this);
         RenderActions = new(this);
@@ -192,26 +173,24 @@ public class Actor {
     internal void Render(Batcher batcher) {
         if (!Visible) { return; }
 
-        batcher.PushMatrix(Position.Rounded);
+        batcher.PushMatrix(Position.LocalTransform);
+
+        //! FIXME (Alex): Calculate display matrix and store on the actor transform
 
         RenderActions.PreRender(batcher);
 
         if (ComponentsVisible) {
-            RenderActions.PreRenderComponents();
             Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Component component in Components.Elements) {
                 if (component.Visible) { component.OnRender(currentBatcher); }
             }
-            RenderActions.PostRenderComponents();
         }
 
         if (ChildrenVisible) {
-            RenderActions.PreRenderChildren();
             Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Actor child in Children.Elements) {
                 child.Render(currentBatcher);
             }
-            RenderActions.PostRenderChildren();
         }
 
         RenderActions.PostRender();
@@ -292,45 +271,6 @@ public class Actor {
         if (this == check) { return true; }
         if (ParentValid) { return Parent.ParentMatches(check); }
         return false;
-    }
-
-    /// <summary>
-    /// Convert a local coordinate to global space.
-    /// This functionality is also available in <seealso cref="CoordSpace(in LittleGame)"> for consistency.
-    /// </summary>
-    /// <param name="position">The local coordinate.</param>
-    /// <returns>The coordinate in global space.</returns>
-    public Vector2 LocalToGlobal(Vector2 position) {
-        return position + GlobalPosition;
-    }
-
-    /// <summary>
-    /// Convert a global coordinate to local space.
-    /// This functionality is also available in <seealso cref="CoordSpace(in LittleGame)"> for consistency.
-    /// </summary>
-    /// <param name="position">The global coordinate.</param>
-    /// <returns>The coordinate in local space.</returns>
-    public Vector2 GlobalToLocal(Vector2 position) {
-        return position - GlobalPosition;
-    }
-
-    /// <summary>
-    /// Convert a coordinate local to another actor to this actor's local space.
-    /// This functionality is also available in <seealso cref="CoordSpace(in LittleGame)"> for consistency.
-    /// </summary>
-    /// <param name="position">The coordinate in the other actor's local space.</param>
-    /// <returns>The coordinate local to this actor.</returns>
-    public Vector2 FromOtherLocal(Actor originLocal, Vector2 position) {
-        return GlobalToLocal(originLocal.LocalToGlobal(position));
-    }
-
-    /// <summary>
-    /// Convert another actor's local position to this actor's local space.
-    /// This functionality is also available in <seealso cref="CoordSpace(in LittleGame)"> for consistency.
-    /// </summary>
-    /// <returns>The other actor's position local to this actor.</returns>
-    public Vector2 FromOtherLocal(Actor originLocal) {
-        return GlobalToLocal(originLocal.GlobalPosition);
     }
 
     /// <summary>

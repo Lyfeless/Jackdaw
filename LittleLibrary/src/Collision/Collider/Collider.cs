@@ -27,7 +27,7 @@ public abstract class Collider {
     /// <summary>
     /// Return all useful subcolliders for a given local bound.
     /// </summary>
-    /// <param name="bounds">The bounds to check collisions against.</param>
+    /// <param name="bounds">The bounds to check collisions against, local to the collider.</param>
     /// <returns>The relevant subcolliders for the bounds.</returns>
     public abstract Collider[] GetSubColliders(Rect bounds);
 
@@ -47,5 +47,5 @@ public abstract class Collider {
     /// <param name="position">The collider's global position</param>
     /// <param name="direction">the ray direction vector.</param>
     /// <returns>The nearest support point in the given direction.</returns>
-    public abstract Vector2 Support(Vector2 position, Vector2 direction);
+    public abstract Vector2 Support(Vector2 direction);
 }

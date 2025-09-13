@@ -16,27 +16,22 @@ public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBo
 
     public override Matrix3x2 PositionOffset => DisplayScale;
 
-    public override void PreRender(RenderActionContainer container, Batcher batcher) {
+    public override void PreRender(RenderActionContainer container) {
         Target.Clear(BackgroundColor);
         Batcher.Clear();
         Batcher.PushMatrix(-Bounds.Position);
 
         float scale = Calc.Min(Bounds.Size.X / Target.Width, Bounds.Size.Y / Target.Height);
         DisplayScale = Transform.CreateMatrix(Bounds.Position + ((Point2)Bounds.Size / 2), new Vector2(Target.Width, Target.Height) / 2, Vector2.One * scale, 0);
-    }
 
-    public override void PreRenderPhase(RenderActionContainer container, Batcher batcher) {
         container.PushBatcher(Batcher);
     }
 
-    public override void PostRenderPhase(RenderActionContainer container, Batcher batcher) {
+    public override void PostRender(RenderActionContainer container) {
         container.PopBatcher();
-    }
 
-    public override void PostRender(RenderActionContainer container, Batcher batcher) {
         Batcher.Render(Target);
-        batcher.PushMatrix(DisplayScale);
-        batcher.Image(Target, Color.White);
-        // batcher.Image(Target, Bounds.Position, Color.White);
+        container.CurrentBatcher.PushMatrix(DisplayScale);
+        container.CurrentBatcher.Image(Target, Color.White);
     }
 }

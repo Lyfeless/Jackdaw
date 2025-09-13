@@ -76,7 +76,7 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         return [.. overlaps];
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) {
+    public override Vector2 Support(Vector2 direction) {
         throw new NotImplementedException();
     }
 

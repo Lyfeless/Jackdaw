@@ -6,11 +6,11 @@ namespace LittleLib;
 public class RenderActionSampler(TextureSampler sampler) : ActorRenderAction() {
     public TextureSampler Sampler = sampler;
 
-    public override void PostRenderPhase(RenderActionContainer container, Batcher batcher) {
-        batcher.PushSampler(sampler);
+    public override void PreRender(RenderActionContainer container) {
+        container.CurrentBatcher.PushSampler(sampler);
     }
 
-    public override void PreRenderPhase(RenderActionContainer container, Batcher batcher) {
-        batcher.PopSampler();
+    public override void PostRender(RenderActionContainer container) {
+        container.CurrentBatcher.PopSampler();
     }
 }

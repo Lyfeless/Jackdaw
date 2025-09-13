@@ -1,4 +1,5 @@
 using System.Numerics;
+using Foster.Framework;
 
 namespace LittleLib;
 
@@ -79,5 +80,26 @@ public static class CalcExtra {
 
         intersection = new(x, y);
         return true;
+    }
+
+    //! FIXME (Alex): These are untested
+    public static Vector2 TransformDirection(Vector2 direction, Transform transform)
+        => TransformDirection(direction, transform.Matrix);
+
+    public static Vector2 TransformDirection(Vector2 direction, Matrix3x2 transform) {
+        return Vector2.Transform(direction, transform) - transform.Translation;
+    }
+
+    public static Rect TransformRect(Rect rect, Transform transform)
+        => TransformRect(rect, transform.Matrix);
+
+    public static Rect TransformRect(Rect rect, Matrix3x2 transform) {
+        //! FIXME (Alex): Can this be simplified?
+        return new BoundsBuilder(
+            Vector2.Transform(rect.TopLeft, transform),
+            Vector2.Transform(rect.TopRight, transform),
+            Vector2.Transform(rect.BottomLeft, transform),
+            Vector2.Transform(rect.BottomRight, transform)
+        ).Rect;
     }
 }

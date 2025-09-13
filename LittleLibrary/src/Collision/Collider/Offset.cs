@@ -28,5 +28,5 @@ public class OffsetCollider : Collider {
         return [.. Collider.GetSubColliders(new(bounds.Position - Offset, bounds.Size)).Select(e => new OffsetCollider(e, Offset))];
     }
 
-    public override Vector2 Support(Vector2 position, Vector2 direction) => Collider.Support(position + Offset, direction);
+    public override Vector2 Support(Vector2 direction) => Offset + Collider.Support(direction);
 }
