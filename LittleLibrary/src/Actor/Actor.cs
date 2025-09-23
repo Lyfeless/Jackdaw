@@ -173,21 +173,24 @@ public class Actor {
     internal void Render(Batcher batcher) {
         if (!Visible) { return; }
 
-        batcher.PushMatrix(Position.LocalTransform);
+        //! FIXME (Alex): Only cache if changed? Is that easy?
+        // This is just a bit messy in general
+        Position.CacheDisplay();
+
+        batcher.PushMatrix(Position.LocalMatrix);
 
         //! FIXME (Alex): Calculate display matrix and store on the actor transform
 
         RenderActions.PreRender(batcher);
+        Batcher currentBatcher = RenderActions.CurrentBatcher;
 
         if (ComponentsVisible) {
-            Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Component component in Components.Elements) {
                 if (component.Visible) { component.OnRender(currentBatcher); }
             }
         }
 
         if (ChildrenVisible) {
-            Batcher currentBatcher = RenderActions.CurrentBatcher;
             foreach (Actor child in Children.Elements) {
                 child.Render(currentBatcher);
             }

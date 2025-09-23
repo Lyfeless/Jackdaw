@@ -4,11 +4,12 @@ using Foster.Framework;
 namespace LittleLib;
 
 public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBounds, Point2 viewportSize, Color backgroundColor) : ActorRenderAction() {
-    GraphicsDevice Device = device;
-    BoundsComponent Bounds = fillBounds;
+    public BoundsComponent Bounds = fillBounds;
 
-    Target Target = new(device, viewportSize.X, viewportSize.Y);
-    Batcher Batcher = new(device);
+    public readonly Point2 Size = new(viewportSize.X, viewportSize.Y);
+
+    readonly Target Target = new(device, viewportSize.X, viewportSize.Y);
+    readonly Batcher Batcher = new(device);
 
     Color BackgroundColor = backgroundColor;
 

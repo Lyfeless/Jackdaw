@@ -19,19 +19,38 @@ public interface ISpatialGrid<TIn, TOut> {
 
 public static class ISpatialGridHelper {
     public static void SetTileLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, TIn element, Vector2 localCoord)
-        => grid.SetTile(element, grid.LocalToTileCoord(localCoord));
+        => grid.SetTile(element, (Point2)grid.LocalToTileCoord(localCoord));
     public static void AddTileStackLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, TIn element, Vector2 localCoord)
-        => grid.AddTileStack(element, grid.LocalToTileCoord(localCoord));
+        => grid.AddTileStack(element, (Point2)grid.LocalToTileCoord(localCoord));
     public static void RemoveTileStackLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localCoord)
-        => grid.RemoveTileStack(grid.LocalToTileCoord(localCoord));
+        => grid.RemoveTileStack((Point2)grid.LocalToTileCoord(localCoord));
     public static void ClearTileLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localCoord)
-        => grid.ClearTile(grid.LocalToTileCoord(localCoord));
+        => grid.ClearTile((Point2)grid.LocalToTileCoord(localCoord));
     public static TOut? GetTileLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localCoord)
-        => grid.GetTile(grid.LocalToTileCoord(localCoord));
+        => grid.GetTile((Point2)grid.LocalToTileCoord(localCoord));
 
-    public static Point2 LocalToTileCoord<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localPosition)
-        => (Point2)((localPosition - grid.Position) / grid.TileSize);
+    public static Matrix3x2 LocalToTileCoord<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Matrix3x2 localPosition) {
+        return localPosition * grid.InMatrix();
+    }
+
+    public static Vector2 LocalToTileCoord<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localPosition) {
+        return Vector2.Transform(localPosition, grid.InMatrix());
+    }
+
+    public static Matrix3x2 TileCoordToLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Matrix3x2 tileCoords) {
+        return tileCoords * grid.OutMatrix();
+    }
 
     public static Vector2 TileCoordToLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Point2 tileCoords)
-        => (tileCoords * grid.TileSize) + grid.Position;
+        => TileCoordToLocal(grid, (Vector2)tileCoords);
+
+    public static Vector2 TileCoordToLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 tileCoords) {
+        return Vector2.Transform(tileCoords, grid.OutMatrix());
+    }
+
+    static Matrix3x2 OutMatrix<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid)
+        => Transform.CreateMatrix(grid.Position, Vector2.Zero, grid.TileSize, 0);
+
+    static Matrix3x2 InMatrix<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid)
+        => Transform.CreateMatrix(-grid.Position, Vector2.Zero, Vector2.One / grid.TileSize, 0);
 }

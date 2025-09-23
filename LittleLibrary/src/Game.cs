@@ -40,7 +40,7 @@ public class LittleGame : App {
     /// <summary>
     /// Conversion functions between many common coordinate spaces.
     /// </summary>
-    public SpaceConverter CoordSpace;
+    public SpaceConverter Convert;
 
     /// <summary>
     /// Random Utility
@@ -92,7 +92,7 @@ public class LittleGame : App {
         Timers = new(this);
         Collision = new();
         Events = new();
-        CoordSpace = new(this);
+        Convert = new(this);
 
         BackgroundColor = Color.FromHexStringRGB(config.Window.ClearColor);
         Window.Resizable = config.Window.Resizable;
@@ -166,7 +166,7 @@ public class LittleGame : App {
     /// <summary>
     /// Convert a coordinate from a window coordinate to a position in the current viewspace.
     /// Most useful when using the fixed viewport <seealso cref="RendererType(in LittleGameWindowConfig)">.
-    /// This functionality is also available in <see cref="CoordSpace"> for consistency.
+    /// This functionality is also available in <see cref="Convert"> for consistency.
     /// </summary>
     /// <param name="position">The position relative to the full window.</param>
     /// <returns>The position transformed to be local to the adjusted viewport.</returns>
@@ -175,7 +175,7 @@ public class LittleGame : App {
     /// <summary>
     /// Convert a coordinate from a coordinate in the current viewspace to a window coordinate.
     /// Most useful when using the fixed viewport <seealso cref="RendererType(in LittleGameWindowConfig)">.
-    /// This functionality is also available in <see cref="CoordSpace"> for consistency.
+    /// This functionality is also available in <see cref="Convert"> for consistency.
     /// </summary>
     /// <param name="position">The position relative to the viewport.</param>
     /// <returns>The position transformed to be local to the full window.</returns>

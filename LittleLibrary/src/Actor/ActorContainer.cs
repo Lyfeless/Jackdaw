@@ -4,7 +4,7 @@ namespace LittleLib;
 /// A container for storing child actors on an actor.
 /// </summary>
 /// <param name="actor">The owning actor.</param>
-public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor>(actor) {
+public class ActorContainer(Actor actor) : RecursiveSearchableChildContainer<Actor, Actor>(actor) {
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
     public override bool CanAdd(Actor child) {
@@ -35,7 +35,7 @@ public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor
             child.EnterTree();
         }
 
-        child.Parent.Position.Cache();
+        child.Parent.Position.MakeDirty();
     }
 
     public override void HandleRemove(Actor child) {
@@ -45,12 +45,10 @@ public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor
 
         child.Parent = Actor.Invalid;
 
-        child.Parent.Position.Cache();
+        child.Parent.Position.MakeDirty();
     }
 
-    protected override ObjectIdentifier<Actor> Match(Actor element) {
-        return element.Match;
-    }
+    protected override ObjectIdentifier<Actor> Match(Actor element) => element.Match;
 
     protected override int RecurseCount() {
         if (modifyActions.Count == 0) { return Owner.Children.Elements.Count; }
@@ -61,7 +59,7 @@ public class ActorContainer(Actor actor) : SearchableChildContainer<Actor, Actor
         return Owner.Children.Elements.Count + addCount;
     }
 
-    protected override SearchableChildContainer<Actor, Actor> RecurseItem(int index) {
+    protected override RecursiveSearchableChildContainer<Actor, Actor> RecurseItem(int index) {
         if (index >= Owner.Children.Elements.Count) {
             index -= Owner.Children.Elements.Count;
             foreach (ChildContainerModifyAction<Actor, Actor> action in modifyActions) {

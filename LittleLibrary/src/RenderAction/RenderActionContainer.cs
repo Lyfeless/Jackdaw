@@ -1,12 +1,21 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
-public class RenderActionContainer(Actor owner) : ChildContainer<ActorRenderAction, Actor>(owner) {
+public class RenderActionContainer(Actor owner) : SearchableChildContainer<ActorRenderAction, Actor>(owner) {
     bool Active = false;
 
     readonly Stack<Batcher> batcherStack = [];
     public Batcher CurrentBatcher => batcherStack.Peek();
+
+    internal Matrix3x2 GetDisplayMatrix() {
+        Matrix3x2 matrix = Matrix3x2.Identity;
+        foreach (ActorRenderAction action in Elements) {
+            matrix = action.PositionOffset * matrix;
+        }
+        return matrix;
+    }
 
     internal void PreRender(Batcher batcher) {
         batcherStack.Clear();
@@ -49,4 +58,6 @@ public class RenderActionContainer(Actor owner) : ChildContainer<ActorRenderActi
     public override string Printable(ActorRenderAction child) {
         return child.GetType().ToString();
     }
+
+    protected override ObjectIdentifier<ActorRenderAction> Match(ActorRenderAction element) => element.Match;
 }

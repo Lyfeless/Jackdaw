@@ -4,7 +4,7 @@ namespace LittleLib;
 /// A container for storing components on an actor.
 /// </summary>
 /// <param name="actor">The owning actor.</param>
-public class ComponentContainer(Actor actor) : SearchableChildContainer<Component, Actor>(actor) {
+public class ComponentContainer(Actor actor) : RecursiveSearchableChildContainer<Component, Actor>(actor) {
     public override bool Locked() => Owner.Game == null || Owner.Game.LockContainers;
 
     public override bool CanAdd(Component child) {
@@ -49,9 +49,7 @@ public class ComponentContainer(Actor actor) : SearchableChildContainer<Componen
         child.Actor = Actor.Invalid;
     }
 
-    protected override ObjectIdentifier<Component> Match(Component element) {
-        return element.Match;
-    }
+    protected override ObjectIdentifier<Component> Match(Component element) => element.Match;
 
     protected override int RecurseCount() {
         if (modifyActions.Count == 0) { return Owner.Children.Elements.Count; }
@@ -62,7 +60,7 @@ public class ComponentContainer(Actor actor) : SearchableChildContainer<Componen
         return Owner.Children.Elements.Count + addCount;
     }
 
-    protected override SearchableChildContainer<Component, Actor> RecurseItem(int index) {
+    protected override RecursiveSearchableChildContainer<Component, Actor> RecurseItem(int index) {
         if (index >= Owner.Children.Elements.Count) {
             index -= Owner.Children.Elements.Count;
             foreach (ChildContainerModifyAction<Actor, Actor> action in Owner.Children.modifyActions) {
