@@ -57,19 +57,19 @@ public struct ActorPosition {
         }
     }
 
-    Matrix3x2 globalMatrix = Matrix3x2.Identity;
+    InvertableMatrix globalMatrix = new();
+
     public Matrix3x2 GlobalMatrix {
         get {
             if (isDirty) { CachePosition(); }
-            return globalMatrix;
+            return globalMatrix.Matrix;
         }
     }
 
-    Matrix3x2 globalMatrixInverse = Matrix3x2.Identity;
     public Matrix3x2 GlobalMatrixInverse {
         get {
             if (isDirty) { CachePosition(); }
-            return globalMatrixInverse;
+            return globalMatrix.MatrixInverse;
         }
     }
 
@@ -89,10 +89,13 @@ public struct ActorPosition {
         }
     }
 
-    public Matrix3x2 LocalDisplayMatrix { get; internal set; } = Matrix3x2.Identity;
-    public Matrix3x2 LocalDisplayMatrixInverse { get; internal set; } = Matrix3x2.Identity;
-    public Matrix3x2 GlobalDisplayMatrix { get; internal set; } = Matrix3x2.Identity;
-    public Matrix3x2 GlobalDisplayMatrixInverse { get; internal set; } = Matrix3x2.Identity;
+    InvertableMatrix localDisplayMatrix = new();
+    public readonly Matrix3x2 LocalDisplayMatrix => localDisplayMatrix.Matrix;
+    public readonly Matrix3x2 LocalDisplayMatrixInverse => localDisplayMatrix.MatrixInverse;
+
+    InvertableMatrix globalDisplayMatrix = new();
+    public readonly Matrix3x2 GlobalDisplayMatrix => globalDisplayMatrix.Matrix;
+    public readonly Matrix3x2 GlobalDisplayMatrixInverse => globalDisplayMatrix.MatrixInverse;
 
     public ActorPosition(Actor actor, Vector2 position, float rotation, Vector2 scale) {
         Actor = actor;
@@ -119,14 +122,12 @@ public struct ActorPosition {
         isDirty = false;
 
         if (Actor.ParentValid) {
-            globalMatrix = transform.Matrix * Actor.Parent.Position.GlobalMatrix;
-            globalMatrixInverse = InvertMatrix(globalMatrix);
+            globalMatrix.Matrix = transform.Matrix * Actor.Parent.Position.GlobalMatrix;
             globalPosition = Vector2.Transform(LocalPosition, Actor.Parent.Position.GlobalMatrix);
             globalRotation = LocalRotation + Actor.Parent.Position.GlobalRotation;
         }
         else {
-            globalMatrix = transform.Matrix;
-            globalMatrixInverse = transform.MatrixInverse;
+            globalMatrix.Matrix = transform.Matrix;
             globalPosition = transform.Position;
             globalRotation = transform.Rotation;
         }
@@ -154,20 +155,17 @@ public struct ActorPosition {
 
         Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * LocalMatrix;
         if (LocalDisplayMatrix != localDisplay) {
-            LocalDisplayMatrix = localDisplay;
-            LocalDisplayMatrixInverse = InvertMatrix(localDisplay);
+            localDisplayMatrix.Matrix = localDisplay;
         }
 
         if (Actor.ParentValid) {
             Matrix3x2 globalDisplay = localDisplay * Actor.Parent.Position.GlobalDisplayMatrix;
             if (GlobalDisplayMatrix != globalDisplay) {
-                GlobalDisplayMatrix = globalDisplay;
-                GlobalDisplayMatrixInverse = InvertMatrix(globalDisplay);
+                globalDisplayMatrix.Matrix = globalDisplay;
             }
         }
         else {
-            GlobalDisplayMatrix = LocalDisplayMatrix;
-            GlobalDisplayMatrixInverse = LocalDisplayMatrixInverse;
+            globalDisplayMatrix.Matrix = LocalDisplayMatrix;
         }
     }
 
@@ -192,9 +190,4 @@ public struct ActorPosition {
     public Vector2 DisplayToLocal(Vector2 position) => GlobalToLocal(DisplayToGlobal(position));
     public Matrix3x2 DisplayToGlobal(Matrix3x2 matrix) => GlobalDisplayMatrix * matrix;
     public Vector2 DisplayToGlobal(Vector2 position) => Vector2.Transform(position, GlobalDisplayMatrix);
-
-    static Matrix3x2 InvertMatrix(Matrix3x2 matrix) {
-        Matrix3x2.Invert(matrix, out Matrix3x2 inv);
-        return inv;
-    }
 }

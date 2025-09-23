@@ -6,8 +6,8 @@ namespace LittleLib;
 //! FIXME (Alex): DOC COMMENTS
 
 public struct InvertableMatrix {
-    Matrix3x2 matrix;
-    Matrix3x2 matrixInverse;
+    Matrix3x2 matrix = Matrix3x2.Identity;
+    Matrix3x2 matrixInverse = Matrix3x2.Identity;
 
     public InvertableMatrix(Matrix3x2 matrix) {
         this.matrix = matrix;
