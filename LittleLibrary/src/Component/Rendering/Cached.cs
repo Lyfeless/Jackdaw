@@ -3,20 +3,32 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): untested
-//! FIXME (Alex): Doc comments
 
+/// <summary>
+/// Optimization component for pre-rendering a component to avoid rending it every frame.
+/// </summary>
 public class CachedRenderComponent : Component {
     readonly Component Component;
     Target RenderedComponent;
 
     Point2 position;
 
+    /// <summary>
+    /// Create and cache a component within a rendering bound.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="component">The component to cache.</param>
+    /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
     public CachedRenderComponent(LittleGame game, Component component, RectInt bounds) : base(game) {
         Component = component;
         Cache(bounds);
     }
 
-    void Cache(RectInt bounds) {
+    /// <summary>
+    /// Re-render the component.
+    /// </summary>
+    /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
+    public void Cache(RectInt bounds) {
         RenderedComponent = new(Game.GraphicsDevice, bounds.Width, bounds.Height);
         position = bounds.Position;
         Batcher batcher = new(Game.GraphicsDevice);

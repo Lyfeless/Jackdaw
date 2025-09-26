@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using System.Numerics;
 using System.Text.Json;
 using Foster.Framework;
 
@@ -49,9 +47,9 @@ public class LittleGame : App {
 
     Color BackgroundColor;
 
-    public Batcher Batcher { get; private set; }
+    readonly Batcher Batcher;
 
-    public bool LockContainers { get; private set; } = false;
+    internal bool LockContainers { get; private set; } = false;
 
     Actor root;
 
@@ -77,9 +75,17 @@ public class LittleGame : App {
     readonly List<ComponentInvalidation> ComponentInvalidateQueue = [];
     readonly List<ActorInvalidation> ActorInvalidateQueue = [];
 
+    /// <summary>
+    /// Create a new game instance using a configuration file.
+    /// </summary>
+    /// <param name="configPath">The path to the configuration file, relative to the application.</param>
     public LittleGame(string configPath)
         : this(JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.LittleGameConfig)) { }
 
+    /// <summary>
+    /// Create a new game instance using manually defined configuration data.
+    /// </summary>
+    /// <param name="config">The game's configuration data.</param>
     public LittleGame(LittleGameConfig config) : base(new AppConfig() {
         ApplicationName = config.ApplicationName,
         WindowTitle = config.WindowTitle,
@@ -162,24 +168,6 @@ public class LittleGame : App {
         root?.Render(Batcher);
         Batcher.Render(Window);
     }
-
-    /// <summary>
-    /// Convert a coordinate from a window coordinate to a position in the current viewspace.
-    /// Most useful when using the fixed viewport <seealso cref="RendererType(in LittleGameWindowConfig)">.
-    /// This functionality is also available in <see cref="Convert"> for consistency.
-    /// </summary>
-    /// <param name="position">The position relative to the full window.</param>
-    /// <returns>The position transformed to be local to the adjusted viewport.</returns>
-    // public Vector2 WindowToViewspace(Vector2 position) => Renderer.WindowToViewspace(position);
-
-    /// <summary>
-    /// Convert a coordinate from a coordinate in the current viewspace to a window coordinate.
-    /// Most useful when using the fixed viewport <seealso cref="RendererType(in LittleGameWindowConfig)">.
-    /// This functionality is also available in <see cref="Convert"> for consistency.
-    /// </summary>
-    /// <param name="position">The position relative to the viewport.</param>
-    /// <returns>The position transformed to be local to the full window.</returns>
-    // public Vector2 ViewspaceToWindow(Vector2 position) => Renderer.ViewspaceToWindow(position);
 
     internal void QueueInvalidate(Component component) => ComponentInvalidateQueue.Add(new(component));
     internal void QueueInvalidate(Actor actor, bool invalidateChildren = true, bool invalidateComponents = true) => ActorInvalidateQueue.Add(new(actor, invalidateChildren, invalidateComponents));

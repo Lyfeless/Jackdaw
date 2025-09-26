@@ -1,3 +1,5 @@
+using Foster.Framework;
+
 namespace LittleLib;
 
 /// <summary>
@@ -30,7 +32,7 @@ public class WeightedRandom<T>(LittleGame game) {
     /// <returns>The randomly selected value.</returns>
     public T Get() {
         if (values.Count == 0) {
-            Console.WriteLine("Attempting to get a weight random with no values, returning default");
+            Log.Warning("Attempting to get a weight random with no values, returning default");
             return default;
         }
 

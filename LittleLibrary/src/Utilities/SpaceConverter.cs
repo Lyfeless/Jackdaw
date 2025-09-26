@@ -11,14 +11,13 @@ public class SpaceConverter(LittleGame game) {
     readonly LittleGame Game = game;
 
     //! FIXME (Alex): Doc comments
-    //! FIXME (Alex): Literally none of this is tested right now
 
-    /*
-        Global -> Root space for all objects, always originates from 0,0 at top left of window. Doubles as Window Space
-        Local -> Position Relative to internal location of actor
-        DisplayLocal -> Position Relative to rendered position of actor
-        Tile -> Position in spatial grid with each tile being one unit
-    */
+    // Local Space - Positions relative to the actor's location.
+    // Global Space - Positions relative to the world origin.
+    // Display Space - Positions relative to the actor's location, with any enter actions applied from the actor or its parents.
+    // Tile Space - Positions relative to a spatial grid with one unit per tile.
+    // Display Local Space - Positions relative to the actor's location, with any enter actions applied from the actor or its parents.
+    // Display Tile Space - Positions relative to a spatial grid with one unit per tile, transformed by an actor's display position.
 
     public Vector2 MouseToGlobal()
         => Game.Input.Mouse.Position;

@@ -11,6 +11,10 @@ public struct BoundsBuilder {
     Vector2 max = Vector2.Zero;
 
     int PointCount = 0;
+
+    /// <summary>
+    /// The total bounds all the added values cover.
+    /// </summary>
     public Rect Rect;
 
     /// <summary>

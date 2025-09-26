@@ -11,9 +11,9 @@ namespace LittleLib;
 /// <param name="tileSize">The size of each tile.</param>
 public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSize) : Collider, ISpatialGrid<Collider?, Collider?> {
     readonly Grid<Collider?> Grid = grid;
-    public readonly RectangleCollider FullCollider = new(tileSize);
 
     Vector2 position = position;
+
     public Vector2 Position {
         get => position;
         set => position = value;

@@ -1,16 +1,44 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
-//! FIXME (Alex): This should be a sprite?
-//! FIXME (Alex): And make a sprite for tiling texture so I can make this less terrible
+/// <summary>
+/// A tiling sprite with borders.
+/// </summary>
 public class SpriteNineslice : Sprite {
+    /// <summary>
+    /// The options available for extending the size of the texture.
+    /// </summary>
     public enum ExtendBehavior {
+        /// <summary>
+        /// Repeat the texture without any distortion.
+        /// </summary>
         TILE,
+        /// <summary>
+        /// Stretch a single texture to the desired size.
+        /// </summary>
         STRETCH
     }
 
+    /// <summary>
+    /// The options available for limiting the minimum size.
+    /// </summary>
+    public enum ConstrainBehavior {
+        /// <summary>
+        /// Don't constrain the size.
+        /// </summary>
+        NONE,
+        /// <summary>
+        /// Restrict the object from getting any smaller than the original texture size.
+        /// </summary>
+        TEXTURE_SIZE,
+        /// <summary>
+        /// Restrict the object from getting any smaller than the border size.
+        /// </summary>
+        BORDER_SIZE
+    }
+
+    readonly Subtexture Full;
     readonly Subtexture TopLeft;
     readonly Subtexture TopRight;
     readonly Subtexture BottomLeft;
@@ -21,16 +49,44 @@ public class SpriteNineslice : Sprite {
     readonly SpriteTilingVertical Right;
     readonly SpriteTiling Center;
 
-    // public ExtendBehavior Extend;
-    public bool ConstrainSize;
+    /// <summary>
+    /// The method used to extend the texture past its regular size.
+    /// </summary>
+    public ExtendBehavior Extend;
 
+    /// <summary>
+    /// The method used to limit the minimum size.
+    /// </summary>
+    public ConstrainBehavior Constrain;
+
+    /// <summary>
+    /// The bounds the nineslice should extend to.
+    /// </summary>
     public BoundsComponent BoundsComponent;
+
+    /// <summary>
+    /// The Rectangle bounds of the nineslice.
+    /// </summary>
     public override RectInt Bounds => (RectInt)BoundsComponent.Rect;
+
+    /// <summary>
+    /// The dimensions of the nineslice.
+    /// </summary>
     public override Point2 Size => (Point2)BoundsComponent.Size;
 
 
-    public SpriteNineslice(Subtexture texture, RectInt center, BoundsComponent bounds) : base() {
+    /// <summary>
+    /// Create a new nineslice object.
+    /// </summary>
+    /// <param name="texture">The texture to extend.</param>
+    /// <param name="center">The position middle of the texture that doesn't include any of the edges.</param>
+    /// <param name="bounds">The bounds object the nineslice should fill.</param>
+    /// <param name="extend">The method used to extend the texture past its regular size.</param>
+    /// <param name="constrain">The method used to limit the minimum size.</param>
+    public SpriteNineslice(Subtexture texture, RectInt center, BoundsComponent bounds, ExtendBehavior extend = ExtendBehavior.TILE, ConstrainBehavior constrain = ConstrainBehavior.NONE) : base() {
         BoundsComponent = bounds;
+
+        Full = texture;
 
         int leftWidth = center.Left;
         int rightWidth = (int)texture.Width - center.Right;
@@ -59,13 +115,22 @@ public class SpriteNineslice : Sprite {
             Offset = new(leftWidth, topHeight)
         };
 
-        //! FIXME (Alex): Need to make these work
-        // Extend = extendBehavior;
-        // ConstrainSize = constrainSize;
+        //! FIXME (Alex): Extend still does nothing.
+        Extend = extend;
+        Constrain = constrain;
     }
 
-    public SpriteNineslice(Assets assets, string texture, RectInt center, BoundsComponent bounds)
-        : this(assets.GetTexture(texture), center, bounds) { }
+    /// <summary>
+    /// Create a new nineslice object.
+    /// </summary>
+    /// <param name="assets">The game instance asset container.</param>
+    /// <param name="texture">The texture name id.</param>
+    /// <param name="center">The position middle of the texture that doesn't include any of the edges.</param>
+    /// <param name="bounds">The bounds object the nineslice should fill.</param>
+    /// <param name="extend">The method used to extend the texture past its regular size.</param>
+    /// <param name="constrain">The method used to limit the minimum size.</param>
+    public SpriteNineslice(Assets assets, string texture, RectInt center, BoundsComponent bounds, ExtendBehavior extend = ExtendBehavior.TILE, ConstrainBehavior constrain = ConstrainBehavior.NONE)
+        : this(assets.GetTexture(texture), center, bounds, extend, constrain) { }
 
     public override void Render(Batcher batcher) {
         batcher.PushMatrix((Point2)BoundsComponent.Position);
@@ -73,6 +138,14 @@ public class SpriteNineslice : Sprite {
         Point2 boundsSize = (Point2)BoundsComponent.Size;
         Point2 topLeftSize = (Point2)TopLeft.Size;
         Point2 bottomRightSize = (Point2)BottomRight.Size;
+
+        if (Constrain != ConstrainBehavior.NONE) {
+            boundsSize = Constrain switch {
+                ConstrainBehavior.TEXTURE_SIZE => LimitSize(boundsSize, (Point2)Full.Size),
+                ConstrainBehavior.BORDER_SIZE => LimitSize(boundsSize, topLeftSize + bottomRightSize),
+                _ => boundsSize
+            };
+        }
 
         int middleWidth = boundsSize.X - topLeftSize.X - bottomRightSize.X;
         int middleHeight = boundsSize.Y - topLeftSize.Y - bottomRightSize.Y;
@@ -99,5 +172,12 @@ public class SpriteNineslice : Sprite {
         batcher.Image(BottomRight, new(boundsSize.X - bottomRightSize.X, boundsSize.Y - bottomRightSize.Y), Color.White);
 
         batcher.PopMatrix();
+    }
+
+    static Point2 LimitSize(Point2 size, Point2 limit) {
+        return new(
+            Math.Min(size.X, limit.X),
+            Math.Min(size.Y, limit.Y)
+        );
     }
 }

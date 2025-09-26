@@ -8,12 +8,37 @@ namespace LittleLib;
 /// <param name="guid">A randomly generated unique identifier.</param>
 /// <param name="name">A string identifier for the object.</param>
 public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T : class {
+    /// <summary>
+    /// A unique identifier.
+    /// </summary>
     public Guid Guid = guid;
+
+    /// <summary>
+    /// An assignable custom name for easier human-readable searching.
+    /// Set to null if no name is assigned.
+    /// </summary>
     public string? Name = name;
+
+    /// <summary>
+    /// A container object used for storing assignable tags.
+    /// </summary>
     public TagContainer Tags = new();
+
+    /// <summary>
+    /// The object owning the identifiers.
+    /// </summary>
     readonly T Obj = obj;
+
+    /// <summary>
+    /// The type of the owning object.
+    /// </summary>
     readonly Type ObjType = obj.GetType();
 
+    /// <summary>
+    /// Create a new Identifier with an auto-generated uuid.
+    /// </summary>
+    /// <param name="obj">The owning object.</param>
+    /// <param name="name">A cusom identifier name. Defaults to null.</param>
     public ObjectIdentifier(T obj, string? name = null) : this(obj, Guid.NewGuid(), name) { }
 
     /// <summary>

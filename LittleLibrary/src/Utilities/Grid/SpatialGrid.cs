@@ -4,7 +4,6 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): Doc comments
-//! FIXME (Alex): make a few premade spatial grids
 
 public interface ISpatialGrid<TIn, TOut> {
     public Vector2 Position { get; set; }

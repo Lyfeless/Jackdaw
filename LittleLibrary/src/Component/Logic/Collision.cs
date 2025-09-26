@@ -16,11 +16,6 @@ public class CollisionComponent(LittleGame game, Collider collider) : Component(
     /// </summary>
     public Collider Collider = collider;
 
-    public CollisionResolver? Resolver;
-
-    public readonly List<CollisionInfo> Collisions = [];
-    public bool Collided => Collisions.Count > 0;
-
     protected override void EnterTree() {
         Game.Collision.Add(this);
     }
@@ -28,9 +23,4 @@ public class CollisionComponent(LittleGame game, Collider collider) : Component(
     protected override void ExitTree() {
         Game.Collision.Remove(this);
     }
-}
-
-public struct CollisionResolver() {
-    public float Mass = 100;
-    public float PushoutPercent = 1;
 }

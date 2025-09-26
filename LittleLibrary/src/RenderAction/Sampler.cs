@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A render action that applies a new sampler to all component and child elements.
+/// </summary>
+/// <param name="sampler">The sampler to apply.</param>
 public class RenderActionSampler(TextureSampler sampler) : ActorRenderAction() {
     public TextureSampler Sampler = sampler;
 

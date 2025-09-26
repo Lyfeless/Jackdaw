@@ -5,6 +5,13 @@ namespace LittleLib;
 
 //! FIXME (Alex): Switch to Calc extension with .net 10 comes out of preview
 public static class CalcExtra {
+    /// <summary>
+    /// Calculate the triple product of 3 2D vectors
+    /// </summary>
+    /// <param name="a">The first vector.</param>
+    /// <param name="b">The second vector.</param>
+    /// <param name="c">The third vector.</param>
+    /// <returns></returns>
     public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) {
         Vector3 a3 = new(a.X, a.Y, 0);
         Vector3 b3 = new(b.X, b.Y, 0);
@@ -16,6 +23,12 @@ public static class CalcExtra {
         return new(second.X, second.Y);
     }
 
+    /// <summary>
+    /// Get the middle position between two points.
+    /// </summary>
+    /// <param name="a">The first point of the line.</param>
+    /// <param name="b">The second point of the line.</param>
+    /// <returns>The midpoint of the line from a to b.</returns>
     public static Vector2 LineMidpoint(Vector2 a, Vector2 b) {
         return ((a - b) / 2) + b;
     }
@@ -82,19 +95,41 @@ public static class CalcExtra {
         return true;
     }
 
-    //! FIXME (Alex): These are untested
+    /// <summary>
+    /// Convert a 2D vector's angle without changing its angle.
+    /// </summary>
+    /// <param name="direction">The direction to transform.</param>
+    /// <param name="transform">The transform to apply to the direction.</param>
+    /// <returns>The transformed direction.</returns>
     public static Vector2 TransformDirection(Vector2 direction, Transform transform)
         => TransformDirection(direction, transform.Matrix);
 
+    /// <summary>
+    /// Convert a 2D vector's angle without changing its angle.
+    /// </summary>
+    /// <param name="direction">The direction to transform.</param>
+    /// <param name="transform">The matrix to transform the direction by.</param>
+    /// <returns>The transformed direction.</returns>
     public static Vector2 TransformDirection(Vector2 direction, Matrix3x2 transform) {
         return Vector2.Transform(direction, transform) - transform.Translation;
     }
 
+    /// <summary>
+    /// Get axis aligned bounds for a transformed rectangle.
+    /// </summary>
+    /// <param name="rect">The rectangle to transform.</param>
+    /// <param name="transform">The transform to apply to the rectangle.</param>
+    /// <returns></returns>
     public static Rect TransformRect(Rect rect, Transform transform)
         => TransformRect(rect, transform.Matrix);
 
+    /// <summary>
+    /// Get axis aligned bounds for a transformed rectangle.
+    /// </summary>
+    /// <param name="rect">The rectangle to transform.</param>
+    /// <param name="transform">The matrix to transform the rectangle by.</param>
+    /// <returns></returns>
     public static Rect TransformRect(Rect rect, Matrix3x2 transform) {
-        //! FIXME (Alex): Can this be simplified?
         return new BoundsBuilder(
             Vector2.Transform(rect.TopLeft, transform),
             Vector2.Transform(rect.TopRight, transform),

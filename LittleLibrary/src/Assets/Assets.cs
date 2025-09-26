@@ -9,10 +9,24 @@ namespace LittleLib;
 /// </summary>
 public class Assets {
     #region File/path definitions
+    /// <summary>
+    /// The game's asset-related config data.
+    /// </summary>
     public LittleGameContentConfig Config;
 
+    /// <summary>
+    /// All file extensions the texture loader will search for.
+    /// </summary>
     public readonly string[] TextureExtensions = [".png", ".jpg"];
+
+    /// <summary>
+    /// All file extensions the aseprite loader will search for.
+    /// </summary>
     public readonly string[] AsepriteExtensions = [".aseprite", ".ase"];
+
+    /// <summary>
+    /// All file extensions the font loader will search for.
+    /// </summary>
     public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
 
     string TexturePath;
@@ -32,7 +46,7 @@ public class Assets {
     /// <returns>The requested texture, or the default texture if nothing was found.</returns>
     public Subtexture GetTexture(string name) {
         if (Textures.TryGetValue(name, out Subtexture output)) { return output; }
-        Console.WriteLine($"ASSETS: Failed to find texture {name}, returning default");
+        Log.Warning($"ASSETS: Failed to find texture {name}, returning default");
         return Textures["error"];
     }
     const string TextureFallbackName = "Fallback.texture.png";
@@ -45,7 +59,7 @@ public class Assets {
     /// <returns>The requested font, or the default font if nothing was found.</returns>
     public SpriteFont GetFont(string name) {
         if (Fonts.TryGetValue(name, out SpriteFont? output)) { return output; }
-        Console.WriteLine($"ASSETS: Failed to find font {name}, returning default");
+        Log.Warning($"ASSETS: Failed to find font {name}, returning default");
         return Fonts["error"];
     }
     const string FontFallbackName = "Fallback.font.ttf";
@@ -58,7 +72,7 @@ public class Assets {
     /// <returns>The requested shader, or the default shader if nothing was found.</returns>
     public Shader GetShader(string name) {
         if (Shaders.TryGetValue(name, out Shader? output)) { return output; }
-        Console.WriteLine($"ASSETS: Failed to find shader {name}, returning default");
+        Log.Warning($"ASSETS: Failed to find shader {name}, returning default");
         return Shaders["error"];
     }
 
@@ -70,7 +84,7 @@ public class Assets {
     /// <returns>The requested animation, or the default animation if nothing was found.</returns>
     public AnimationData GetAnimation(string name) {
         if (Animations.TryGetValue(name, out AnimationData? output)) { return output; }
-        Console.WriteLine($"ASSETS: Failed to find animation {name}, returning default");
+        Log.Warning($"ASSETS: Failed to find animation {name}, returning default");
         return Animations["error"];
     }
 

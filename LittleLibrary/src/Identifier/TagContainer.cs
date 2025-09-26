@@ -1,11 +1,18 @@
 namespace LittleLib;
 
 /// <summary>
-/// A structure for storing and modifying multiple individual bit flags. </br>
+/// A structure for storing and modifying multiple individual bit flags. <br/>
 /// Capable of storing up to 64 tags values.
 /// </summary>
 public struct TagContainer() {
+    /// <summary>
+    /// All tags stored in the container.
+    /// </summary>
     public long Tags;
+
+    /// <summary>
+    /// If the container has no tags set.
+    /// </summary>
     public readonly bool Empty => Tags == 0;
 
     /// <summary>

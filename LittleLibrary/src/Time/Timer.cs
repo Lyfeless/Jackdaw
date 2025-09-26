@@ -8,6 +8,9 @@ public class Timer {
 
     readonly string TimeTracker;
 
+    /// <summary>
+    /// The length of the timer in milliseconds.
+    /// </summary>
     public readonly float Duration;
 
     double StartTime;
@@ -20,12 +23,12 @@ public class Timer {
     /// <summary>
     /// An updateless timer with a duration.
     /// </summary>
-    /// <param name="game"></param>
-    /// <param name="duration"></param>
-    /// <param name="timeTracker"></param>
-    /// <param name="startFinished"></param>
-    /// <param name="startTime"></param>
-    /// <param name="looping"></param>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="duration">The length of the timer in milliseconds.</param>
+    /// <param name="timeTracker">The tracker name to time should use. Leave empty to use real time.</param>
+    /// <param name="startFinished">If the timer should be already completed when created.</param>
+    /// <param name="startTime">The time offset from the timer's start to begin at in milliseconds.</param>
+    /// <param name="looping">If the timer should loop when done.</param>
     public Timer(LittleGame game, float duration, string? timeTracker = null, bool startFinished = false, float startTime = 0, bool looping = false) {
         Game = game;
         TimeTracker = timeTracker ?? string.Empty;

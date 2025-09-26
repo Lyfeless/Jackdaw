@@ -68,37 +68,37 @@ public abstract class Component {
     protected virtual void Render(Batcher batcher) { }
 
     /// <summary>
-    /// Runs the first time the component is added to an actor. Will not run if removed and re-added. </br>
+    /// Runs the first time the component is added to an actor. Will not run if removed and re-added. <br/>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree yet.
     /// </summary>
     protected virtual void AddedFirst() { }
 
     /// <summary>
-    /// Runs any time the component is added to an actor. </br>
+    /// Runs any time the component is added to an actor. <br/>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree yet.
     /// </summary>
     protected virtual void Added() { }
 
     /// <summary>
-    /// Runs any time the component is removed to an actor. </br>
+    /// Runs any time the component is removed to an actor. <br/>
     /// All actions in this function can assume a valid owning actor, but can't guarantee the actor is part of the node tree.
     /// </summary>
     protected virtual void Removed() { }
 
     /// <summary>
-    /// Runs the first time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. </br>
+    /// Runs the first time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. <br/>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
     protected virtual void EnterTreeFirst() { }
 
     /// <summary>
-    /// Runs any time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. </br>
+    /// Runs any time the component becomes part of the node tree, either by adding the owner to the tree or being added to an actor already in the tree. <br/>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
     protected virtual void EnterTree() { }
 
     /// <summary>
-    /// Runs any time the component exits the node tree, either by removing its owning actor from the tree or being removed from its owner. </br>
+    /// Runs any time the component exits the node tree, either by removing its owning actor from the tree or being removed from its owner. <br/>
     /// All actions in this function can assume a valid owning actor within the node tree.
     /// </summary>
     protected virtual void ExitTree() { }
@@ -124,6 +124,8 @@ public abstract class Component {
         if (ActorValid) {
             Actor.Components.Remove(this);
         }
+
+        IsValid = false;
     }
 
     internal void OnAdded() {
@@ -143,6 +145,8 @@ public abstract class Component {
         EnterTree();
     }
 
-    //! FIXME (Alex): DOC COMMENT
+    /// <summary>
+    /// Mark the component for cleanup at the end of the tick.
+    /// </summary>
     public void QueueInvalidate() => Game.QueueInvalidate(this);
 }

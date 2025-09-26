@@ -1,8 +1,12 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A render action that clips all child and component elements outside of a specified bound.
+/// </summary>
+/// <param name="device">The game window's graphics device.</param>
+/// <param name="bounds">The bounds to clip all rendering into, relative to actor position.</param>
 public class RenderActionClipRect(GraphicsDevice device, BoundsComponent bounds) : ActorRenderAction() {
     GraphicsDevice Device = device;
     BoundsComponent Bounds = bounds;

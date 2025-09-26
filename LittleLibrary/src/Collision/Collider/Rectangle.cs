@@ -8,9 +8,22 @@ namespace LittleLib;
 /// </summary>
 /// <param name="rect"></param>
 public class RectangleCollider(Rect rect) : Collider {
+    /// <summary>
+    /// The collider rectangle.
+    /// </summary>
     public Rect Rect = rect;
 
+    /// <summary>
+    /// Create a new rectangle collider.
+    /// </summary>
+    /// <param name="size">The size of the rectangle.</param>
     public RectangleCollider(Vector2 size) : this(new Rect(Vector2.Zero, size)) { }
+
+    /// <summary>
+    /// Create a new rectangle collider.
+    /// </summary>
+    /// <param name="size">The position of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
     public RectangleCollider(Vector2 position, Vector2 size) : this(new Rect(position, size)) { }
 
     public override Rect Bounds => Rect;

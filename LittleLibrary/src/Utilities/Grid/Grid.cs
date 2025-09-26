@@ -8,9 +8,12 @@ namespace LittleLib;
 /// <typeparam name="T">The type of tile to store in the grid.</typeparam>
 /// <param name="gridSize">The grid dimensions.</param>
 public class Grid<T>(Point2 gridSize) {
-    public readonly Point2 Size = gridSize;
-    //! FIXME (Alex): possibly store as a 1 dimensional array? Is there any difference?
     readonly T?[,] Tiles = new T?[gridSize.X, gridSize.Y];
+
+    /// <summary>
+    /// The tile count of the grid.
+    /// </summary>
+    public readonly Point2 Size = gridSize;
 
     public Grid(int width, int height) : this(new(width, height)) { }
 

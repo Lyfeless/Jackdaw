@@ -1,3 +1,5 @@
+using Foster.Framework;
+
 namespace LittleLib;
 
 /// <summary>
@@ -9,7 +11,7 @@ public class ActorContainer(Actor actor) : RecursiveSearchableChildContainer<Act
 
     public override bool CanAdd(Actor child) {
         if (!Owner.IsValid) {
-            Console.WriteLine($"ActorContainer: Cannot add object {child}, Actor is invalid");
+            Log.Warning($"ActorContainer: Cannot add object {child}, Actor is invalid");
             return false;
         }
 

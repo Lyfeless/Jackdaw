@@ -145,8 +145,8 @@ public class Actor {
     }
 
     /// <summary>
-    /// Update all components and children. </br>
-    /// Updates all children first, then updates all components. </br>
+    /// Update all components and children. <br/>
+    /// Updates all children first, then updates all components. <br/>
     /// Both are updated in the order they're stored in their container, from first to last.
     /// </summary>
     internal void Update() {
@@ -163,11 +163,9 @@ public class Actor {
         }
     }
 
-    //! FIXME (Alex): batcher maybe doesnt need to be passed? They already have access to game
-    //      Actually, actor should store current batcher and other batcher effects to allow for components to control rendering of others
     /// <summary>
-    /// Render all components and children. </br>
-    /// Renders all components first, then renders all children. </br>
+    /// Render all components and children. <br/>
+    /// Renders all components first, then renders all children. <br/>
     /// Both are rendered in the order they're stored in their container, from first to last.
     /// </summary>
     internal void Render(Batcher batcher) {
@@ -178,8 +176,6 @@ public class Actor {
         Position.CacheDisplay();
 
         batcher.PushMatrix(Position.LocalMatrix);
-
-        //! FIXME (Alex): Calculate display matrix and store on the actor transform
 
         RenderActions.PreRender(batcher);
         Batcher currentBatcher = RenderActions.CurrentBatcher;
@@ -236,9 +232,15 @@ public class Actor {
         }
     }
 
-    public void QueueInvalidate(bool invalidateChildren = true) {
+    /// <summary>
+    /// Mark the actor for cleanup at the end of the tick.
+    /// Invalidated actors are removed from scene trees and removed all attached children and components.
+    /// </summary>
+    /// <param name="invalidateChildren">If all the actor's children should be recursively invalidated as well.</param>
+    /// <param name="invalidateComponents">If all the actor's components should be invalidated as well.</param>
+    public void QueueInvalidate(bool invalidateChildren = true, bool invalidateComponents = true) {
         if (!IsValid) { return; }
-        Game.QueueInvalidate(this, invalidateChildren);
+        Game.QueueInvalidate(this, invalidateChildren, invalidateComponents);
     }
 
     internal void Invalidate(bool invalidateChildren = true, bool invalidateComponents = true) {
@@ -254,6 +256,8 @@ public class Actor {
             }
         }
 
+        IsValid = false;
+
         Children.Clear();
         Components.Clear();
 
@@ -266,8 +270,6 @@ public class Actor {
         foreach (Actor child in Children.Elements) {
             child.Invalidate(false, invalidateComponents);
         }
-
-        IsValid = false;
     }
 
     bool ParentMatches(Actor check) {

@@ -1,5 +1,11 @@
+using Foster.Framework;
+
 namespace LittleLib;
 
+/// <summary>
+/// Basic first iteration of save format.
+/// </summary>
+/// <param name="savePath">The file path to read the data from.</param>
 public class SaveDataV1(string savePath) : SaveData(savePath) {
     /*
         Layout:
@@ -29,7 +35,7 @@ public class SaveDataV1(string savePath) : SaveData(savePath) {
     public override void Load() {
         BinaryReader? reader = CreateReader(SavePath);
         if (reader == null) {
-            Console.WriteLine($"SaveData: Failed to read Save Data at path: {SavePath}");
+            Log.Warning($"SaveData: Failed to read Save Data at path: {SavePath}");
             return;
         }
         Load(reader);

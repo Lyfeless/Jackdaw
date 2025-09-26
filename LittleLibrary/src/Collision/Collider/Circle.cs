@@ -9,6 +9,10 @@ namespace LittleLib;
 /// <param name="circle">The collision circle.</param>
 public class CircleCollider(Circle circle) : Collider {
     Circle circle = circle;
+
+    /// <summary>
+    /// The collider circle.
+    /// </summary>
     public Circle Circle {
         get => circle;
         set {

@@ -10,7 +10,6 @@ namespace LittleLib;
 /// <param name="startFinished">If the timer should start finished.</param>
 /// <param name="startTime">The time offset the timer should begin with.</param>
 public class TimerComponent(LittleGame game, float duration, Action callback, string? timeTracker = null, bool startFinished = false, float startTime = 0) : Component(game) {
-    //! FIXME (Alex): Should maybe clean up the timer constructor to take in less info by default?
     readonly Timer Timer = new(game, duration, timeTracker, startFinished, startTime);
     readonly Action Callback = callback;
 

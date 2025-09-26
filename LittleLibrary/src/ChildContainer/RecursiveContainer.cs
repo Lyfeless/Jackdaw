@@ -7,8 +7,6 @@ namespace LittleLib;
 /// <typeparam name="Towner">The type of owner.</typeparam>
 /// <param name="owner">The owning object.</param>
 public abstract class RecursiveSearchableChildContainer<Telement, Towner>(Towner owner) : SearchableChildContainer<Telement, Towner>(owner) where Telement : class {
-    //! FIXME (Alex): recursion functions probably aren't very useable outside of the current use case, is that a problem?
-
     #region Overridable Functions
     /// <summary>
     /// Get the number of child elements that need to be recursed in a search.

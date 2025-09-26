@@ -11,6 +11,11 @@ public class OffsetCollider : Collider {
     readonly Collider Collider;
     readonly Vector2 Offset;
 
+    /// <summary>
+    /// Create an offset collider from an existing collider.
+    /// </summary>
+    /// <param name="collider">The collider to offset.</param>
+    /// <param name="offset">The offset amount.</param>
     public OffsetCollider(Collider collider, Vector2 offset) {
         Collider = collider;
         Offset = offset;

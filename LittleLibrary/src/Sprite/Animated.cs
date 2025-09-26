@@ -40,9 +40,8 @@ public class SpriteAnimated(LittleGame game, AnimationData animation) : Sprite {
 
     public override void Render(Batcher batcher) {
         AnimationFrame frame = Frame;
-        //! FIXME (Alex): Surely there's a more elegant way to do this
-        bool flipX = frame.FlipX ? !FlipX : FlipX;
-        bool flipY = frame.FlipY ? !FlipY : FlipY;
+        bool flipX = frame.FlipX != FlipX;
+        bool flipY = frame.FlipY != FlipY;
         batcher.Image(frame.Texture, Animation.PositionOffset + frame.PositionOffset + Offset + (bounds.Size / 2), bounds.Center - Animation.PositionOffset - frame.PositionOffset, FlipScale(flipX, flipY), 0, Color);
     }
 }

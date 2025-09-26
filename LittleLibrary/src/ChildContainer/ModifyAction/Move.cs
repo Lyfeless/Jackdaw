@@ -1,3 +1,5 @@
+using Foster.Framework;
+
 namespace LittleLib;
 
 internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child, int amount) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
@@ -6,7 +8,7 @@ internal class ChildContainerModifyActionMove<Telement, Towner>(ChildContainer<T
 
     public override void Execute() {
         if (!Container.Elements.Contains(Child)) {
-            Console.WriteLine($"ChildContainer: Object {Child} is not child, can't move");
+            Log.Warning($"ChildContainer: Object {Child} is not child, can't move");
             return;
         }
 

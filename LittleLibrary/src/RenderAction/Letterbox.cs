@@ -3,9 +3,22 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// A render action that scales a view into a bound while maintaining an aspect ratio.
+/// </summary>
+/// <param name="device">The game window's graphics device.</param>
+/// <param name="fillBounds">The bounds that the letterboxed viewport should fill, relative to the actor position.</param>
+/// <param name="viewportSize">The size of the viewport to be scaled.</param>
+/// <param name="backgroundColor">The background color of the viewport contents.</param>
 public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBounds, Point2 viewportSize, Color backgroundColor) : ActorRenderAction() {
+    /// <summary>
+    /// The bounds that the letterboxed viewport should fill, relative to the actor position.
+    /// </summary>
     public BoundsComponent Bounds = fillBounds;
 
+    /// <summary>
+    /// The size of the viewport to be scaled.
+    /// </summary>
     public readonly Point2 Size = new(viewportSize.X, viewportSize.Y);
 
     readonly Target Target = new(device, viewportSize.X, viewportSize.Y);

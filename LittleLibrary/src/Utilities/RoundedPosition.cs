@@ -8,13 +8,19 @@ namespace LittleLib;
 /// to avoid any floating point imprecision when rendering.
 /// </summary>
 public struct RoundedPosition {
+    /// <summary>
+    /// The exact position.
+    /// </summary>
     public Vector2 Precise { get; private set; }
+
+    /// <summary>
+    /// The position, rounded to the nearest int value.
+    /// </summary>
     public Point2 Rounded { get; private set; }
 
     public RoundedPosition(Vector2 position) {
         Set(position);
     }
-
     public RoundedPosition() : this(Vector2.Zero) { }
     public RoundedPosition(float x, float y) : this(new Vector2(x, y)) { }
     public RoundedPosition(int x, int y) : this(new(x, y)) { }

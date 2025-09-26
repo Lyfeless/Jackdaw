@@ -4,9 +4,13 @@ namespace LittleLib;
 /// A small claimer utility to track if an object is already being used by a different component.
 /// </summary>
 public class ComponentClaimer() {
-    public bool Claimed => tickClaim != null || storeClaim != null;
     Component? tickClaim = null;
     Component? storeClaim = null;
+
+    /// <summary>
+    /// If the component is claimed by any component in any form.
+    /// </summary>
+    public bool Claimed => tickClaim != null || storeClaim != null;
 
     /// <summary>
     /// Check if a component is holding the claim.

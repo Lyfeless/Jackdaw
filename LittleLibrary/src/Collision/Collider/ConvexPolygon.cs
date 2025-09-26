@@ -7,7 +7,10 @@ namespace LittleLib;
 /// </summary>
 /// <param name="polygon">The polygon shape.</param>
 public class ConvexPolygonCollider(ConvexPolygon polygon) : ConvexCollider(polygon) {
-    //! FIXME (Alex): Should this just be a child type of TriangleCollider? Might be wiser in the long run
+    /// <summary>
+    /// Create a new convex collider from a triangle.
+    /// </summary>
+    /// <param name="triangle">The triangle collider.</param>
     public ConvexPolygonCollider(Triangle triangle) : this(new ConvexPolygon() {
         //! FIXME (Alex): Hacky way to convert a triangle to a polygon, consider cleaning up
         Vertices = [

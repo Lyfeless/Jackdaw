@@ -6,11 +6,26 @@ namespace LittleLib;
 /// Sprite-based animation data
 /// </summary>
 public class AnimationData {
+    /// <summary>
+    /// Individual frame data.
+    /// </summary>
     public readonly AnimationFrame[] Frames = [];
+
+    /// <summary>
+    /// The length of the full animation, in milliseconds.
+    /// </summary>
     public readonly float Duration;
+
+    /// <summary>
+    /// If the animation should loop once it completes.
+    /// </summary>
     public readonly bool Looping;
     //! FIXME (Alex): Should start delay be here, or only in the actual component?
     public readonly float StartDelay;
+
+    /// <summary>
+    /// The amount all frames should be offset from the origin position.
+    /// </summary>
     public readonly Point2 PositionOffset;
 
     /// <summary>

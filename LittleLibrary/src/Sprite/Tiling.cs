@@ -2,8 +2,8 @@ using Foster.Framework;
 
 namespace LittleLib;
 
-//! FIXME (Alex): Maybe better to have the option be PadFromOrigin instead, just makes the math a bit more annoying I think
 //! FIXME (Alex): Doc comments
+//! FIXME (Alex): These should have behavior to stretch as well as tile?
 
 public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite {
     readonly Subtexture Texture = texture;

@@ -3,7 +3,6 @@ using Foster.Framework;
 namespace LittleLib;
 
 //! FIXME (Alex): Load bindings from savedata?
-//! FIXME (Alex): Maybe this shouldn't throw excpetions?
 
 /// <summary>
 /// Storage for input bindings.

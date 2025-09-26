@@ -3,9 +3,14 @@ using Foster.Framework;
 
 namespace LittleLib;
 
+/// <summary>
+/// Information about a single position along a path.
+/// </summary>
+/// <param name="Position">The position offset from the path origin.</param>
+/// <param name="Segment">The segment of the path the point falls on.</param>
+/// <param name="SegmentPercent">The point's percent distance along the segment.</param>
 public record struct MultiSegmentPathPosition(Vector2 Position, IPathSegment Segment, float SegmentPercent);
 
-//! FIXME (Alex): Deadful name, but calling it just path is also bad
 /// <summary>
 /// A utility for creating and navigating static paths made of multiple segments.
 /// </summary>
@@ -19,7 +24,7 @@ public readonly struct MultiSegmentPath {
         Start = start;
         Segments = segments;
 
-        End = Vector2.Zero;
+        EndRelative = Vector2.Zero;
 
         Length = 0;
 
@@ -29,18 +34,49 @@ public readonly struct MultiSegmentPath {
         SegmentLengths = new float[segments.Length];
 
         for (int i = 0; i < segments.Length; ++i) {
-            End += segments[i].EndOffset;
+            EndRelative += segments[i].EndOffset;
             SegmentLengths[i] = segments[i].Length;
             Length += SegmentLengths[i];
             AbsolutePositions[i + 1] = AbsolutePositions[i] + segments[i].EndOffset;
         }
+
+        End = start + EndRelative;
     }
 
+    /// <summary>
+    /// The start position of the path.
+    /// </summary>
     public readonly Vector2 Start;
+
+    /// <summary>
+    /// The end position of the path.
+    /// </summary>
     public readonly Vector2 End;
+
+    /// <summary>
+    /// The end position of the path, relative to the start.
+    /// </summary>
+    public readonly Vector2 EndRelative;
+
+    /// <summary>
+    /// The segments of the full path.
+    /// The start position of each segment is relative to the end of the last.
+    /// </summary>
     public readonly IPathSegment[] Segments;
+
+    /// <summary>
+    /// The positions of each segment start, relative to the start of the path.
+    /// </summary>
     public readonly Vector2[] AbsolutePositions;
+
+    /// <summary>
+    /// The length of each segment of the path.
+    /// </summary>
     public readonly float[] SegmentLengths;
+
+    /// <summary>
+    /// The total length of the entire path.
+    /// </summary>
     public readonly float Length;
 
     /// <summary>
@@ -70,6 +106,11 @@ public readonly struct MultiSegmentPath {
         return new(End, Segments[^1], 1);
     }
 
+    /// <summary>
+    /// Convert an array of point to offsets from the previous point in the array.
+    /// </summary>
+    /// <param name="points">The points to convert.</param>
+    /// <returns>The points converted to relative.</returns>
     public static Vector2[] AbsoluteToRelative(Vector2[] points) {
         if (points.Length > 1) {
             for (int i = points.Length - 1; i >= 1; --i) {
@@ -129,7 +170,7 @@ public readonly struct PathSegmentLinear(Vector2 offset) : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 2) {
-            Console.WriteLine("PATH: Not enough points provided to make a path of segments");
+            Log.Warning("PATH: Not enough points provided to make a path of segments");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
@@ -174,13 +215,13 @@ public readonly struct PathSegmentQuadraticBezier : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 3) {
-            Console.WriteLine("PATH: Not enough points provided to make a path of quadratic beziers");
+            Log.Warning("PATH: Not enough points provided to make a path of quadratic beziers");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
         int length = points.Length;
         if (length % 2 != 1) {
-            Console.WriteLine($"PATH: Point count must be odd to properly make a quadratic bezier path, ignoring the last point");
+            Log.Warning($"PATH: Point count must be odd to properly make a quadratic bezier path, ignoring the last point");
             length--;
         }
 
@@ -247,14 +288,14 @@ public readonly struct PathSegmentCubicBezier : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 4) {
-            Console.WriteLine("PATH: Not enough points provided to make a path of cubic beziers");
+            Log.Warning("PATH: Not enough points provided to make a path of cubic beziers");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
         int length = points.Length;
         if (length % 3 != 1) {
             int pointReduction = length - ((length - 1) / 3 * 3) + 1;
-            Console.WriteLine($"PATH: Point count must be 3n + 1 to properly make a cubic bezier path, ignoring the last {pointReduction} points");
+            Log.Warning($"PATH: Point count must be 3n + 1 to properly make a cubic bezier path, ignoring the last {pointReduction} points");
             length -= pointReduction;
         }
 

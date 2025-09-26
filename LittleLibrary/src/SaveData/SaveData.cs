@@ -1,8 +1,11 @@
+using Foster.Framework;
+
 namespace LittleLib;
 
 /// <summary>
 /// Simple system for storing key/value pairs as save data. Automatically handles saving and loading into a userpath folder.
 /// </summary>
+/// <param name="path">The file path to read the data from.</param>
 public abstract class SaveData(string path) {
     protected string SavePath = path;
     protected readonly Dictionary<string, string> Strings = [];
@@ -91,7 +94,7 @@ public abstract class SaveData(string path) {
     public string[] BoolKeys() => [.. Bools.Keys];
 
     /// <summary>
-    /// Load savedata from the the assigned location. </br>
+    /// Load savedata from the the assigned location. <br/>
     /// It's not recommended to use this function directly,
     /// use <see cref="LoadByVersion"> to get a loader with the correct version for the save data.
     /// </summary>
@@ -110,7 +113,7 @@ public abstract class SaveData(string path) {
     public static SaveData? LoadByVersion(string savePath) {
         BinaryReader? reader = CreateReader(savePath);
         if (reader == null) {
-            Console.WriteLine($"SaveData: Failed to read Save Data at path: {savePath}");
+            Log.Warning($"SaveData: Failed to read Save Data at path: {savePath}");
             return null;
         }
         int version = reader.ReadInt32();

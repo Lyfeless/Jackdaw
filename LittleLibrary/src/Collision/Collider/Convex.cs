@@ -9,6 +9,10 @@ namespace LittleLib;
 /// <param name="shape">The collider's shape.</param>
 public abstract class ConvexCollider(IConvexShape shape) : Collider {
     IConvexShape shape = shape;
+
+    /// <summary>
+    /// The collider shape.
+    /// </summary>
     public IConvexShape Shape {
         get => shape;
         set {

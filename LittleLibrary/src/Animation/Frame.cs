@@ -6,11 +6,35 @@ namespace LittleLib;
 /// A single frame of a sprite animation.
 /// </summary>
 public readonly struct AnimationFrame {
+    /// <summary>
+    /// The texture the frame should display.
+    /// </summary>
     public readonly Subtexture Texture;
+
+    /// <summary>
+    /// The length of the frame, in milliseconds.
+    /// </summary>
     public readonly float Duration = 1;
+
+    /// <summary>
+    /// The amount the frame should be offset from the origin position.
+    /// Stacks with full animation position offset.
+    /// </summary>
     public readonly Point2 PositionOffset = Point2.Zero;
+
+    /// <summary>
+    /// If the frame should be flipped horizontally.
+    /// </summary>
     public readonly bool FlipX = false;
+
+    /// <summary>
+    /// If the frame should be flipped vertically.
+    /// </summary>
     public readonly bool FlipY = false;
+
+    /// <summary>
+    /// Additional custom data attached to the frame.
+    /// </summary>
     public readonly string EmbeddedData = string.Empty;
 
     /// <summary>
