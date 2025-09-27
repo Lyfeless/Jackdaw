@@ -21,8 +21,6 @@ public class AudioManager(Game game, string directory = "") : Component(game) {
 
         string path = Path.Join(Game.Assets.Config.RootFolder, BankPath);
         if (Path.Exists(path)) {
-            Console.WriteLine("Load FMOD Data");
-
             foreach (string file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(STRINGS_EXTENSION))) {
                 LoadBank(file);
             }
@@ -34,22 +32,18 @@ public class AudioManager(Game game, string directory = "") : Component(game) {
     }
 
     void LoadBank(string bank) {
-        Console.WriteLine($"Load bank {bank}");
-
         FMODInstance.loadBankFile(bank, LOAD_BANK_FLAGS.NORMAL, out Bank bankData);
         banks.Add(bankData);
 
         bankData.getEventList(out EventDescription[] bankEvents);
         foreach (EventDescription bankEvent in bankEvents) {
             bankEvent.getPath(out string eventPath);
-            Console.WriteLine($"Event {eventPath}");
             events.Add(eventPath, bankEvent);
         }
 
         bankData.getBusList(out Bus[] bankBuses);
         foreach (Bus bankBus in bankBuses) {
             bankBus.getPath(out string busPath);
-            Console.WriteLine($"Bus {busPath}");
             buses.Add(busPath, bankBus);
         }
     }
@@ -125,7 +119,7 @@ public class AudioManager(Game game, string directory = "") : Component(game) {
 
     public SoundEvent Get(string eventName) {
         if (!events.TryGetValue(eventName, out EventDescription desc)) {
-            Console.WriteLine($"FMOD: No event found with name {eventName}");
+            Log.Warning($"FMOD: No event found with name {eventName}");
             return new(new());
         }
 

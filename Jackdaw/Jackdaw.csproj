@@ -15,6 +15,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Fallback/font.ttf" />
     <EmbeddedResource Include="Fallback/texture.png" />
+    <EmbeddedResource Include="Fallback/man.png" />
   </ItemGroup>
 
 </Project>

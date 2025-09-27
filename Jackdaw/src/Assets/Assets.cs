@@ -50,6 +50,7 @@ public class Assets {
         return Textures["error"];
     }
     const string TextureFallbackName = "Fallback.texture.png";
+    const string ManFallbackName = "Fallback.man.png";
 
     readonly Dictionary<string, SpriteFont> Fonts = [];
     /// <summary>
@@ -118,8 +119,8 @@ public class Assets {
             };
 
             // Load fallback texture
-            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{TextureFallbackName}")!;
-            packer.Add("error", new Image(stream));
+            packer.Add("error", FallbackTexture(assembly, assemblyName!, TextureFallbackName));
+            packer.Add("fallback-man", FallbackTexture(assembly, assemblyName!, ManFallbackName));
 
             // Load all textures in asset directory
             if (Directory.Exists(TexturePath)) {
@@ -353,5 +354,10 @@ public class Assets {
 
     static string GetFrameName(string name, int frame) {
         return $"{name}{frame}";
+    }
+
+    static Image FallbackTexture(Assembly assembly, string assemblyName, string name) {
+        using Stream streamError = assembly.GetManifestResourceStream($"{assemblyName}.{name}")!;
+        return new Image(streamError);
     }
 }
