@@ -1,10 +1,10 @@
 using System.Numerics;
 using Foster.Framework;
 
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 public class LDTKTileset {
-    readonly LittleGame Game;
+    readonly Game Game;
 
     public readonly string Identifier;
     public readonly Subtexture Atlas;
@@ -21,7 +21,7 @@ public class LDTKTileset {
     public Point2 GetTileCoord(int id) => new(id % tileElements.Size.X, id / tileElements.Size.X);
 
     public LDTKTileset(
-        LittleGame game,
+        Game game,
         string identifier,
         Subtexture atlas,
         Point2 tileCount,
@@ -59,7 +59,7 @@ public class LDTKTileset {
             foreach (string line in lines) {
                 int index = line.IndexOf(':');
                 if (index == -1) {
-                    Console.WriteLine($"LDTK Tileset: Failed to load custom data {line} for tile {entry.ID}, missing identifier");
+                    Log.Warning($"LDTK Tileset: Failed to load custom data {line} for tile {entry.ID}, missing identifier");
                     continue;
                 }
                 string dataID = line[..index];

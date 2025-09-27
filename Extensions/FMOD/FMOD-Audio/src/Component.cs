@@ -1,6 +1,6 @@
-namespace LittleLib.Audio.FMODAudio;
+namespace Jackdaw.Audio.FMODAudio;
 
-public class SoundPlayerComponent(LittleGame game, SoundEvent soundEvent, bool autoplay = false) : Component(game) {
+public class SoundPlayerComponent(Game game, SoundEvent soundEvent, bool autoplay = false) : Component(game) {
     readonly SoundEvent Sound = soundEvent;
     public bool Autoplay = autoplay;
 

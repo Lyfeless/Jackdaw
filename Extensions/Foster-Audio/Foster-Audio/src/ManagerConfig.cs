@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LittleLib.Audio.FosterAudio;
+namespace Jackdaw.Audio.FosterAudio;
 
 public struct AudioConfig() {
     [JsonPropertyName("buses")]

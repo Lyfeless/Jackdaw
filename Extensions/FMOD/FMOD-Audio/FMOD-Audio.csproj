@@ -9,6 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\LittleLibrary\LittleLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Jackdaw\Jackdaw.csproj" />
   </ItemGroup>
 </Project>

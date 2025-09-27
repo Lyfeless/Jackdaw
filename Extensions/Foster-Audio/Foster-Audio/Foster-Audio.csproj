@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\LittleLibrary\LittleLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Jackdaw\Jackdaw.csproj" />
     <ProjectReference Include="..\Foster.Audio\Foster.Audio\Foster.Audio.csproj" />
   </ItemGroup>
 

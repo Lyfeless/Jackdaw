@@ -1,6 +1,6 @@
 using Foster.Audio;
 
-namespace LittleLib.Audio.FosterAudio;
+namespace Jackdaw.Audio.FosterAudio;
 
 public class SoundPoolPlayerComponent(AudioManager manager, Sound[] sounds, string? bus = null) : SoundPlayerComponent(manager, manager.GetSound("error"), bus) {
     public Sound[] Sounds = sounds;

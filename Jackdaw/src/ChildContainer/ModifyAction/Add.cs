@@ -1,0 +1,16 @@
+using Foster.Framework;
+
+namespace Jackdaw;
+
+internal class ChildContainerModifyActionAdd<Telement, Towner>(ChildContainer<Telement, Towner> container, Telement child) : ChildContainerModifyAction<Telement, Towner>(container) where Telement : class {
+    public readonly Telement Child = child;
+
+    public override void Execute() {
+        if (!Container.CanAdd(Child) || Container.Elements.Contains(Child)) {
+            Log.Warning($"ChildContainer: Failed to add child {Container.Printable(Child)}");
+            return;
+        }
+        Container.Elements.Add(Child);
+        Container.HandleAdd(Child);
+    }
+}

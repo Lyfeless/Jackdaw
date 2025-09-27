@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LittleLib;
+namespace Jackdaw.Audio.FosterAudio;
 
 [JsonSourceGenerationOptions(
     AllowTrailingCommas = true,

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 [JsonSourceGenerationOptions(
     AllowTrailingCommas = true,

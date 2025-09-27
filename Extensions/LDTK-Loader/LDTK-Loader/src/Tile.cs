@@ -1,4 +1,4 @@
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 /// <summary>
 /// An instance of a single tile loaded from an LDTK level.

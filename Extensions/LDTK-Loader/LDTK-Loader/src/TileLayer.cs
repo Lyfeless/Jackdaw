@@ -1,7 +1,7 @@
 using System.Numerics;
 using Foster.Framework;
 
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 /// <summary>
 /// Loaded instance of an LDTK tile grid layer.
@@ -44,7 +44,7 @@ public class LDTKTileLayer : Component, ISpatialGrid<Point2, LDTKTile> {
     /// </summary>
     public Vector2 Size => Tiles.Size * tileSize;
 
-    public LDTKTileLayer(LittleGame game, LDTKTileset tileset, Point2 gridSize, int tileSize, Vector2 position) : base(game) {
+    public LDTKTileLayer(Game game, LDTKTileset tileset, Point2 gridSize, int tileSize, Vector2 position) : base(game) {
         this.tileSize = new(tileSize);
         Tiles = new(gridSize);
         Tileset = tileset;

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Foster.Audio;
 
-namespace LittleLib;
+namespace Jackdaw.Audio.FosterAudio;
 
 internal class SoundConfig {
     public const SoundLoadingMethod DefaultLoadingMethod = SoundLoadingMethod.Preload;

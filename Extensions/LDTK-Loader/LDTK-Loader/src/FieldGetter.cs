@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Foster.Framework;
 
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 /// <summary>
 /// Utility class for getting custom values out of level savedata.
@@ -275,7 +275,7 @@ public static class LDTKFieldGetter {
             if (field.NameID == id && field.Value != null) { return (JsonElement)field.Value; }
         }
 
-        Console.WriteLine($"LDTKField: Failed to find id {id}");
+        Log.Warning($"LDTKField: Failed to find id {id}");
         return default;
     }
 

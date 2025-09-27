@@ -2,9 +2,9 @@ using System.Reflection;
 using System.Text.Json;
 using Foster.Audio;
 
-namespace LittleLib.Audio.FosterAudio;
+namespace Jackdaw.Audio.FosterAudio;
 
-public class AudioManager(LittleGame game, AudioConfig config) : Component(game) {
+public class AudioManager(Game game, AudioConfig config) : Component(game) {
     AudioConfig Config = config;
 
     readonly Dictionary<string, SoundGroup> Buses = [];

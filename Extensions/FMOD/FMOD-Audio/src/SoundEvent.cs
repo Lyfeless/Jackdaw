@@ -1,6 +1,6 @@
 using FMOD.Studio;
 
-namespace LittleLib.Audio.FMODAudio;
+namespace Jackdaw.Audio.FMODAudio;
 
 public class SoundEvent(EventDescription description) {
     readonly EventDescription Description = description;

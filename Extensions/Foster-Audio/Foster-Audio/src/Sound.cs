@@ -1,7 +1,7 @@
 using System.Numerics;
 using Foster.Audio;
 
-namespace LittleLib.Audio.FosterAudio;
+namespace Jackdaw.Audio.FosterAudio;
 
 public class SoundPlayerComponent(AudioManager manager, Sound sound, string? bus = null) : Component(manager.Game) {
     protected readonly AudioManager Manager = manager;

@@ -1,6 +1,6 @@
 using Foster.Audio;
 
-namespace LittleLib.Audio.FosterAudio;
+namespace Jackdaw.Audio.FosterAudio;
 
 public class RandomPitchSoundPlayerComponent(AudioManager manager, Sound sound, float pitchRange, string? bus = null) : SoundPlayerComponent(manager, sound, bus) {
     public float PitchRange = pitchRange;

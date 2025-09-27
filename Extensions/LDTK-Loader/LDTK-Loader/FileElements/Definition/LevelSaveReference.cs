@@ -1,1 +1,0 @@
-namespace LittleLib.Loader.LDTK;

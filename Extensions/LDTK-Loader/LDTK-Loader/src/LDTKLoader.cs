@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Foster.Framework;
 
-namespace LittleLib.Loader.LDTK;
+namespace Jackdaw.Loader.LDTK;
 
 /// <summary>
 /// Imports files created by the LDTK level editor, automatically converting them to usable actor node structures. </br>
@@ -16,7 +16,7 @@ public class LDTKLoader {
 
     record class LayerTileStack(List<TileSaveData> Tiles);
 
-    readonly LittleGame Game;
+    readonly Game Game;
     readonly string LevelFolderPath;
 
     readonly Dictionary<int, LDTKTileset> Tilesets = [];
@@ -38,7 +38,7 @@ public class LDTKLoader {
     /// <param name="game">The current game instance.</param>
     /// <param name="path">The relative path to the root .ldtk file.</param>
     /// <param name="collisionTagFunc">A callback function to convert LDTK enum strings into collision tags for tile info.</param>
-    public LDTKLoader(LittleGame game, string path, Func<string, int?> collisionTagFunc) {
+    public LDTKLoader(Game game, string path, Func<string, int?> collisionTagFunc) {
         Game = game;
         LevelFolderPath = Path.Join(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
 
@@ -78,7 +78,7 @@ public class LDTKLoader {
     /// <returns>Level instance.</returns>
     public Actor? Load(string name) {
         if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) {
-            Console.WriteLine($"LDTKLoader: Level name {name} not found, load unsuccessful");
+            Log.Warning($"LDTKLoader: Level name {name} not found, load unsuccessful");
             return null;
         }
 
@@ -86,13 +86,13 @@ public class LDTKLoader {
         try {
             levelData = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(LevelFolderPath, $"{levelRef.NameID}.ldtkl")), LDTKSourceGenerationContext.Default.LevelSaveData);
         } catch {
-            Console.WriteLine($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
+            Log.Warning($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
             return null;
         }
 
         if (levelData == null) {
             //! FIXME (Alex): Don't like the duplicate error message here
-            Console.WriteLine($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
+            Log.Warning($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
             return null;
         }
 
@@ -111,7 +111,7 @@ public class LDTKLoader {
             Actor newLayer = new(Game);
             newLayer.Match.Name = layerDefinition.Identifier ?? layerData.InstanceID;
             newLayer.Match.Guid = new Guid(layerData.InstanceID);
-            newLayer.Position.Set(layerData.OffsetX, layerData.OffsetY);
+            newLayer.Position.LocalPosition = new(layerData.OffsetX, layerData.OffsetY);
             if (!layerData.Visible) {
                 newLayer.Ticking = false;
                 newLayer.Visible = false;
@@ -121,13 +121,13 @@ public class LDTKLoader {
                 case EntityLayerDescriptor: {
                         foreach (EntitySaveData entityData in layerData.Entities) {
                             if (!ActorRegistry.ContainsKey(entityData.NameID)) {
-                                Console.WriteLine($"LDTKLoader: Unhandled entity creation for {entityData.NameID}, no generator defined");
+                                Log.Warning($"LDTKLoader: Unhandled entity creation for {entityData.NameID}, no generator defined");
                                 continue;
                             }
                             Actor newEntity = new(Game);
                             newEntity.Match.Name = entityData.InstanceID;
                             newEntity.Match.Guid = new Guid(entityData.InstanceID);
-                            newEntity.Position.Set(new(entityData.Position[0], entityData.Position[1]));
+                            newEntity.Position.LocalPosition = new(entityData.Position[0], entityData.Position[1]);
                             ActorRegistry[entityData.NameID](newEntity, entityData);
 
                             newLayer.Children.Add(newEntity);
@@ -138,7 +138,7 @@ public class LDTKLoader {
                 case TileLayerDescriptor:
                 case AutoLayerDescriptor: {
                         if (layerData.Tileset == null) {
-                            Console.WriteLine($"LDTKLoader: Unable to load layer {newLayer.Match.Name}, no tileset assigned");
+                            Log.Warning($"LDTKLoader: Unable to load layer {newLayer.Match.Name}, no tileset assigned");
                             continue;
                         }
                         LDTKTileset tileset = Tilesets[(int)layerData.Tileset];
@@ -170,7 +170,7 @@ public class LDTKLoader {
     /// <returns>The loader instance</returns>
     public LDTKLoader RegisterActor(string id, Action<Actor, EntitySaveData> func) {
         if (ActorRegistry.ContainsKey(id)) {
-            Console.WriteLine($"LDTKLoader: Attempting to re-define actor id {id}, skipping.");
+            Log.Warning($"LDTKLoader: Attempting to re-define actor id {id}, skipping.");
             return this;
         }
         ActorRegistry.Add(id, func);
@@ -194,7 +194,7 @@ public class LDTKLoader {
     /// <returns>An array of data fields for the level.</returns>
     public FieldSaveData[] GetLevelFieldData(string name) {
         if (!Levels.TryGetValue(name, out LevelSaveReference? levelRef)) {
-            Console.WriteLine($"Unable to find level {name}, no field data to return");
+            Log.Warning($"Unable to find level {name}, no field data to return");
             return [];
         }
         return levelRef.Fields;

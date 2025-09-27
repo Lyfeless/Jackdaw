@@ -2,9 +2,9 @@
 using FMOD.Studio;
 using Foster.Framework;
 
-namespace LittleLib.Audio.FMODAudio;
+namespace Jackdaw.Audio.FMODAudio;
 
-public class AudioManager(LittleGame game, string directory = "") : Component(game) {
+public class AudioManager(Game game, string directory = "") : Component(game) {
     const string BANK_EXTENSION = ".bank";
     const string STRINGS_EXTENSION = ".strings.bank";
 
