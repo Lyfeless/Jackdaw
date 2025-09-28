@@ -2,8 +2,6 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-//! FIXME (Alex): Load bindings from savedata?
-
 /// <summary>
 /// Storage for input bindings.
 /// </summary>

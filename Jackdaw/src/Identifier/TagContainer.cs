@@ -89,7 +89,6 @@ public struct TagContainer() {
         Tags &= ~tags;
     }
 
-    //! FIXME (Alex): Unfinished
     public void Change(Enum tag, bool value) {
         throw new NotImplementedException();
     }
@@ -158,7 +157,6 @@ public struct TagContainer() {
         return (tags & Tags) == tags;
     }
 
-    //! FIXME (Alex): Don't want to implment these until I'm sure they'll get used
     public int[] TagsAsInt() {
         throw new NotImplementedException();
     }

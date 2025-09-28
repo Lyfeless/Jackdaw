@@ -3,7 +3,6 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-//! FIXME (Alex): Switch to Calc extension with .net 10 comes out of preview
 public static class CalcExtra {
     /// <summary>
     /// Calculate the triple product of 3 2D vectors
@@ -33,7 +32,6 @@ public static class CalcExtra {
         return ((a - b) / 2) + b;
     }
 
-    //! FIXME (Alex): Can this also get NAN collisions?
     /// <summary>
     /// Get intersection between two line segments.
     /// </summary>

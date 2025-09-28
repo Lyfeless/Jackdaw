@@ -3,7 +3,6 @@ using Foster.Framework;
 namespace Jackdaw;
 
 //! FIXME (Alex): Doc comments
-//! FIXME (Alex): These should have behavior to stretch as well as tile?
 
 public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite {
     readonly Subtexture Texture = texture;
@@ -13,8 +12,6 @@ public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite 
     public override Point2 Size => new(Math.Abs(Width), (int)Texture.Height);
 
     public override RectInt Bounds => new(new(Math.Min(Width, 0), 0), Size);
-
-    //! FIXME (Alex): Doesn't support flipping
     public override void Render(Batcher batcher) {
         if (Width == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
 
@@ -53,8 +50,6 @@ public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
     public override Point2 Size => new((int)Texture.Width, Math.Abs(Height));
 
     public override RectInt Bounds => new(new(0, Math.Min(Height, 0)), Size);
-
-    //! FIXME (Alex): Doesn't support flipping
     public override void Render(Batcher batcher) {
         if (Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
 
@@ -96,8 +91,6 @@ public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     public override Point2 Size { get => new(Math.Abs(Width), Math.Abs(Height)); }
 
     public override RectInt Bounds => new(new(Math.Min(Width, 0), Math.Min(Height, 0)), Size);
-
-    //! FIXME (Alex): Doesn't support flipping
 
     public override void Render(Batcher batcher) {
         if (Width == 0 || Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }

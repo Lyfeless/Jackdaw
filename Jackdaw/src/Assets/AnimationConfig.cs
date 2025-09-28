@@ -38,9 +38,6 @@ internal class AnimationConfig {
     [JsonPropertyName("frames")]
     public AnimationConfigFrame[] Frames { get; set; } = [];
 
-    [JsonPropertyName("startDelay")]
-    public float StartDelay { get; set; } = 0;
-
     [JsonPropertyName("looping")]
     public bool Looping { get; set; } = true;
 

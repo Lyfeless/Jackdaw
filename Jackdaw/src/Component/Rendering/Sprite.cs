@@ -58,9 +58,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
         : this(game, game.Assets.GetTexture(sprite), offset) { }
 
     protected override void Render(Batcher batcher) {
-        //! FIXME (Alex): This clips tiling sprites for some reason
-        //! FIXME (Alex): Disabled because of viewport changes
-        // if (!Game.Viewspace.Bounds.Overlaps(Sprite.Bounds.Translate(Actor.GlobalPositionRounded + Offset))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Sprite.Bounds.Translate(offset ?? Point2.Zero), Actor.Position.GlobalDisplayMatrix))) { return; }
 
         batcher.PushMatrix(Offset);
         Sprite.Render(batcher);

@@ -32,7 +32,6 @@ public class Grid<T>(Point2 gridSize) {
     /// <returns>The tile at the location, null if the tile doesn't exist or the position is out of bounds.</returns>
     public T? Get(Point2 tile) {
         if (Contains(tile)) { return Tiles[tile.X, tile.Y]; }
-        //! FIXME (Alex): Verify if this returns null for int? values
         return default;
     }
 
@@ -72,7 +71,4 @@ public class Grid<T>(Point2 gridSize) {
     public bool Contains(Point2 tile) {
         return tile.X >= 0 && tile.Y >= 0 && tile.X < Size.X && tile.Y < Size.Y;
     }
-
-    //! FIXME (Alex): Needs extra utility functions
-    //      Get start and end tiles contained within rect
 }

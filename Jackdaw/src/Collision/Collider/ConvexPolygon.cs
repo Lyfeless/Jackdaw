@@ -12,11 +12,10 @@ public class ConvexPolygonCollider(ConvexPolygon polygon) : ConvexCollider(polyg
     /// </summary>
     /// <param name="triangle">The triangle collider.</param>
     public ConvexPolygonCollider(Triangle triangle) : this(new ConvexPolygon() {
-        //! FIXME (Alex): Hacky way to convert a triangle to a polygon, consider cleaning up
         Vertices = [
-            triangle.GetPoint(0),
-            triangle.GetPoint(1),
-            triangle.GetPoint(2),
+            triangle.A,
+            triangle.B,
+            triangle.C,
         ]
     }) { }
 }

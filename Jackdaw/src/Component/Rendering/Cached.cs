@@ -2,16 +2,28 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-//! FIXME (Alex): untested
-
 /// <summary>
-/// Optimization component for pre-rendering a component to avoid rending it every frame.
+/// Optimization component for pre-rendering objects to avoid rending it every frame.
 /// </summary>
 public class CachedRenderComponent : Component {
-    readonly Component Component;
+    readonly ICacheableObject CachedObject;
     Target RenderedComponent;
 
     Point2 position;
+
+    bool uncached = true;
+    RectInt bounds;
+
+    /// <summary>
+    /// The bounds to render the object in, relative to the component. Anything outside the bounds will be clipped.
+    /// </summary>
+    public RectInt Bounds {
+        get => bounds;
+        set {
+            bounds = value;
+            uncached = true;
+        }
+    }
 
     /// <summary>
     /// Create and cache a component within a rendering bound.
@@ -20,26 +32,58 @@ public class CachedRenderComponent : Component {
     /// <param name="component">The component to cache.</param>
     /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
     public CachedRenderComponent(Game game, Component component, RectInt bounds) : base(game) {
-        Component = component;
-        Cache(bounds);
+        CachedObject = new CachableComponent(component);
+        this.bounds = bounds;
     }
 
     /// <summary>
-    /// Re-render the component.
+    /// Create and cache an actor within a rendering bound.
     /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="actor">The actor to cache.</param>
     /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
-    public void Cache(RectInt bounds) {
+    public CachedRenderComponent(Game game, Actor actor, RectInt bounds) : base(game) {
+        CachedObject = new CachableActor(actor);
+        this.bounds = bounds;
+    }
+
+    protected override void Update() {
+        if (!uncached) { return; }
+
+        uncached = false;
+
         RenderedComponent = new(Game.GraphicsDevice, bounds.Width, bounds.Height);
+        RenderedComponent.Clear(Color.Orange);
         position = bounds.Position;
         Batcher batcher = new(Game.GraphicsDevice);
         batcher.PushMatrix(-position);
-        //! FIXME (Alex): Maybe not wise to be using internal utility functions here
-        Component.OnRender(batcher);
+        CachedObject.Render(batcher);
         batcher.Render(RenderedComponent);
     }
 
+    /// <summary>
+    /// Manually re-render the component.
+    /// </summary>
+    public void Cache() {
+        uncached = true;
+    }
+
     protected override void Render(Batcher batcher) {
-        //! FIXME (Alex): Cull
+        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(new Rect(position, RenderedComponent.SizeInPixels()), Actor.Position.GlobalDisplayMatrix))) { return; }
         batcher.Image(RenderedComponent, position, Color.White);
     }
+}
+
+internal interface ICacheableObject {
+    public void Render(Batcher batcher);
+}
+
+internal class CachableComponent(Component component) : ICacheableObject {
+    readonly Component component = component;
+    public void Render(Batcher batcher) => component.OnRender(batcher);
+}
+
+internal class CachableActor(Actor actor) : ICacheableObject {
+    readonly Actor actor = actor;
+    public void Render(Batcher batcher) => actor.Render(batcher);
 }

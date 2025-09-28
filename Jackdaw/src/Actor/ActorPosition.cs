@@ -10,11 +10,11 @@ public struct ActorPosition {
     /// <summary>
     /// The actor storing the position.
     /// </summary>
-    public Actor Actor { get; private set; }
+    public Actor Actor { get; private set; } = Actor.Invalid;
 
     bool isDirty = true;
 
-    Transform transform;
+    Transform transform = Transform.Identity;
 
     /// <summary>
     /// The full transform representing the actor's position relative to its parent.
@@ -82,7 +82,7 @@ public struct ActorPosition {
         }
     }
 
-    InvertableMatrix globalMatrix = new();
+    InvertableMatrix globalMatrix = Transform.Identity;
 
     /// <summary>
     /// Ther actor's position in global space, accounting for all parent transforms.
@@ -128,7 +128,7 @@ public struct ActorPosition {
         }
     }
 
-    InvertableMatrix localDisplayMatrix = new();
+    InvertableMatrix localDisplayMatrix = Transform.Identity;
 
     /// <summary>
     /// The actor's local display position, representing the actor's local position combined with any local render action offsets.
@@ -140,7 +140,7 @@ public struct ActorPosition {
     /// </summary>
     public readonly Matrix3x2 LocalDisplayMatrixInverse => localDisplayMatrix.MatrixInverse;
 
-    InvertableMatrix globalDisplayMatrix = new();
+    InvertableMatrix globalDisplayMatrix = Transform.Identity;
 
     /// <summary>
     /// The actor's local display position, representing the actor's global position combined with any local or parent render action offsets.
@@ -226,8 +226,6 @@ public struct ActorPosition {
     }
 
     internal void CacheDisplay() {
-        //! FIXME (Alex): Round the transforms on these
-
         Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * LocalMatrix;
         if (LocalDisplayMatrix != localDisplay) {
             localDisplayMatrix.Matrix = localDisplay;

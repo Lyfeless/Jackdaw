@@ -180,7 +180,6 @@ public class Assets {
         // Shaders
         {
             // Load fallback shader
-            //! FIXME (Alex): I could see an argument for just crashing if a shader doesn't load correctly, might be harder to identify bugs if it doesn't crash on fail
             Shaders.Add("error", new BatcherShader(graphicsDevice));
 
             // Load shaders from config
@@ -270,7 +269,6 @@ public class Assets {
                 horizontalFrames: config.HorizontalFrames,
                 verticalFrames: config.VerticalFrames,
                 frameTime: config.FrameTime,
-                startDelay: config.StartDelay,
                 looping: config.Looping,
                 positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
             );
@@ -286,7 +284,6 @@ public class Assets {
                     clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null,
                     embeddedData: frame.EmbeddedData
                 ))],
-                startDelay: config.StartDelay,
                 looping: config.Looping,
                 positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
             );

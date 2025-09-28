@@ -171,8 +171,6 @@ public class Actor {
     internal void Render(Batcher batcher) {
         if (!Visible) { return; }
 
-        //! FIXME (Alex): Only cache if changed? Is that easy?
-        // This is just a bit messy in general
         Position.CacheDisplay();
 
         batcher.PushMatrix(Position.LocalMatrix);

@@ -45,7 +45,6 @@ public class Timer {
     /// </summary>
     public double ElapsedTime {
         get {
-            //! FIXME (Alex): This potentially fixes the timer looping problems, retest
             double time = Milliseconds - StartTime;
             if (Looping) { time %= Duration; }
             return time;

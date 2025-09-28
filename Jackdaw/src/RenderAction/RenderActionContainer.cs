@@ -66,7 +66,6 @@ public class RenderActionContainer(Actor owner) : SearchableChildContainer<Actor
 
     public override bool Locked() => Active;
 
-    //! FIXME (Alex): Does this need anything more?
     public override bool CanAdd(ActorRenderAction child) => true;
 
     public override void HandleAdd(ActorRenderAction child) { }

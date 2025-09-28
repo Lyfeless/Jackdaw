@@ -2,8 +2,6 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-//! FIXME (Alex): Should this be a sprite?
-
 /// <summary>
 /// A simple rectangle renderer.
 /// </summary>
@@ -22,9 +20,7 @@ public class RectComponent(Game game, Rect rect, Color color) : Component(game) 
     public Color Color = color;
 
     protected override void Render(Batcher batcher) {
-        //! FIXME (Alex): Verify culling is correct
-        //! FIXME (Alex): Disabled because of viewport changes
-        // if (!Game.Viewspace.Bounds.Overlaps(new Rect(Actor.GlobalPosition + Rect.Position, Rect.Size))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Rect, Actor.Position.GlobalDisplayMatrix))) { return; }
         batcher.Rect(Rect, Color);
     }
 }

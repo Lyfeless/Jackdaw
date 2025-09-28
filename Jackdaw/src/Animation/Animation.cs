@@ -20,8 +20,6 @@ public class AnimationData {
     /// If the animation should loop once it completes.
     /// </summary>
     public readonly bool Looping;
-    //! FIXME (Alex): Should start delay be here, or only in the actual component?
-    public readonly float StartDelay;
 
     /// <summary>
     /// The amount all frames should be offset from the origin position.
@@ -50,7 +48,7 @@ public class AnimationData {
         float startDelay = 0,
         bool looping = true,
         Point2? positionOffset = null
-    ) : this(assets.GetTexture(texture), horizontalFrames, verticalFrames, frameTime, maxFrames, startDelay, looping, positionOffset) { }
+    ) : this(assets.GetTexture(texture), horizontalFrames, verticalFrames, frameTime, maxFrames, looping, positionOffset) { }
 
     /// <summary>
     /// Create an animation by dividing a single sprite sheet into a grid of frames
@@ -69,10 +67,9 @@ public class AnimationData {
         int verticalFrames,
         float frameTime,
         int maxFrames = 0,
-        float startDelay = 0,
         bool looping = true,
         Point2? positionOffset = null
-    ) : this(startDelay, looping, positionOffset) {
+    ) : this(looping, positionOffset) {
         int frameCount = horizontalFrames * verticalFrames;
         if (maxFrames != 0) { frameCount = Math.Min(frameCount, maxFrames); }
         Frames = new AnimationFrame[frameCount];
@@ -100,18 +97,16 @@ public class AnimationData {
         float startDelay = 0,
         bool looping = false,
         Point2? positionOffset = null
-    ) : this(startDelay, looping, positionOffset) {
+    ) : this(looping, positionOffset) {
         Frames = frames;
         Duration = frames.Sum(e => e.Duration);
     }
 
-    AnimationData(float startDelay = 0, bool looping = false, Point2? positionOffset = null) {
+    AnimationData(bool looping = false, Point2? positionOffset = null) {
         Looping = looping;
-        StartDelay = startDelay;
         PositionOffset = positionOffset ?? Point2.Zero;
     }
 
-    //! FIXME (Alex): This can possibly be optimized with some kind of lookup list/tree
     /// <summary>
     /// Get a frame from the animation.
     /// </summary>

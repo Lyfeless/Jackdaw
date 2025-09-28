@@ -7,7 +7,8 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="game">The current game instance.</param>
 /// <param name="animation">The sprite animation to use.</param>
-public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
+/// <param name="startDelay">The time in milliseconds before the animation should start running.</param>
+public class SpriteAnimated(Game game, AnimationData animation, float startDelay = 0) : Sprite {
     readonly AnimationData Animation = animation;
 
     /// <summary>
@@ -16,7 +17,7 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     public readonly Timer Timer = new(
         game: game,
         duration: animation.Duration,
-        startTime: -animation.StartDelay,
+        startTime: -startDelay,
         looping: animation.Looping
     );
 

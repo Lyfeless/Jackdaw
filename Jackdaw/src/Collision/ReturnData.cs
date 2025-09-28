@@ -56,7 +56,7 @@ public record struct PushoutCollisionComponentInfo(CollisionComponent Component,
 /// <param name="Component">The collided component.</param>
 /// <param name="ClosestCollider">The collider closest to the start of the cast.</param>
 /// <param name="Colliders">All the subcolliders in the component that were collided.</param>
-//! FIXME (Alex): Shouls this also include the fraction?
+//! FIXME (Alex): Should this also include the fraction?
 public record struct SweptCollisionComponentInfo(CollisionComponent Component, int ClosestCollider, SweptColliderInfo[] Colliders);
 
 /// <summary>
