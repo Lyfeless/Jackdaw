@@ -3,88 +3,134 @@ using Foster.Audio;
 
 namespace Jackdaw.Audio.FosterAudio;
 
+/// <summary>
+/// A basic component for playing sounds.
+/// </summary>
+/// <param name="manager">The audio manager.</param>
+/// <param name="sound">The sound to play.</param>
+/// <param name="bus">The bus to play the sound on.</param>
 public class SoundPlayerComponent(AudioManager manager, Sound sound, string? bus = null) : Component(manager.Game) {
     protected readonly AudioManager Manager = manager;
     protected Sound Sound = sound;
     protected readonly string? Bus = bus;
+
+    /// <summary>
+    /// The current sound instance.
+    /// </summary>
     public SoundInstance Player;
 
+    /// <summary>
+    /// If the sound should automatically start playing when added to the actor tree.
+    /// </summary>
     public bool Autostart = false;
 
     bool paused = false;
     TimeSpan pauseCursor;
 
-    float? volume;
+    /// <summary>
+    /// The volume the sound should play at.
+    /// </summary>
     public float? Volume { get => volume; set => volume = value; }
+    float? volume;
 
-    float? pitch;
+    /// <summary>
+    /// The pitch to play the sound at.
+    /// </summary>
     public float? Pitch { get => pitch; set => pitch = value; }
+    float? pitch;
 
-    bool? looping;
+    /// <summary>
+    /// If the sound should loop when the <see cref="LoopEnd" /> is reached.
+    /// </summary>
     public bool? Looping { get => looping; set => looping = value; }
+    bool? looping;
 
-    TimeSpan? loopBegin;
+    /// <summary>
+    /// The timestamp to start at when the sound loops. Defaults to the start of the sound.
+    /// </summary>
     public TimeSpan? LoopBegin { get => loopBegin; set => loopBegin = value; }
+    TimeSpan? loopBegin;
 
-    TimeSpan? loopEnd;
+    /// <summary>
+    /// The timestamp to loop the sound when reached. Defaults to the end of the sound.
+    /// </summary>
     public TimeSpan? LoopEnd { get => loopEnd; set => loopEnd = value; }
+    TimeSpan? loopEnd;
 
-    bool? spatialized;
+    /// <summary>
+    /// If the sound has 3D Audio enabled.
+    /// </summary>
     public bool? Spatialized { get => spatialized; set => spatialized = value; }
+    bool? spatialized;
 
-    float? minGain;
     public float? MinGain { get => minGain; set => minGain = value; }
+    float? minGain;
 
-    float? minDistance;
-    public float? MinDistance { get => minDistance; set => minDistance = value; }
-
-    float? maxDistance;
-    public float? MaxDistance { get => maxDistance; set => maxDistance = value; }
-
-    float? directionalAttenuationFactor;
-    public float? DirectionalAttenuationFactor { get => directionalAttenuationFactor; set => directionalAttenuationFactor = value; }
-
-    float? dopplerFactor;
-    public float? DopplerFactor { get => dopplerFactor; set => dopplerFactor = value; }
-
-    float? maxGain;
     public float? MaxGain { get => maxGain; set => maxGain = value; }
+    float? maxGain;
 
-    float? pan;
+    /// <summary>
+    /// The closest distance the sound can be heard.
+    /// </summary>
+    public float? MinDistance { get => minDistance; set => minDistance = value; }
+    float? minDistance;
+
+    /// <summary>
+    /// The furthest distance the sound can be heard.
+    /// </summary>
+    public float? MaxDistance { get => maxDistance; set => maxDistance = value; }
+    float? maxDistance;
+
+    public float? DirectionalAttenuationFactor { get => directionalAttenuationFactor; set => directionalAttenuationFactor = value; }
+    float? directionalAttenuationFactor;
+
+    public float? DopplerFactor { get => dopplerFactor; set => dopplerFactor = value; }
+    float? dopplerFactor;
+
     public float? Pan { get => pan; set => pan = value; }
+    float? pan;
 
-    float? rolloff;
     public float? Rolloff { get => rolloff; set => rolloff = value; }
+    float? rolloff;
 
-    int? pinnedListenerIndex;
     public int? PinnedListenerIndex { get => pinnedListenerIndex; set => pinnedListenerIndex = value; }
+    int? pinnedListenerIndex;
 
-    Vector3? position;
+    /// <summary>
+    /// The 3D spatialized position to play the sound at.
+    /// </summary>
     public Vector3? Position { get => position; set => position = value; }
+    Vector3? position;
 
-    Vector3? velocity;
+    /// <summary>
+    /// The sound's 3D velocity.
+    /// </summary>
     public Vector3? Velocity { get => velocity; set => velocity = value; }
+    Vector3? velocity;
 
-    Vector3? direction;
     public Vector3? Direction { get => direction; set => direction = value; }
+    Vector3? direction;
 
-    SoundCone? cone;
     public SoundCone? Cone { get => cone; set => cone = value; }
+    SoundCone? cone;
 
-    SoundPositioning? positioning;
     public SoundPositioning? Positioning { get => positioning; set => positioning = value; }
+    SoundPositioning? positioning;
 
-    SoundAttenuationModel? attenuationModel;
     public SoundAttenuationModel? AttenuationModel { get => attenuationModel; set => attenuationModel = value; }
+    SoundAttenuationModel? attenuationModel;
 
-    ulong? loopBeginPcmFrames;
     public ulong? LoopBeginPcmFrames { get => loopBeginPcmFrames; set => loopBeginPcmFrames = value; }
+    ulong? loopBeginPcmFrames;
 
-    ulong? loopEndPcmFrames;
     public ulong? LoopEndPcmFrames { get => loopEndPcmFrames; set => loopEndPcmFrames = value; }
+    ulong? loopEndPcmFrames;
 
     public SoundPlayerComponent(AudioManager manager, string sound, string? bus = null) : this(manager, manager.GetSound(sound), bus) { }
 
+    /// <summary>
+    /// Play the sound.
+    /// </summary>
     public virtual void Play() {
         paused = false;
         Stop();
@@ -118,17 +164,26 @@ public class SoundPlayerComponent(AudioManager manager, Sound sound, string? bus
         }
     }
 
+    /// <summary>
+    /// Stop the sound.
+    /// </summary>
     public void Stop() {
         paused = false;
         Player.Stop();
     }
 
+    /// <summary>
+    /// Pause the sound with stopping it.
+    /// </summary>
     public void Pause() {
         paused = true;
         pauseCursor = Player.Cursor;
         Player.Pause();
     }
 
+    /// <summary>
+    /// Resume the sound at the position it was paused at.
+    /// </summary>
     public void Unpause() {
         if (!paused) { return; }
 

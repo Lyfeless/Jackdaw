@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw.Loader.LDTK;
 
-public class TilesetSaveDefinition {
+class TilesetSaveDefinition {
     [JsonPropertyName("uid")]
     public int DefinitionID { get; set; }
 

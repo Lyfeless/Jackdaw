@@ -44,6 +44,14 @@ public class LDTKTileLayer : Component, ISpatialGrid<Point2, LDTKTile> {
     /// </summary>
     public Vector2 Size => Tiles.Size * tileSize;
 
+    /// <summary>
+    /// Loaded instance of an LDTK tile grid layer.
+    /// </summary>
+    /// <param name="game">The game instance.</param>
+    /// <param name="tileset">The tileset the layer is using.</param>
+    /// <param name="gridSize">The grid dimensions.</param>
+    /// <param name="tileSize">The size of an individual grid tile.</param>
+    /// <param name="position">The grid's position relative to the level position.</param>
     public LDTKTileLayer(Game game, LDTKTileset tileset, Point2 gridSize, int tileSize, Vector2 position) : base(game) {
         this.tileSize = new(tileSize);
         Tiles = new(gridSize);

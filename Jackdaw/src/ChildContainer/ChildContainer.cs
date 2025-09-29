@@ -10,6 +10,11 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     protected readonly Towner Owner = owner;
 
     /// <summary>
+    /// If the container should override its locked conditional and always queue actions.
+    /// </summary>
+    public bool ManualLock = false;
+
+    /// <summary>
     /// All the elements currently being stored.
     /// </summary>
     public readonly List<Telement> Elements = [];

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw.Loader.LDTK;
 
-public class TileTypeCustomData {
+class TileTypeCustomData {
     [JsonPropertyName("tileId")]
     public int ID { get; set; } = 0;
 

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw.Loader.LDTK;
 
-public class LayerSaveData {
+class LayerSaveData {
     [JsonPropertyName("__type")]
     public string Type { get; set; } = string.Empty;
 

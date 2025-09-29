@@ -3,7 +3,7 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A renderable sprite for use in the <seealso cref="SpriteComponent">.
+/// A renderable sprite for use in the <seealso cref="SpriteComponent" />.
 /// Can be recolored, offset, or flipped.
 /// </summary>
 public abstract class Sprite {

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw.Loader.LDTK;
 
-public class LevelSaveData {
+class LevelSaveData {
     [JsonPropertyName("layerInstances")]
     public LayerSaveData[] Layers { get; set; } = [];
 }

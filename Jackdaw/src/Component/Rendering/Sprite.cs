@@ -3,7 +3,7 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A component that renders a <seealso cref="Sprite"> object.
+/// A component that renders a <seealso cref="Sprite" /> object.
 /// </summary>
 /// <param name="game">The current game instance.</param>
 /// <param name="sprite">The sprite to render.</param>
@@ -20,7 +20,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     public Point2 Offset = offset ?? Point2.Zero;
 
     /// <summary>
-    /// A component that renders a <seealso cref="Sprite"> object.
+    /// A component that renders a <seealso cref="Sprite" /> object.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite to render.</param>
@@ -30,7 +30,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
         : this(game, new SpriteSingle(sprite) { Color = color }, offset) { }
 
     /// <summary>
-    /// A component that renders a <seealso cref="Sprite"> object.
+    /// A component that renders a <seealso cref="Sprite" /> object.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite to render.</param>
@@ -39,7 +39,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
         : this(game, new SpriteSingle(sprite), offset) { }
 
     /// <summary>
-    /// A component that renders a <seealso cref="Sprite"> object.
+    /// A component that renders a <seealso cref="Sprite" /> object.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite asset name.</param>
@@ -49,7 +49,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
         : this(game, game.Assets.GetTexture(sprite), color, offset) { }
 
     /// <summary>
-    /// A component that renders a <seealso cref="Sprite"> object.
+    /// A component that renders a <seealso cref="Sprite" /> object.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite asset name.</param>

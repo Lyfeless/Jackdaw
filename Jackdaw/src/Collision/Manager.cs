@@ -1163,7 +1163,6 @@ public class CollisionManager {
     static Vector2 PerpDirection(Vector2 pointA, Vector2 pointB, Vector2 facingDirection) {
         Vector2 line = pointB - pointA;
         Vector2 direction = CalcExtra.TripleProduct(line, pointA, line);
-        //! FIXME (Alex): Forcing the vector to always face in the opposite direction of velocity can probably be done with pure math
         if (Vector2.Dot(direction, facingDirection) < 0) { direction = -direction; }
         return direction;
     }

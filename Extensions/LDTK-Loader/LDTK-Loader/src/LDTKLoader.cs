@@ -31,7 +31,6 @@ public class LDTKLoader {
 
     readonly Dictionary<string, Action<Actor, EntitySaveData>> ActorRegistry = [];
 
-    //! FIXME (Alex): find a better way to set collision enums data
     /// <summary>
     /// Create a loader from an LDTK level save file.
     /// </summary>
@@ -91,17 +90,14 @@ public class LDTKLoader {
         }
 
         if (levelData == null) {
-            //! FIXME (Alex): Don't like the duplicate error message here
             Log.Warning($"LDTKLoader: An error occured while trying to load {name}, load unsuccessful");
             return null;
         }
 
         Actor levelRoot = new(Game);
         levelRoot.Match.Name = levelRef.NameID;
-
-        //! FIXME (Alex): Do something with these?
-        Point2 levelPosition = new(levelRef.X, levelRef.Y);
-        Point2 levelSize = new(levelRef.Width, levelRef.Height);
+        levelRoot.Position.LocalPosition = new(levelRef.X, levelRef.Y);
+        // Point2 levelSize = new(levelRef.Width, levelRef.Height);
 
         List<Actor> layers = [];
 
@@ -179,7 +175,6 @@ public class LDTKLoader {
 
     Subtexture GetTilesetTexture(TilesetSaveDefinition tileset) {
         string path = Path.Join(
-                //! FIXME (Alex): This is a bit jank, look into a better way to handle this
                 Path.GetDirectoryName(tileset.TexturePath[(Game.Assets.Config.TextureFolder.Length + 1)..]),
                 Path.GetFileNameWithoutExtension(tileset.TexturePath)
             ).Replace("\\", "/");

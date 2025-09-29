@@ -244,6 +244,9 @@ public class Actor {
     internal void Invalidate(bool invalidateChildren = true, bool invalidateComponents = true) {
         if (!IsValid) { return; }
 
+        Children.ManualLock = true;
+        Components.ManualLock = true;
+
         if (invalidateChildren) {
             InvalidateChildren(invalidateComponents);
         }
@@ -258,6 +261,9 @@ public class Actor {
 
         Children.Clear();
         Components.Clear();
+
+        Children.ApplyChanges();
+        Components.ApplyChanges();
 
         if (ParentValid) {
             Parent.Children.Remove(this);

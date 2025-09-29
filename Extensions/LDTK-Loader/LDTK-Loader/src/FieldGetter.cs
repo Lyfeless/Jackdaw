@@ -9,13 +9,32 @@ namespace Jackdaw.Loader.LDTK;
 public static class LDTKFieldGetter {
     #region Reference Types
     /// <summary>
-    /// Displayable tile reference, stores the position and size of a texture source on a tileset.
+    /// Displayable tile reference.
     /// </summary>
     public struct TileReference {
+        /// <summary>
+        /// The tileset the tile is using.
+        /// </summary>
         public int Tileset;
+
+        /// <summary>
+        /// The tile's x position in the tileset texture.
+        /// </summary>
         public int X;
+
+        /// <summary>
+        /// The tile's y position in the tileset texture.
+        /// </summary>
         public int Y;
+
+        /// <summary>
+        /// The tile's width in the tileset texture.
+        /// </summary>
         public int Width;
+
+        /// <summary>
+        /// The tile's height in the tileset texture.
+        /// </summary>
         public int Height;
     }
 
@@ -23,8 +42,19 @@ public static class LDTKFieldGetter {
     /// Reference to an entity and containers, loaded or not.
     /// </summary>
     public struct EntityReference {
+        /// <summary>
+        /// The level name the entity is part of.
+        /// </summary>
         public string Level;
+
+        /// <summary>
+        /// The layer name the entity is part of.
+        /// </summary>
         public string Layer;
+
+        /// <summary>
+        /// The entity's uuid.
+        /// </summary>
         public string Entity;
     }
 
