@@ -4,7 +4,7 @@ using Foster.Framework;
 namespace Jackdaw.Loader.LDTK;
 
 /// <summary>
-/// Imports files created by the LDTK level editor, automatically converting them to usable actor node structures. </br>
+/// Imports files created by the LDTK level editor, automatically converting them to usable actor node structures. <br/>
 /// Relies on LDTK's option to split levels into seperate files to avoid loading everything upfront.
 /// In the LDTK project settings select the options "Save levels to seperate files" to get a subfolder of all levels.
 /// </summary>
@@ -35,7 +35,7 @@ public class LDTKLoader {
     /// Create a loader from an LDTK level save file.
     /// </summary>
     /// <param name="game">The current game instance.</param>
-    /// <param name="path">The relative path to the root .ldtk file.</param>
+    /// <param name="path">The path to the root .ldtk file, relative to the program directory.</param>
     /// <param name="collisionTagFunc">A callback function to convert LDTK enum strings into collision tags for tile info.</param>
     public LDTKLoader(Game game, string path, Func<string, int?> collisionTagFunc) {
         Game = game;
@@ -159,7 +159,8 @@ public class LDTKLoader {
     }
 
     /// <summary>
-    /// Register a conversion function to create new actors out of LDTK entity data.
+    /// Register a conversion function to create new actors out of LDTK entity data. </br>
+    /// Actor registrations pass in a premade actor set up with its position and other base information.
     /// </summary>
     /// <param name="id">The LDTK entity identifier.</param>
     /// <param name="func">A conversion function to create an actor from the LDTK data.</param>

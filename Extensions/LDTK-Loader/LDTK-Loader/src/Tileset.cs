@@ -141,7 +141,7 @@ public class LDTKTileset {
                                     Circle: CIRCLE [x] [y] [radius]
                                         ex: collider: CIRCLE 8 8 4
                                     Polygon: POLY [x1] [y1] [x2] [y2] ...
-                                        Expects a confex collider but doesn't verify
+                                        Expects a convex collider but doesn't verify
                                         ex: collider: POLY 0 8 16 8 8 16 0 8
                         */
 
