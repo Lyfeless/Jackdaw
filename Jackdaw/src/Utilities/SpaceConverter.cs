@@ -9,17 +9,6 @@ namespace Jackdaw;
 public class SpaceConverter(Game game) {
     readonly Game Game = game;
 
-    //! FIXME (Alex): Doc comments
-
-    // Local Space - Positions relative to the actor's location.
-    // Global Space - Positions relative to the world origin.
-    // Tile Space - Positions relative to a spatial grid with one unit per tile.
-    // Display Local Space - Positions relative to the actor's location, with any enter actions applied from the actor or its parents.
-    // Display Tile Space - Positions relative to a spatial grid with one unit per tile, transformed by an actor's display position.
-
-    /// <br/> <br/>
-    /// <br/>
-
     #region Mouse
     /// <summary>
     /// Convert the mouse position to global space.
