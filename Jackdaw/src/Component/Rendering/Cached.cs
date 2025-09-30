@@ -54,9 +54,8 @@ public class CachedRenderComponent : Component {
 
         RenderedComponent = new(Game.GraphicsDevice, bounds.Width, bounds.Height);
         RenderedComponent.Clear(Color.Orange);
-        position = bounds.Position;
         Batcher batcher = new(Game.GraphicsDevice);
-        batcher.PushMatrix(-position);
+        batcher.PushMatrix(-bounds.Position);
         CachedObject.Render(batcher);
         batcher.Render(RenderedComponent);
     }

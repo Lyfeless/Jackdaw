@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Numerics;
 using Foster.Framework;
 
@@ -44,9 +45,22 @@ public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid
         : this(game, position, new Grid<Sprite>(gridSize), tileSize) { }
 
     protected override void Render(Batcher batcher) {
-        //! FIXME (Alex): NOT DONE! Needs culling
-        for (int x = 0; x < Grid.Size.X; ++x) {
-            for (int y = 0; y < Grid.Size.Y; ++y) {
+        Rect bounds = CalcExtra.TransformRect(new(Game.Window.Width, Game.Window.Height), Actor.Position.GlobalDisplayMatrixInverse);
+
+        Vector2 topLeft = Game.Convert.LocalToTile(bounds.TopLeft, this);
+        Vector2 bottomRight = Game.Convert.LocalToTile(bounds.BottomRight, this);
+
+        Point2 start = new(
+            (int)Math.Clamp(topLeft.X, 0, Grid.Size.X - 1),
+            (int)Math.Clamp(topLeft.Y, 0, Grid.Size.Y - 1)
+        );
+        Point2 end = new(
+            (int)Math.Clamp(bottomRight.X, 0, Grid.Size.X - 1),
+            (int)Math.Clamp(bottomRight.Y, 0, Grid.Size.Y - 1)
+        );
+
+        for (int x = start.X; x <= end.X; ++x) {
+            for (int y = start.Y; y <= end.Y; ++y) {
                 Sprite? sprite = Grid.Get(x, y);
                 if (sprite == null) { continue; }
                 batcher.PushMatrix((TileSize * new Point2(x, y)) + Position);

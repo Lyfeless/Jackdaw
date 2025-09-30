@@ -20,7 +20,6 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     public SpriteSingle(Assets assets, string texture) : this(assets.GetTexture(texture)) { }
 
     public override void Render(Batcher batcher) {
-        //! FIXME (Alex): Flip code might still be incorrect, re-check
         batcher.Image(Texture, Offset + (Bounds.Size / 2), Bounds.Center, FlipScale(), 0, Color);
     }
 }

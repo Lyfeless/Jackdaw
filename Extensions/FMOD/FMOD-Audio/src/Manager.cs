@@ -43,7 +43,6 @@ public class AudioManager(Game game, string directory = "") : Component(game) {
         bankData.getEventList(out EventDescription[] bankEvents);
         foreach (EventDescription bankEvent in bankEvents) {
             bankEvent.getPath(out string eventPath);
-            Console.WriteLine(eventPath);
             events.Add(eventPath, bankEvent);
         }
 

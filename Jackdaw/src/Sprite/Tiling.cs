@@ -2,11 +2,22 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-//! FIXME (Alex): Doc comments
-
+/// <summary>
+/// A horizontally resizable sprite that tiles the texture to fill space.
+/// </summary>
+/// <param name="texture">The texture to tile.</param>
+/// <param name="width">The sprite's resized width.</param>
 public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite {
     readonly Subtexture Texture = texture;
+
+    /// <summary>
+    /// The sprite's resized width.
+    /// </summary>
     public int Width = width;
+
+    /// <summary>
+    /// If tiling should grow from the texture's origin or outer edge.
+    /// </summary>
     public bool PadOrigin = false;
 
     public override Point2 Size => new(Math.Abs(Width), (int)Texture.Height);
@@ -42,14 +53,28 @@ public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite 
     }
 }
 
+
+/// <summary>
+/// A vertically resizable sprite that tiles the texture to fill space.
+/// </summary>
+/// <param name="texture">The texture to tile.</param>
+/// <param name="height">The sprite's resized height.</param>
 public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
     readonly Subtexture Texture = texture;
+
+    /// <summary>
+    /// The sprite's resized height.
+    /// </summary>
     public int Height = height;
+
+    /// <summary>
+    /// If tiling should grow from the texture's origin or outer edge.
+    /// </summary>
     public bool PadOrigin = false;
 
     public override Point2 Size => new((int)Texture.Width, Math.Abs(Height));
-
     public override RectInt Bounds => new(new(0, Math.Min(Height, 0)), Size);
+
     public override void Render(Batcher batcher) {
         if (Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
 
@@ -80,16 +105,27 @@ public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
     }
 }
 
+/// <summary>
+/// A resizable sprite that tiles the texture to fill space.
+/// </summary>
+/// <param name="texture">The texture to tile.</param>
+/// <param name="size">The sprite's resized size.</param>
 public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     readonly Subtexture Texture = texture;
     public int Width = size.X;
     public int Height = size.Y;
 
+    /// <summary>
+    /// If horizontal tiling should grow from the texture's origin or outer edge.
+    /// </summary>
     public bool PadOriginX = false;
+
+    /// <summary>
+    /// If vertical tiling should grow from the texture's origin or outer edge.
+    /// </summary>
     public bool PadOriginY = false;
 
     public override Point2 Size { get => new(Math.Abs(Width), Math.Abs(Height)); }
-
     public override RectInt Bounds => new(new(Math.Min(Width, 0), Math.Min(Height, 0)), Size);
 
     public override void Render(Batcher batcher) {
@@ -149,12 +185,12 @@ public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
 
         batcher.Image(Texture.GetClipSubtexture(new(clipX, clipY, clipWidth, clipHeight)), Offset + offset + new Point2(cornerX, cornerY), Color);
 
-        SpriteTilingHorizontal horizontal = new(texture.GetClipSubtexture(new(0, clipY, textureSize.X, clipHeight)), Math.Abs(Width) - remainder.X) {
+        SpriteTilingHorizontal horizontal = new(Texture.GetClipSubtexture(new(0, clipY, textureSize.X, clipHeight)), Math.Abs(Width) - remainder.X) {
             Offset = Offset + offset + new Point2(offsetChangeX, cornerY),
             PadOrigin = padLeft
         };
 
-        SpriteTilingVertical vertical = new(texture.GetClipSubtexture(new(clipX, 0, clipWidth, textureSize.Y)), Math.Abs(Height) - remainder.Y) {
+        SpriteTilingVertical vertical = new(Texture.GetClipSubtexture(new(clipX, 0, clipWidth, textureSize.Y)), Math.Abs(Height) - remainder.Y) {
             Offset = Offset + offset + new Point2(cornerX, offsetChangeY),
             PadOrigin = padTop
         };

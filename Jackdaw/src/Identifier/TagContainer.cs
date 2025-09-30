@@ -47,8 +47,6 @@ public struct TagContainer() {
         Tags = tags;
     }
 
-    //! FIXME (Alex): Test all the add and remove functions
-
     /// <summary>
     /// Set all given tag values to true, leaving all other values unchanged.
     /// </summary>

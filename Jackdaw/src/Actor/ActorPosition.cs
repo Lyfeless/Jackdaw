@@ -226,7 +226,11 @@ public struct ActorPosition {
     }
 
     internal void CacheDisplay() {
-        Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * LocalMatrix;
+        // Round the position offset to reduce the chance of floating-point imprecision when rendering
+        Transform localRounded = transform;
+        localRounded.Position = (Point2)localRounded.Position;
+
+        Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * localRounded.Matrix;
         if (LocalDisplayMatrix != localDisplay) {
             localDisplayMatrix.Matrix = localDisplay;
         }

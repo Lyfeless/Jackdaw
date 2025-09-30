@@ -51,6 +51,7 @@ public class SpriteNineslice : Sprite {
 
     /// <summary>
     /// The method used to extend the texture past its regular size.
+    /// NOTE: Currently not implemented, defaults to tile.
     /// </summary>
     public ExtendBehavior Extend;
 
@@ -115,7 +116,6 @@ public class SpriteNineslice : Sprite {
             Offset = new(leftWidth, topHeight)
         };
 
-        //! FIXME (Alex): Extend still does nothing.
         Extend = extend;
         Constrain = constrain;
     }

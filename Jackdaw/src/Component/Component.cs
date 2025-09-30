@@ -119,13 +119,13 @@ public abstract class Component {
     internal void OnInvalidated() {
         if (!IsValid) { return; }
 
+        IsValid = false;
+
         Invalidated();
 
         if (ActorValid) {
             Actor.Components.Remove(this);
         }
-
-        IsValid = false;
     }
 
     internal void OnAdded() {
