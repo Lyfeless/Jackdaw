@@ -21,7 +21,6 @@ public record struct AllCollisionInfo(bool Collided, CollisionComponentInfo[] Co
 /// </summary>
 /// <param name="Collided">If the collision check found any collisions.</param>
 /// <param name="Pushout">The largest pushout from all the checks.</param>
-//! FIXME (Alex): MAKE THIS TRUE
 /// <param name="ColliderInfo">Information about all found collisions, sorted by largest pushout.</param>
 public record struct PushoutCollisionInfo(bool Collided, Vector2 Pushout, PushoutCollisionComponentInfo[] ColliderInfo);
 
@@ -31,7 +30,7 @@ public record struct PushoutCollisionInfo(bool Collided, Vector2 Pushout, Pushou
 /// <param name="Collided">If the collision check found any collisions.</param>
 /// <param name="AdjustedVelocity">The velocity adjusted by all collisions.</param>
 /// <param name="VelocityFraction">The percent of the total velocity the shape was able to move.</param>
-/// <param name="ColliderInfo">Information about all found collisions.</param>
+/// <param name="ColliderInfo">Information about all found collisions, sorted by smallest velocity fraction.</param>
 public record struct SweptCollisionInfo(bool Collided, Vector2 AdjustedVelocity, Vector2 VelocityFraction, SweptCollisionComponentInfo[] ColliderInfo);
 
 
@@ -56,8 +55,7 @@ public record struct PushoutCollisionComponentInfo(CollisionComponent Component,
 /// <param name="Component">The collided component.</param>
 /// <param name="ClosestCollider">The collider closest to the start of the cast.</param>
 /// <param name="Colliders">All the subcolliders in the component that were collided.</param>
-//! FIXME (Alex): Should this also include the fraction?
-public record struct SweptCollisionComponentInfo(CollisionComponent Component, int ClosestCollider, SweptColliderInfo[] Colliders);
+public record struct SweptCollisionComponentInfo(CollisionComponent Component, Vector2 Fraction, int ClosestCollider, SweptColliderInfo[] Colliders);
 
 /// <summary>
 /// Single collider information with pushout information.

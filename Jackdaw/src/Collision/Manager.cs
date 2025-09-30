@@ -497,10 +497,9 @@ public class CollisionManager {
             }
         }
 
-        return new(other, closest, colliders);
+        return new(other, colliders[closest].Fraction, closest, colliders);
     }
 
-    //! FIXME (Alex): Should include the minCollider in the result
     SweptCollisionInfo GetSweptCollisionResult(SweptCollisionComponentInfo[] colliderInfo, Vector2 velocity, Vector2 fraction, CollisionComponent? minCollider, bool allowNegative = false) {
         bool collided = colliderInfo.Length > 0;
 
@@ -513,7 +512,7 @@ public class CollisionManager {
             fraction = Vector2.Zero;
         }
 
-        return new(collided, velocity * fraction, fraction, colliderInfo);
+        return new(collided, velocity * fraction, fraction, [.. colliderInfo.OrderBy(e => e.Fraction.LengthSquared())]);
     }
     #endregion
 
@@ -580,7 +579,6 @@ public class CollisionManager {
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv) {
         Vector2 smallestPushout = Vector2.Zero;
         float smallestLength = float.PositiveInfinity;
-        CollisionComponent? minCollider = null;
 
         List<PushoutCollisionComponentInfo> componentInfo = [];
         foreach (CollisionComponent other in Colliders) {
@@ -592,13 +590,11 @@ public class CollisionManager {
             if (compareLength < smallestLength) {
                 smallestPushout = resultCast.Colliders[resultCast.LargestPushout].Pushout;
                 smallestLength = compareLength;
-                minCollider = other;
             }
             componentInfo.Add(resultCast);
         }
 
-        //! FIXME (Alex): include mincollider possibly?
-        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo]);
+        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo.OrderByDescending(e => e.Colliders[e.LargestPushout].Pushout.LengthSquared())]);
     }
 
     /// <summary>
@@ -628,7 +624,6 @@ public class CollisionManager {
     public PushoutCollisionInfo GetCollisionPushout(Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {
         Vector2 smallestPushout = Vector2.Zero;
         float smallestLength = float.PositiveInfinity;
-        CollisionComponent? minCollider = null;
 
         List<PushoutCollisionComponentInfo> componentInfo = [];
         foreach (CollisionComponent other in Colliders) {
@@ -641,13 +636,11 @@ public class CollisionManager {
             if (compareLength < smallestLength) {
                 smallestPushout = resultCast.Colliders[resultCast.LargestPushout].Pushout;
                 smallestLength = compareLength;
-                minCollider = other;
             }
             componentInfo.Add(resultCast);
         }
 
-        //! FIXME (Alex): include mincollider possibly?
-        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo]);
+        return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo.OrderByDescending(e => e.Colliders[e.LargestPushout].Pushout.LengthSquared())]);
     }
 
     /// <summary>
