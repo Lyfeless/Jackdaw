@@ -57,8 +57,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Set a tile at a position in the grid, in local coordinates.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The grid to set to.</param>
     /// <param name="element">The element to set the tile to.</param>
     /// <param name="localCoord">The local coordinate to add to.</param>
@@ -68,8 +66,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// If applicable, add an additional element to stack on a tile, in local coordinates.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The grid to add to.</param>
     /// <param name="element">The element to set the tile to.</param>
     /// <param name="localCoord">The local coordinate to add to.</param>
@@ -79,8 +75,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// If applicable, remove the top element from a tile's element stack, in local coordinates.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The grid to remove from.</param>
     /// <param name="localCoord">The local coordinate to add to.</param>
     public static void RemoveTileStackLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localCoord)
@@ -89,8 +83,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Clear all data from a tile, in local coordinates.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The grid to set to.</param>
     /// <param name="localCoord">The local coordinate to add to.</param>
     public static void ClearTileLocal<TIn, TOut>(this ISpatialGrid<TIn, TOut> grid, Vector2 localCoord)
@@ -99,8 +91,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Get the stored value at a tile position, in local coordinates.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The grid to set to.</param>
     /// <param name="localCoord">The local coordinate to add to.</param>
     /// <returns>The tile value at the given local position.</returns>
@@ -110,8 +100,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Convert a position from a spatial position to a tile coordinate.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The spatial grid.</param>
     /// <param name="localPosition">The local coord to be converted.</param>
     /// <returns>The local coordinate in tile space.</returns>
@@ -122,8 +110,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Convert a position from a spatial position to a tile coordinate.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The spatial grid.</param>
     /// <param name="localPosition">The local coord to be converted.</param>
     /// <returns>The local coordinate in tile space.</returns>
@@ -134,8 +120,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Convert a position from a tile coordinate to a spatial position.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The spatial grid.</param>
     /// <param name="tileCoords">The tile coord to be converted.</param>
     /// <returns>The tile coordinate in local space.</returns>
@@ -146,8 +130,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Convert a position from a tile coordinate to a spatial position.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The spatial grid.</param>
     /// <param name="tileCoords">The tile coord to be converted.</param>
     /// <returns>The tile coordinate in local space.</returns>
@@ -157,8 +139,6 @@ public static class ISpatialGridHelper {
     /// <summary>
     /// Convert a position from a tile coordinate to a spatial position.
     /// </summary>
-    /// <typeparam name="TIn">The type of object used to assign tiles.</typeparam>
-    /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
     /// <param name="grid">The spatial grid.</param>
     /// <param name="tileCoords">The tile coord to be converted.</param>
     /// <returns>The tile coordinate in local space.</returns>
