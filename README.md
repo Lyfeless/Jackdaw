@@ -37,7 +37,10 @@ game.Start();
 Example projects are in progress and will be available soon.
 
 #### Extensions
-Jackdaw is designed to not require any specific programs to run, so extensions have been made to interface with some existing utilities. All current Jackdaw extensions are located in [this-repo].
+Jackdaw is designed to not require any specific programs to run, so extensions have been made to interface with some existing utilities.
+- [LDTK Loader](https://github.com/Lyfeless/Jackdaw.LDTK)
+- [Foster.Audio](https://github.com/Lyfeless/Jackdaw.Foster.Audio)
+- [FMOD](https://github.com/Lyfeless/Jackdaw.FMOD)
 
 #### Dependancies
-This project is built off of the framework [foster]. Anything requiring other external libraries or programs should be implemented through extensions.
+This project is built off of the framework [Foster](https://github.com/FosterFramework/Foster). Anything requiring other external libraries or programs should be implemented through extensions.
