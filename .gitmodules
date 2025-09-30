@@ -1,6 +1,3 @@
 [submodule "Foster"]
 	path = Foster
 	url = https://github.com/FosterFramework/Foster.git
-[submodule "Extensions/Foster-Audio/Foster.Audio"]
-	path = Extensions/Foster-Audio/Foster.Audio
-	url = https://github.com/MrBrixican/Foster.Audio.git
