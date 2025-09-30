@@ -81,6 +81,11 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     }
 
     /// <summary>
+    /// Get a new rectangle collider that fills the entire space of a single tile.
+    /// </summary>
+    public RectangleCollider FullCollider => new(tileSize);
+
+    /// <summary>
     /// Set the collider for a tile.
     /// </summary>
     /// <param name="collider">The collider to set.</param>
