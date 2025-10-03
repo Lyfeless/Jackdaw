@@ -36,28 +36,6 @@ public struct GameConfig() {
 /// </summary>
 public struct GameWindowConfig() {
     /// <summary>
-    /// Rendering configuration options.
-    /// </summary>
-    public enum RendererType {
-        /// <summary>
-        /// Scene tree is rendered directly to the screen, 1 window pixel => 1 ingame unit.
-        /// </summary>
-        FULL_WINDOW,
-
-        /// <summary>
-        /// Scene is letterboxed to keep a consistent resolution and aspect ratio.
-        /// </summary>
-        FIXED_VIEWPORT
-    }
-
-    /// <summary>
-    /// Display method for rending the scene tree to the window.
-    /// </summary>
-    [JsonPropertyName("Renderer")]
-    [JsonConverter(typeof(JsonStringEnumConverter<RendererType>))]
-    public RendererType Renderer { get; set; } = RendererType.FIXED_VIEWPORT;
-
-    /// <summary>
     /// Initial width of the full window.
     /// </summary>
     [JsonPropertyName("windowWidth")]

@@ -166,7 +166,7 @@ public class Assets {
 
             // Load all fonts in asset directory
             if (Directory.Exists(FontPath)) {
-                string configPath = Path.Join(Config.RootFolder, Config.RootFolder);
+                string configPath = Path.Join(Config.RootFolder, Config.FontConfig);
                 FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
 
                 foreach (string file in Directory.EnumerateFiles(FontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
