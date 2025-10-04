@@ -123,9 +123,7 @@ public abstract class Component {
 
         Invalidated();
 
-        if (ActorValid) {
-            Actor.Components.Remove(this);
-        }
+        Actor?.Components.Remove(this);
     }
 
     internal void OnAdded() {

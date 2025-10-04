@@ -246,7 +246,9 @@ public class Actor {
         IsValid = false;
 
         if (invalidateChildren) {
-            InvalidateChildren(invalidateComponents);
+            foreach (Actor child in Children.Elements) {
+                child.Invalidate(false, invalidateComponents);
+            }
         }
 
         if (invalidateComponents) {
@@ -266,11 +268,6 @@ public class Actor {
         }
     }
 
-    void InvalidateChildren(bool invalidateComponents = true) {
-        foreach (Actor child in Children.Elements) {
-            child.Invalidate(false, invalidateComponents);
-        }
-    }
 
     bool ParentMatches(Actor check) {
         if (this == check) { return true; }
