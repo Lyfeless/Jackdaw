@@ -42,11 +42,9 @@ public class ComponentContainer(Actor actor) : RecursiveSearchableChildContainer
     }
 
     public override void HandleRemove(Component child) {
-        if (child.IsValid) {
-            child.OnRemoved();
-            if (Owner.InTree) {
-                child.OnExitTree();
-            }
+        child.OnRemoved();
+        if (Owner.InTree) {
+            child.OnExitTree();
         }
         child.Actor = Actor.Invalid;
     }
