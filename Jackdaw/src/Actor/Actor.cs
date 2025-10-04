@@ -271,7 +271,7 @@ public class Actor {
 
     bool ParentMatches(Actor check) {
         if (this == check) { return true; }
-        if (ParentValid) { return Parent.ParentMatches(check); }
+        if (Parent != null && Parent != Invalid) { return Parent.ParentMatches(check); }
         return false;
     }
 
