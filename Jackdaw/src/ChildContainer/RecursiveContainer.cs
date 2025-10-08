@@ -129,5 +129,64 @@ public abstract class RecursiveSearchableChildContainer<Telement, Towner>(Towner
 
         return elements;
     }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <param name="func">The condition function to check.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive(Func<ObjectIdentifier<Telement>, bool> func)
+        => FindRecursive(func) != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="func">The condition function to check.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive<T>(Func<ObjectIdentifier<Telement>, bool> func) where T : class, Telement
+        => FindRecursive<T>(func) != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive<T>() where T : class, Telement
+        => FindRecursive<T>() != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <param name="func">The condition function to check.</param>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive(Func<ObjectIdentifier<Telement>, bool> func, out Telement foundElement) {
+        foundElement = FindRecursive(func);
+        return foundElement != null;
+    }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="func">The condition function to check.</param>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive<T>(Func<ObjectIdentifier<Telement>, bool> func, out T foundElement) where T : class, Telement {
+        foundElement = FindRecursive<T>(func);
+        return foundElement != null;
+    }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition in the elements array and all child objects.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool HasRecursive<T>(out T foundElement) where T : class, Telement {
+        foundElement = FindRecursive<T>();
+        return foundElement != null;
+    }
     #endregion
 }

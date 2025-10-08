@@ -135,5 +135,65 @@ public abstract class SearchableChildContainer<Telement, Towner>(Towner owner) :
 
         return [.. foundElements];
     }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <param name="func">The condition function to check.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has(Func<ObjectIdentifier<Telement>, bool> func)
+        => Find(func) != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="func">The condition function to check.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has<T>(Func<ObjectIdentifier<Telement>, bool> func) where T : class, Telement
+        => Find<T>(func) != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has<T>() where T : class, Telement
+        => Find<T>() != null;
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <param name="func">The condition function to check.</param>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has(Func<ObjectIdentifier<Telement>, bool> func, out Telement foundElement) {
+        foundElement = Find(func);
+        return foundElement != null;
+    }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="func">The condition function to check.</param>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has<T>(Func<ObjectIdentifier<Telement>, bool> func, out T foundElement) where T : class, Telement {
+        foundElement = Find<T>(func);
+        return foundElement != null;
+    }
+
+    /// <summary>
+    /// Check if the container has a child that matches the condition.
+    /// </summary>
+    /// <typeparam name="T">The type of child to search for.</typeparam>
+    /// <param name="foundElement">The first matching element found.</param>
+    /// <returns>If a matching element was found.</returns>
+    public bool Has<T>(out T foundElement) where T : class, Telement {
+        foundElement = Find<T>();
+        return foundElement != null;
+    }
+
     #endregion
 }
