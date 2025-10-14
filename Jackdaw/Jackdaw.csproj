@@ -6,6 +6,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAotCompatible>true</IsAotCompatible>
+
+    <Title>Jackdaw</Title>
+    <Version>0.1.0</Version>
+    <Authors>Lyfeless</Authors>
+    <Description>A simple 2D game library/engine.</Description>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Lyfeless/Jackdaw</RepositoryUrl>
+
+    <PackageId>JackdawEngine</PackageId>
+    <PackageProjectUrl>https://github.com/Lyfeless/Jackdaw</PackageProjectUrl>
+    <PackageTags>Jackdaw;Foster</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +29,11 @@
     <EmbeddedResource Include="Fallback/font.ttf" />
     <EmbeddedResource Include="Fallback/texture.png" />
     <EmbeddedResource Include="Fallback/man.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ProjectDir)..\LICENSE" Pack="true" PackagePath="/" />
+    <None Include="$(ProjectDir)..\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>
