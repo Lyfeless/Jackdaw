@@ -48,6 +48,6 @@ public class LineComponent : Component {
 
     protected override void Render(Batcher batcher) {
         if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(bounds, Actor.Position.GlobalDisplayMatrix))) { return; }
-        batcher.Line(line, LineWeight, Color);
+        batcher.Line(line.From, line.To, LineWeight, Color);
     }
 }

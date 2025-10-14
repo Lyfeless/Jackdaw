@@ -8,7 +8,7 @@
     <IsAotCompatible>true</IsAotCompatible>
 
     <Title>Jackdaw</Title>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Lyfeless</Authors>
     <Description>A simple 2D game library/engine.</Description>
     <RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Foster\Framework\Foster.Framework.csproj" />
+    <!-- <ProjectReference Include="..\Foster\Framework\Foster.Framework.csproj" /> -->
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +34,10 @@
   <ItemGroup>
     <None Include="$(ProjectDir)..\LICENSE" Pack="true" PackagePath="/" />
     <None Include="$(ProjectDir)..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FosterFramework" Version="0.2.2" />
   </ItemGroup>
 
 </Project>
