@@ -26,16 +26,12 @@ public class Timer {
     /// <param name="game">The current game instance.</param>
     /// <param name="duration">The length of the timer in milliseconds.</param>
     /// <param name="timeTracker">The tracker name to time should use. Leave empty to use real time.</param>
-    /// <param name="startFinished">If the timer should be already completed when created.</param>
     /// <param name="startTime">The time offset from the timer's start to begin at in milliseconds.</param>
-    /// <param name="looping">If the timer should loop when done.</param>
-    public Timer(Game game, float duration, string? timeTracker = null, bool startFinished = false, float startTime = 0, bool looping = false) {
+    public Timer(Game game, float duration, string? timeTracker = null, float startTime = 0) {
         Game = game;
         TimeTracker = timeTracker ?? string.Empty;
         Duration = duration;
-        Looping = looping;
         Set(startTime);
-        if (startFinished) { Stop(); }
     }
 
     double Milliseconds => Game.Timers.GetTrackedTime(TimeTracker).TotalMilliseconds;

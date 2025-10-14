@@ -17,9 +17,10 @@ public class SpriteAnimated(Game game, AnimationData animation, float startDelay
     public readonly Timer Timer = new(
         game: game,
         duration: animation.Duration,
-        startTime: -startDelay,
-        looping: animation.Looping
-    );
+        startTime: -startDelay
+    ) {
+        Looping = animation.Looping
+    };
 
     readonly RectInt bounds = (RectInt)new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, e.Texture.Size))]).Rect;
     public override Point2 Size => bounds.Size;

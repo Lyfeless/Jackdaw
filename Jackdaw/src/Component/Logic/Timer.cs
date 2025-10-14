@@ -5,13 +5,10 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="game">The current game instance.</param>
 /// <param name="duration">The timer's duration in milliseconds.</param>
-/// <param name="callback">The action to run when the timer finishes.</param>
 /// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
-/// <param name="startFinished">If the timer should start finished.</param>
 /// <param name="startTime">The time offset the timer should begin with.</param>
-public class TimerComponent(Game game, float duration, Action callback, string? timeTracker = null, bool startFinished = false, float startTime = 0) : Component(game) {
-    readonly Timer Timer = new(game, duration, timeTracker, startFinished, startTime);
-    readonly Action Callback = callback;
+public class TimerComponent(Game game, float duration, string? timeTracker = null, float startTime = 0) : Component(game) {
+    readonly Timer Timer = new(game, duration, timeTracker, startTime);
 
     /// <summary>
     /// If the timer should reset when finished.
@@ -24,14 +21,21 @@ public class TimerComponent(Game game, float duration, Action callback, string? 
     public bool RemoveOnFinish = false;
 
     /// <summary>
+    /// The action to run when the timer finishes or loops.
+    /// </summary>
+    public Action? Callback;
+
+    /// <summary>
     /// A wrapper for the timer object to automatically run actions when finished.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="duration">The timer's duration in milliseconds.</param>
+    /// <param name="callback">The action to run when the timer finishes or loops.</param>
     /// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
-    /// <param name="startFinished">If the timer should start finished.</param>
     /// <param name="startTime">The time offset the timer should begin with.</param>
-    public TimerComponent(Game game, float duration, string? timeTracker = null, bool startFinished = false, float startTime = 0) : this(game, duration, () => { }, timeTracker, startFinished, startTime) { }
+    public TimerComponent(Game game, float duration, Action callback, string? timeTracker = null, float startTime = 0) : this(game, duration, timeTracker, startTime) {
+        Callback = callback;
+    }
 
     /// <summary>
     /// The time since the timer started. Resets when looping.
@@ -77,7 +81,7 @@ public class TimerComponent(Game game, float duration, Action callback, string? 
     protected override void Update() {
         if (!Timer.Done) { return; }
 
-        Callback();
+        Callback?.Invoke();
 
         if (RemoveOnFinish) { Actor.Components.Remove(this); }
         else if (LoopOnFinish) { Timer.Restart(); }
