@@ -125,14 +125,14 @@ public struct GameContentConfig() {
     /// Defaults to ".llanim".
     /// </summary>
     [JsonPropertyName("animationExtension")]
-    public string AnimationExtension { get; set; } = ".llanim";
+    public string AnimationExtension { get; set; } = ".jda";
 
     /// <summary>
     /// The file extension for groups of animations.
     /// Defaults to ".llganim".
     /// </summary>
     [JsonPropertyName("animationGroupExtension")]
-    public string AnimationGroupExtension { get; set; } = ".llganim";
+    public string AnimationGroupExtension { get; set; } = ".jdga";
 
     /// <summary>
     /// The file extension for aseprite sidecar files.
