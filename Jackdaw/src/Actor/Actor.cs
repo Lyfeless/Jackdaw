@@ -250,15 +250,18 @@ public class Actor {
                 child.Invalidate(false, invalidateComponents);
             }
         }
+        else {
+            Children.Clear();
+        }
 
         if (invalidateComponents) {
             foreach (Component component in Components.Elements) {
                 component.OnInvalidated();
             }
         }
-
-        Children.Clear();
-        Components.Clear();
+        else {
+            Components.Clear();
+        }
 
         Children.ApplyChanges();
         Components.ApplyChanges();
