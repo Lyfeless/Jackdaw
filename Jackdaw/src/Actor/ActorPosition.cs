@@ -328,7 +328,7 @@ public struct ActorPosition {
     /// <param name="position">The local position to transform.</param>
     /// <param name="other">The actor position the position is relative to.</param>
     /// <returns>The position in the new local space.</returns>
-    public Vector2 FromOtherLocal(Vector2 position, ActorPosition other) => GlobalToLocal(other.GlobalToLocal(position));
+    public Vector2 FromOtherLocal(Vector2 position, ActorPosition other) => GlobalToLocal(other.LocalToGlobal(position));
 
     /// <summary>
     /// Convert a another actor's position to local space.
