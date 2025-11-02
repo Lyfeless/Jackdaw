@@ -119,11 +119,7 @@ public class Actor {
     /// <summary>
     /// If all parents above the actor are ticking their children
     /// </summary>
-    public bool GlobalTicking {
-        get {
-            return ParentValid ? Parent.GlobalTicking : ChildrenTicking;
-        }
-    }
+    public bool GlobalTicking => ChildrenTicking && (!ParentValid || Parent.GlobalTicking);
 
     /// <summary>
     /// If the actor is currently in the game's node tree.
