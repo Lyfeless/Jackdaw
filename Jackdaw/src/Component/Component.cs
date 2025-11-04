@@ -39,12 +39,29 @@ public abstract class Component {
     /// <summary>
     /// Should the component tick while attached to an actor.
     /// </summary>
-    public bool Ticking = true;
+    public bool Ticking {
+        get => ticking;
+        set {
+            if (ticking == value) { return; }
+            ticking = value;
+            OnTickingChanged();
+        }
+    }
 
     /// <summary>
     /// Should the component render while attached to an actor.
     /// </summary>
-    public bool Visible = true;
+    public bool Visible {
+        get => visible;
+        set {
+            if (visible == value) { return; }
+            visible = value;
+            OnVisibilityChanged();
+        }
+    }
+
+    bool ticking = true;
+    bool visible = true;
 
     bool addedToActor = false;
     bool addedToTree = false;
@@ -108,6 +125,36 @@ public abstract class Component {
     /// </summary>
     protected virtual void Invalidated() { }
 
+    /// <summary>
+    /// Runs when the component's ticking state changes.
+    /// </summary>
+    protected virtual void TickingChanged() { }
+
+    /// <summary>
+    /// Runs when the component starts ticking. Not ran when the component is created, despite starting active.
+    /// </summary>
+    protected virtual void TickingOn() { }
+
+    /// <summary>
+    /// Runs when the component stops ticking.
+    /// </summary>
+    protected virtual void TickingOff() { }
+
+    /// <summary>
+    /// Runs when the component's visibility state changes.
+    /// </summary>
+    protected virtual void VisibilityChanged() { }
+
+    /// <summary>
+    /// Runs when the component becomes visible. Not ran when the component is created, despite starting visible.
+    /// </summary>
+    protected virtual void VisibilityOn() { }
+
+    /// <summary>
+    /// Runs when the component becomes not visible.
+    /// </summary>
+    protected virtual void VisibilityOff() { }
+
     public override string ToString() {
         return Match.ToString();
     }
@@ -141,6 +188,20 @@ public abstract class Component {
             EnterTreeFirst();
         }
         EnterTree();
+    }
+
+    internal void OnTickingChanged() {
+        if (Ticking) { TickingOn(); }
+        else { TickingOff(); }
+
+        TickingChanged();
+    }
+
+    internal void OnVisibilityChanged() {
+        if (Visible) { VisibilityOn(); }
+        else { VisibilityOff(); }
+
+        VisibilityChanged();
     }
 
     /// <summary>
