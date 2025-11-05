@@ -1184,7 +1184,7 @@ public class CollisionManager {
 
     static bool CheckComponent(CollisionComponent component) {
         return
-            component.Actor.GlobalTicking &&
+            component.Actor.GlobalComponentsTicking &&
             component.Ticking;
     }
     #endregion

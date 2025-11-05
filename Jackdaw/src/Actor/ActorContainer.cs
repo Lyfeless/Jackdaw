@@ -27,28 +27,9 @@ public class ActorContainer(Actor actor) : RecursiveSearchableChildContainer<Act
         return child.Match.ToString();
     }
 
-    public override void HandleAdd(Actor child) {
-        if (child.ParentValid) {
-            child.Parent.Children.Remove(child);
-        }
+    public override void HandleAdd(Actor child) => child.ParentAdded(Owner);
 
-        child.Parent = Owner;
-        if (Owner.InTree) {
-            child.EnterTree();
-        }
-
-        child.Parent.Position.MakeDirty();
-    }
-
-    public override void HandleRemove(Actor child) {
-        if (Owner.InTree) {
-            child.ExitTree();
-        }
-
-        child.Parent = Actor.Invalid;
-
-        child.Parent.Position.MakeDirty();
-    }
+    public override void HandleRemove(Actor child) => child.ParentRemoved();
 
     protected override ObjectIdentifier<Actor> Match(Actor element) => element.Match;
 

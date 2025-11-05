@@ -61,7 +61,10 @@ public abstract class Component {
     }
 
     bool ticking = true;
+    bool globalTicking = true;
+
     bool visible = true;
+    bool globalVisible = true;
 
     bool addedToActor = false;
     bool addedToTree = false;
@@ -191,14 +194,22 @@ public abstract class Component {
     }
 
     internal void OnTickingChanged() {
-        if (Ticking) { TickingOn(); }
+        bool newTickingState = Ticking && Actor.GlobalComponentsTicking;
+        if (newTickingState == globalTicking) { return; }
+        globalTicking = newTickingState;
+
+        if (globalTicking) { TickingOn(); }
         else { TickingOff(); }
 
         TickingChanged();
     }
 
     internal void OnVisibilityChanged() {
-        if (Visible) { VisibilityOn(); }
+        bool newVisibleState = Visible && Actor.GlobalComponentsVisible;
+        if (newVisibleState == globalVisible) { return; }
+        globalVisible = newVisibleState;
+
+        if (globalVisible) { VisibilityOn(); }
         else { VisibilityOff(); }
 
         VisibilityChanged();

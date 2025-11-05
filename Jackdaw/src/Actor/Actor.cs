@@ -66,16 +66,32 @@ public class Actor {
     /// <summary>
     /// If the actor's components should render.
     /// </summary>
-    public bool ComponentsVisible = true;
+    public bool ComponentsVisible {
+        get => componentsVisible;
+        set => componentsVisible = value;
+    }
+
+    /// <summary>
+    /// If the actor's componenents will render due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalComponentsVisible => ComponentsVisible && ParentTicking;
 
     /// <summary>
     /// If the actor's children should render.
     /// </summary>
-    public bool ChildrenVisible = true;
+    public bool ChildrenVisible {
+        get => childrenVisible;
+        set => childrenVisible = value;
+    }
+
+    /// <summary>
+    /// If the actor's children will render due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalChildrenVisible => ChildrenVisible && ParentTicking;
 
     /// <summary>
     /// If the actor's components and children are rendering.
-    /// Assigning changes the value of both <see cref="ComponentsVisible"> and <see cref="ChildrenVisible">
+    /// Assigning changes the value of both <see cref="ComponentsVisible" /> and <see cref="ChildrenVisible" />
     /// </summary>
     public bool Visible {
         get => ComponentsVisible && ChildrenVisible;
@@ -86,27 +102,50 @@ public class Actor {
     }
 
     /// <summary>
+    /// If the actor will render due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalVisible => Visible && ParentVisible;
+
+    /// <summary>
     /// If all parents above the actor are rendering their children
     /// </summary>
-    public bool GlobalVisible {
-        get {
-            return ParentValid ? Parent.GlobalVisible : ChildrenVisible;
-        }
-    }
+    public bool ParentVisible { get; internal set; } = true;
 
     /// <summary>
     /// If the actor's components should tick.
     /// </summary>
-    public bool ComponentsTicking = true;
+    public bool ComponentsTicking {
+        get => componentsTicking;
+        set {
+            componentsTicking = value;
+            ComponentTickingChanged();
+        }
+    }
+
+    /// <summary>
+    /// If the actor's componenents will tick due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalComponentsTicking => ComponentsTicking && ParentTicking;
 
     /// <summary>
     /// If the actor's children should tick.
     /// </summary>
-    public bool ChildrenTicking = true;
+    public bool ChildrenTicking {
+        get => childrenTicking;
+        set {
+            childrenTicking = value;
+            ChildrenTickingChanged();
+        }
+    }
+
+    /// <summary>
+    /// If the actor's children will tick due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalChildrenTicking => ChildrenTicking && ParentTicking;
 
     /// <summary>
     /// If the actor's components and children are ticking.
-    /// Assigning changes the value of both <see cref="ComponentsTicking"> and <see cref="ChildrenTicking">
+    /// Assigning changes the value of both <see cref="ComponentsTicking" /> and <see cref="ChildrenTicking" />
     /// </summary>
     public bool Ticking {
         get => ComponentsTicking && ChildrenTicking;
@@ -117,14 +156,26 @@ public class Actor {
     }
 
     /// <summary>
+    /// If the actor will tick due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalTicking => Ticking && ParentTicking;
+
+    /// <summary>
     /// If all parents above the actor are ticking their children
     /// </summary>
-    public bool GlobalTicking => ChildrenTicking && (!ParentValid || Parent.GlobalTicking);
+    public bool ParentTicking { get; internal set; } = true;
+    // public bool GlobalTicking => ChildrenTicking && (!ParentValid || Parent.GlobalTicking);
 
     /// <summary>
     /// If the actor is currently in the game's node tree.
     /// </summary>
-    public bool InTree => Game != null && ParentMatches(Game.Root);
+    public bool InTree { get; internal set; } = false;
+
+    bool componentsVisible = true;
+    bool childrenVisible = true;
+
+    bool componentsTicking = true;
+    bool childrenTicking = true;
 
     bool addedToTree = false;
 
@@ -199,6 +250,8 @@ public class Actor {
     }
 
     internal void EnterTree() {
+        InTree = true;
+
         if (!addedToTree) {
             EnterTreeFirst();
             addedToTree = true;
@@ -216,6 +269,8 @@ public class Actor {
     internal void EnterTreeFirst() { }
 
     internal void ExitTree() {
+        InTree = false;
+
         foreach (Component component in Components.Elements) {
             component.OnExitTree();
         }
@@ -223,6 +278,35 @@ public class Actor {
         foreach (Actor child in Children.Elements) {
             child.ExitTree();
         }
+    }
+
+    internal void ParentAdded(Actor parent) {
+        if (ParentValid) {
+            Parent.Children.Remove(this);
+        }
+
+        Parent = parent;
+        if (Parent.InTree) {
+            EnterTree();
+        }
+
+        ParentTickingChanged();
+        ParentVisibilityChanged();
+
+        Position.MakeDirty();
+    }
+
+    internal void ParentRemoved() {
+        if (Parent.InTree) {
+            ExitTree();
+        }
+
+        Parent = Invalid;
+
+        ParentTickingChanged();
+        ParentVisibilityChanged();
+
+        Position.MakeDirty();
     }
 
     /// <summary>
@@ -267,11 +351,40 @@ public class Actor {
         }
     }
 
+    internal void ParentTickingChanged() {
+        ParentTicking = Parent.GlobalChildrenTicking;
+        ChildrenTickingChanged();
+        ComponentTickingChanged();
+    }
 
-    bool ParentMatches(Actor check) {
-        if (this == check) { return true; }
-        if (Parent != null && Parent != Invalid) { return Parent.ParentMatches(check); }
-        return false;
+    internal void ChildrenTickingChanged() {
+        foreach (Actor child in Children.Elements) {
+            child.ParentTickingChanged();
+        }
+    }
+
+    internal void ComponentTickingChanged() {
+        foreach (Component component in Components.Elements) {
+            component.OnTickingChanged();
+        }
+    }
+
+    internal void ParentVisibilityChanged() {
+        ParentVisible = Parent.GlobalChildrenVisible;
+        ChildrenVisibilityChanged();
+        ComponentVisibilityChanged();
+    }
+
+    internal void ChildrenVisibilityChanged() {
+        foreach (Actor child in Children.Elements) {
+            child.ParentVisibilityChanged();
+        }
+    }
+
+    internal void ComponentVisibilityChanged() {
+        foreach (Component component in Components.Elements) {
+            component.OnVisibilityChanged();
+        }
     }
 
     /// <summary>
