@@ -162,8 +162,8 @@ public abstract class Component {
         return Match.ToString();
     }
 
-    internal void OnUpdate() => Update();
-    internal void OnRender(Batcher batcher) => Render(batcher);
+    internal void OnUpdate() { if (Ticking) { Update(); } }
+    internal void OnRender(Batcher batcher) { if (Visible) { Render(batcher); } }
     internal void OnRemoved() => Removed();
     internal void OnExitTree() => ExitTree();
     internal void OnInvalidated() {

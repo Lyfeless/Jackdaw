@@ -175,6 +175,10 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         return Owner;
     }
 
+    public void RunAll(Action<Telement> action) {
+        foreach (Telement element in Elements) { action(element); }
+    }
+
     public void ApplyChanges() {
         if (modifyActions.Count == 0) { return; }
         for (int i = 0; i < modifyActions.Count; ++i) {

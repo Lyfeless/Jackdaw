@@ -205,9 +205,7 @@ public struct ActorPosition {
 
     internal void MakeDirty() {
         isDirty = true;
-        foreach (Actor child in Actor.Children.Elements) {
-            child.Position.MakeDirty();
-        }
+        Actor.Children.RunAll(e => e.Position.MakeDirty());
     }
 
     void CachePosition() {

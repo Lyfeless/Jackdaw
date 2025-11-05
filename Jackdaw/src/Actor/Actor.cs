@@ -196,17 +196,8 @@ public class Actor {
     /// Both are updated in the order they're stored in their container, from first to last.
     /// </summary>
     internal void Update() {
-        if (ChildrenTicking) {
-            foreach (Actor child in Children.Elements) {
-                child.Update();
-            }
-        }
-
-        if (ComponentsTicking) {
-            foreach (Component component in Components.Elements) {
-                if (component.Ticking) { component.OnUpdate(); }
-            }
-        }
+        if (ChildrenTicking) { Children.RunAll(e => e.Update()); }
+        if (ComponentsTicking) { Components.RunAll(e => e.OnUpdate()); }
     }
 
     /// <summary>
@@ -224,17 +215,8 @@ public class Actor {
         RenderActions.PreRender(batcher);
         Batcher currentBatcher = RenderActions.CurrentBatcher;
 
-        if (ComponentsVisible) {
-            foreach (Component component in Components.Elements) {
-                if (component.Visible) { component.OnRender(currentBatcher); }
-            }
-        }
-
-        if (ChildrenVisible) {
-            foreach (Actor child in Children.Elements) {
-                child.Render(currentBatcher);
-            }
-        }
+        if (ComponentsVisible) { Components.RunAll(e => e.OnRender(currentBatcher)); }
+        if (ChildrenVisible) { Children.RunAll(e => e.Render(batcher)); }
 
         RenderActions.PostRender();
 
@@ -243,9 +225,7 @@ public class Actor {
 
     internal void ApplyChanges() {
         Children.ApplyChanges();
-        foreach (Actor child in Children.Elements) {
-            child.ApplyChanges();
-        }
+        Children.RunAll(e => e.ApplyChanges());
         Components.ApplyChanges();
     }
 
@@ -257,13 +237,8 @@ public class Actor {
             addedToTree = true;
         }
 
-        foreach (Component component in Components.Elements) {
-            component.OnEnterTree();
-        }
-
-        foreach (Actor child in Children.Elements) {
-            child.EnterTree();
-        }
+        Components.RunAll(e => e.OnEnterTree());
+        Children.RunAll(e => e.EnterTree());
     }
 
     internal void EnterTreeFirst() { }
@@ -271,24 +246,15 @@ public class Actor {
     internal void ExitTree() {
         InTree = false;
 
-        foreach (Component component in Components.Elements) {
-            component.OnExitTree();
-        }
-
-        foreach (Actor child in Children.Elements) {
-            child.ExitTree();
-        }
+        Components.RunAll(e => e.OnExitTree());
+        Children.RunAll(e => e.ExitTree());
     }
 
     internal void ParentAdded(Actor parent) {
-        if (ParentValid) {
-            Parent.Children.Remove(this);
-        }
+        if (ParentValid) { Parent.Children.Remove(this); }
 
         Parent = parent;
-        if (Parent.InTree) {
-            EnterTree();
-        }
+        if (Parent.InTree) { EnterTree(); }
 
         ParentTickingChanged();
         ParentVisibilityChanged();
@@ -297,9 +263,7 @@ public class Actor {
     }
 
     internal void ParentRemoved() {
-        if (Parent.InTree) {
-            ExitTree();
-        }
+        if (Parent.InTree) { ExitTree(); }
 
         Parent = Invalid;
 
@@ -325,23 +289,11 @@ public class Actor {
 
         IsValid = false;
 
-        if (invalidateChildren) {
-            foreach (Actor child in Children.Elements) {
-                child.Invalidate(false, invalidateComponents);
-            }
-        }
-        else {
-            Children.Clear();
-        }
+        if (invalidateChildren) { Children.RunAll(e => e.Invalidate(invalidateChildren, invalidateComponents)); }
+        else { Children.Clear(); }
 
-        if (invalidateComponents) {
-            foreach (Component component in Components.Elements) {
-                component.OnInvalidated();
-            }
-        }
-        else {
-            Components.Clear();
-        }
+        if (invalidateComponents) { Components.RunAll(e => e.OnInvalidated()); }
+        else { Components.Clear(); }
 
         Children.ApplyChanges();
         Components.ApplyChanges();
@@ -357,17 +309,9 @@ public class Actor {
         ComponentTickingChanged();
     }
 
-    internal void ChildrenTickingChanged() {
-        foreach (Actor child in Children.Elements) {
-            child.ParentTickingChanged();
-        }
-    }
+    internal void ChildrenTickingChanged() => Children.RunAll(e => e.ParentTickingChanged());
 
-    internal void ComponentTickingChanged() {
-        foreach (Component component in Components.Elements) {
-            component.OnTickingChanged();
-        }
-    }
+    internal void ComponentTickingChanged() => Components.RunAll(e => e.OnTickingChanged());
 
     internal void ParentVisibilityChanged() {
         ParentVisible = Parent.GlobalChildrenVisible;
@@ -375,17 +319,9 @@ public class Actor {
         ComponentVisibilityChanged();
     }
 
-    internal void ChildrenVisibilityChanged() {
-        foreach (Actor child in Children.Elements) {
-            child.ParentVisibilityChanged();
-        }
-    }
+    internal void ChildrenVisibilityChanged() => Children.RunAll(e => e.ParentVisibilityChanged());
 
-    internal void ComponentVisibilityChanged() {
-        foreach (Component component in Components.Elements) {
-            component.OnVisibilityChanged();
-        }
-    }
+    internal void ComponentVisibilityChanged() => Components.RunAll(e => e.OnVisibilityChanged());
 
     /// <summary>
     /// Create a new actor pre-assigned with the supplied children.
