@@ -36,7 +36,7 @@ public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBo
         Batcher.PushMatrix(-Bounds.Position);
 
         float scale = Calc.Min(Bounds.Size.X / Target.Width, Bounds.Size.Y / Target.Height);
-        DisplayScale = Transform.CreateMatrix(Bounds.Position + ((Point2)Bounds.Size / 2), new Vector2(Target.Width, Target.Height) / 2, Vector2.One * scale, 0);
+        DisplayScale = Transform.CreateMatrix(Bounds.Position + (Bounds.Size.FloorToPoint2() / 2), Target.SizeInPixels() / 2, Vector2.One * scale, 0);
 
         container.PushBatcher(Batcher);
     }
@@ -47,5 +47,6 @@ public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBo
         Batcher.Render(Target);
         container.CurrentBatcher.PushMatrix(DisplayScale);
         container.CurrentBatcher.Image(Target, Color.White);
+        container.CurrentBatcher.PopMatrix();
     }
 }

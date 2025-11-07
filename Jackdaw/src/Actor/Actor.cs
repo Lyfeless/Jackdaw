@@ -216,7 +216,7 @@ public class Actor {
         Batcher currentBatcher = RenderActions.CurrentBatcher;
 
         if (ComponentsVisible) { Components.RunAll(e => e.OnRender(currentBatcher)); }
-        if (ChildrenVisible) { Children.RunAll(e => e.Render(batcher)); }
+        if (ChildrenVisible) { Children.RunAll(e => e.Render(currentBatcher)); }
 
         RenderActions.PostRender();
 
