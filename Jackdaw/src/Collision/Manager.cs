@@ -314,8 +314,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Vector2 velocity)
+        => GetSweptCollision(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -325,8 +325,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, ActorPosition position, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, ActorPosition position, Vector2 velocity)
+        => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -336,8 +336,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Transform position, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Transform position, Vector2 velocity)
+        => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -347,9 +347,9 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity, bool allowNegative = false) {
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity) {
         Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetSweptCollision(collider, position, positionInv, velocity, allowNegative);
+        return GetSweptCollision(collider, position, positionInv, velocity);
     }
 
     /// <summary>
@@ -361,8 +361,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(e => CheckComponent(collider, e), collider.Collider, position, positionInv, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
+        => GetSweptCollision(e => CheckComponent(collider, e), collider.Collider, position, positionInv, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -372,8 +372,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(Collider collider, ActorPosition position, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(Collider collider, ActorPosition position, Vector2 velocity)
+        => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -383,8 +383,8 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(Collider collider, Transform position, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(Collider collider, Transform position, Vector2 velocity)
+        => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -394,9 +394,9 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity, bool allowNegative = false) {
+    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity) {
         Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetSweptCollision(collider, position, positionInv, velocity, allowNegative);
+        return GetSweptCollision(collider, position, positionInv, velocity);
     }
 
     /// <summary>
@@ -408,25 +408,24 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity, bool allowNegative = false)
-        => GetSweptCollision(CheckComponent, collider, position, positionInv, velocity, allowNegative);
+    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
+        => GetSweptCollision(CheckComponent, collider, position, positionInv, velocity);
 
-    SweptCollisionInfo GetSweptCollision(Func<CollisionComponent, bool> componentCheck, Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity, bool allowNegative = false) {
+    SweptCollisionInfo GetSweptCollision(Func<CollisionComponent, bool> componentCheck, Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity) {
         // If object isn't moving just get the first collided object to avoid extra calculations
         if (velocity == Vector2.Zero) {
             Log.Info("COLLISION: Trying to get swept collision with no velocity could result in errors, returning basic collision check");
             SingleCollisionInfo collision = GetFirstCollision(collider, position);
-            return new(collision.Collided, Vector2.Zero, Vector2.Zero, []);
+            return new(collision.Collided, Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero, []);
         }
 
-        Vector2 minFraction = Vector2.One;
-        CollisionComponent? minCollider = null;
+        int minCollider = -1;
         List<SweptCollisionComponentInfo> componentInfo = [];
 
         foreach (CollisionComponent other in Colliders) {
             if (!componentCheck(other)) { continue; }
 
-            SweepColliderPair[] collisionPairs = ColliderIntersectionFraction(new(
+            SweptCollisionComponentInfo result = GetSweptComponentInfo(new(
                 collider,
                 position,
                 positionInv,
@@ -435,44 +434,61 @@ public class CollisionManager {
                 other.Actor.Position.GlobalMatrix,
                 other.Actor.Position.GlobalMatrixInverse,
                 Vector2.Zero
-            ));
+            ), other);
 
-            if (collisionPairs.Length == 0) { continue; }
+            if (result.Colliders.Length == 0) { continue; }
 
-            SweptColliderInfo[] colliders = new SweptColliderInfo[collisionPairs.Length];
-            int closest = 0;
-            for (int i = 0; i < colliders.Length; ++i) {
-                SweepColliderPair pair = collisionPairs[i];
-                colliders[i] = new(pair.B, pair.Fraction, pair.Normal);
-                if (IsRayFractionSmaller(pair.Fraction, collisionPairs[closest].Fraction)) {
-                    closest = i;
-                }
-            }
-
-            SweptCollisionComponentInfo result = new(other, colliders[closest].Fraction, closest, colliders);
-
-            if (IsRayFractionSmaller(result.Colliders[result.ClosestCollider].Fraction, minFraction)) {
-                minFraction = result.Colliders[result.ClosestCollider].Fraction;
-                minCollider = other;
+            if (minCollider == -1 || IsRayFractionSmaller(result.Colliders[result.ClosestCollider].Fraction, componentInfo[minCollider].Fraction)) {
+                minCollider = componentInfo.Count;
             }
             componentInfo.Add(result);
         }
 
+        if (minCollider == -1) { return new(false, velocity, velocity, Vector2.One, Vector2.One, []); }
+
+        Vector2 velocityScaled = velocity * componentInfo[minCollider].Fraction;
+        Vector2 velocityScaledClamped = velocity * componentInfo[minCollider].FractionClamped;
+
+        // Failsafe: Collision bugs occasionally let object intersect after a sweep, if that happens to move is cancelled.
+        //  The hope is this only occurs with precision due to colliders being very close so the cancel shouldn't be too noticable.
+        //  Need to find the solution in the algorithm eventually though.
+        if (GetFirstCollision(collider, Matrix3x2.CreateTranslation(velocityScaled) * position).Collided) { return new(false, Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero, []); }
+
         SweptCollisionComponentInfo[] outputComponentInfo = [.. componentInfo.OrderBy(e => e.Fraction.LengthSquared())];
-        // return GetSweptCollisionResult([.. componentInfo], velocity, minFraction, minCollider, allowNegative);
 
-        bool collided = outputComponentInfo.Length > 0;
+        return new(
+            true,
+            velocityScaled,
+            velocityScaledClamped,
+            componentInfo[minCollider].Fraction,
+            componentInfo[minCollider].FractionClamped,
+            outputComponentInfo
+        );
+    }
 
-        // Apply small pushback to stop objects getting stuck inside one another
-        if (collided) {
-            minFraction -= minFraction.Normalized() * (SWEEP_TOLERANCE + float.Epsilon);
+    SweptCollisionComponentInfo GetSweptComponentInfo(ColliderContext ctx, CollisionComponent component) {
+        SweepColliderPair[] collisionPairs = ColliderIntersectionFraction(ctx);
+
+        if (collisionPairs.Length == 0) { return new(component, Vector2.One, Vector2.One, 0, []); }
+
+        SweptColliderInfo[] colliders = new SweptColliderInfo[collisionPairs.Length];
+        int closest = 0;
+        for (int i = 0; i < colliders.Length; ++i) {
+            SweepColliderPair pair = collisionPairs[i];
+
+            Vector2 fraction = pair.Fraction;
+            // Apply small pushback to stop objects getting stuck inside one another
+            fraction -= Vector2.One * (SWEEP_TOLERANCE + float.Epsilon);
+            Vector2 fractionClamped = FractionNegative(fraction) ? Vector2.Zero : fraction;
+
+            SweptColliderInfo info = new(pair.B, fraction, fractionClamped, pair.Normal);
+            if (IsRayFractionSmaller(info.Fraction, collisionPairs[closest].Fraction)) {
+                closest = i;
+            }
+            colliders[i] = info;
         }
 
-        if (!allowNegative && FractionNegative(minFraction)) {
-            minFraction = Vector2.Zero;
-        }
-
-        return new(collided, velocity * minFraction, minFraction, outputComponentInfo);
+        return new(component, colliders[closest].Fraction, colliders[closest].FractionClamped, closest, colliders);
     }
     #endregion
 
@@ -616,7 +632,7 @@ public class CollisionManager {
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Matrix3x2 position, Vector2 direction) {
         if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
-        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction, true), direction);
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction), direction);
     }
 
     /// <summary>
@@ -631,7 +647,7 @@ public class CollisionManager {
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Matrix3x2 position, Vector2 direction) {
         if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
-        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction, true), direction);
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction), direction);
     }
 
     PushoutCollisionInfo GetCollisionPushout(Func<CollisionComponent, bool> componentCheck, Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {

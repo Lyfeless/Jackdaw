@@ -29,9 +29,11 @@ public record struct PushoutCollisionInfo(bool Collided, Vector2 Pushout, Pushou
 /// </summary>
 /// <param name="Collided">If the collision check found any collisions.</param>
 /// <param name="AdjustedVelocity">The velocity adjusted by all collisions.</param>
+/// <param name="AdjustedVelocityClamped">The velocity adjusted by all collisions, clamped to not include backwards movement.</param>
 /// <param name="VelocityFraction">The percent of the total velocity the shape was able to move.</param>
+/// <param name="VelocityFractionClamped">The percent of the total velocity the shape was able to move, clamped to not include negative fractions.</param>
 /// <param name="ColliderInfo">Information about all found collisions, sorted by smallest velocity fraction.</param>
-public record struct SweptCollisionInfo(bool Collided, Vector2 AdjustedVelocity, Vector2 VelocityFraction, SweptCollisionComponentInfo[] ColliderInfo);
+public record struct SweptCollisionInfo(bool Collided, Vector2 AdjustedVelocity, Vector2 AdjustedVelocityClamped, Vector2 VelocityFraction, Vector2 VelocityFractionClamped, SweptCollisionComponentInfo[] ColliderInfo);
 
 
 /// <summary>
@@ -53,9 +55,11 @@ public record struct PushoutCollisionComponentInfo(CollisionComponent Component,
 /// Raycast and shapecast single collision information.
 /// </summary>
 /// <param name="Component">The collided component.</param>
+/// <param name="Fraction">The fraction of the total velocity the cast was able to complete.</param>
+/// <param name="FractionClamped">The fraction of the total velocity the cast was able to complete, clamped to not include negative fractions.</param>
 /// <param name="ClosestCollider">The collider closest to the start of the cast.</param>
 /// <param name="Colliders">All the subcolliders in the component that were collided.</param>
-public record struct SweptCollisionComponentInfo(CollisionComponent Component, Vector2 Fraction, int ClosestCollider, SweptColliderInfo[] Colliders);
+public record struct SweptCollisionComponentInfo(CollisionComponent Component, Vector2 Fraction, Vector2 FractionClamped, int ClosestCollider, SweptColliderInfo[] Colliders);
 
 /// <summary>
 /// Single collider information with pushout information.
@@ -69,5 +73,6 @@ public record struct PushoutColliderInfo(Collider Collider, Vector2 Pushout);
 /// </summary>
 /// <param name="Collider">The collider.</param>
 /// <param name="Fraction">The fraction of the total velocity the cast was able to complete.</param>
+/// <param name="FractionClamped">The fraction of the total velocity the cast was able to complete, clamped to not include negative fractions.</param>
 /// <param name="Normal">The normal vector of the collided side of the collider.</param>
-public record struct SweptColliderInfo(Collider Collider, Vector2 Fraction, Vector2 Normal);
+public record struct SweptColliderInfo(Collider Collider, Vector2 Fraction, Vector2 FractionClamped, Vector2 Normal);
