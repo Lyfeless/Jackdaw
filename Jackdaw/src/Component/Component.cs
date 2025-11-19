@@ -9,17 +9,17 @@ public abstract class Component {
     /// <summary>
     /// The current game instance.
     /// </summary>
-    public Game Game;
+    public Game Game { get; internal set; }
 
     /// <summary>
     /// The actor that currently owns this component.
     /// </summary>
-    public Actor Actor = Actor.Invalid;
+    public Actor Actor { get; internal set; } = Actor.Invalid;
 
     /// <summary>
     /// If the component is a valid, usable instance.
     /// </summary>
-    public bool IsValid { get; private set; } = true;
+    public bool IsValid { get; internal set; } = true;
 
     /// <summary>
     /// If the actor is a currently active, non-invalidated instance.
@@ -34,7 +34,7 @@ public abstract class Component {
     /// <summary>
     /// Component identifier, used when searching for specific components in the tree.
     /// </summary>
-    public ObjectIdentifier<Component> Match;
+    public readonly ObjectIdentifier<Component> Match;
 
     /// <summary>
     /// Should the component tick while attached to an actor.

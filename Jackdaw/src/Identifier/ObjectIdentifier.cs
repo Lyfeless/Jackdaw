@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// <param name="obj">The object to identify.</param>
 /// <param name="guid">A randomly generated unique identifier.</param>
 /// <param name="name">A string identifier for the object.</param>
-public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T : class {
+public class ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T : class {
     /// <summary>
     /// A unique identifier.
     /// </summary>
@@ -46,7 +46,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="guid">The guid to compare with.</param>
     /// <returns>If the guid matches.</returns>
-    public readonly bool ByGuid(Guid guid) {
+    public bool ByGuid(Guid guid) {
         return guid == Guid;
     }
 
@@ -55,7 +55,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="name">The name to compare with.</param>
     /// <returns>If the name matches.</returns>
-    public readonly bool ByName(string name) {
+    public bool ByName(string name) {
         return name == Name;
     }
 
@@ -64,7 +64,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="type">The type to compare with.</param>
     /// <returns>If the type matches.</returns>
-    public readonly bool ByType(Type type) {
+    public bool ByType(Type type) {
         return type == ObjType;
     }
 
@@ -73,7 +73,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <typeparam name="Tcheck">The type to compare with.</typeparam>
     /// <returns>If the type matches.</returns>
-    public readonly bool ByType<Tcheck>() {
+    public bool ByType<Tcheck>() {
         return typeof(Tcheck) == ObjType;
     }
 
@@ -82,7 +82,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="obj">The object to compare with.</param>
     /// <returns>If the object matches.</returns>
-    public readonly bool ByObject(T obj) {
+    public bool ByObject(T obj) {
         return obj == Obj;
     }
 
@@ -91,7 +91,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="tags">The tags to compare with, stored as individual bits.</param>
     /// <returns>If any of the tags match.</returns>
-    public readonly bool ByAnyTags(long tags) {
+    public bool ByAnyTags(long tags) {
         return Tags.Any(tags);
     }
 
@@ -100,7 +100,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="values">The tags to compare with.</param>
     /// <returns>If any of the tags match.</returns>
-    public readonly bool ByAnyTags(params int[] values) {
+    public bool ByAnyTags(params int[] values) {
         return Tags.Any(values);
     }
 
@@ -109,7 +109,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="values">The tags to compare with.</param>
     /// <returns>If any of the tags match.</returns>
-    public readonly bool ByAnyTags(params Enum[] values) {
+    public bool ByAnyTags(params Enum[] values) {
         return Tags.Any(values);
     }
 
@@ -118,7 +118,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="tags">The tags to compare with, stored as individual bits.</param>
     /// <returns>If all of the tags match.</returns>
-    public readonly bool ByAllTags(long tags) {
+    public bool ByAllTags(long tags) {
         return Tags.All(tags);
     }
 
@@ -127,7 +127,7 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="values">The tags to compare with.</param>
     /// <returns>If all of the tags match.</returns>
-    public readonly bool ByAllTags(params int[] values) {
+    public bool ByAllTags(params int[] values) {
         return Tags.All(values);
     }
 
@@ -136,11 +136,11 @@ public struct ObjectIdentifier<T>(T obj, Guid guid, string? name = null) where T
     /// </summary>
     /// <param name="values">The tags to compare with.</param>
     /// <returns>If all of the tags match.</returns>
-    public readonly bool ByAllTags(params Enum[] values) {
+    public bool ByAllTags(params Enum[] values) {
         return Tags.All(values);
     }
 
-    public override readonly string ToString() {
+    public override string ToString() {
         return Name ?? $"{ObjType} {Guid}";
     }
 }

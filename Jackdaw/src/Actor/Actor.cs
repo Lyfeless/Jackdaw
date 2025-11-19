@@ -21,32 +21,32 @@ public class Actor {
     /// <summary>
     /// The active game instance.
     /// </summary>
-    public Game Game;
+    public Game Game { get; internal set; }
 
     /// <summary>
     /// The actor's parent in the node tree. <see cref="Invalid"> if no parent is assigned.
     /// </summary>
-    public Actor Parent;
+    public Actor Parent { get; internal set; }
 
     /// <summary>
     /// Actor identifier, used when searching for specific actors in the tree.
     /// </summary>
-    public ObjectIdentifier<Actor> Match;
+    public readonly ObjectIdentifier<Actor> Match;
 
     /// <summary>
     /// All child actors owned by this actor.
     /// </summary>
-    public ActorContainer Children;
+    public readonly ActorContainer Children;
 
     /// <summary>
     /// All components attached to the actor.
     /// </summary>
-    public ComponentContainer Components;
+    public readonly ComponentContainer Components;
 
     /// <summary>
     /// All custom rendering actions to run on the actor.
     /// </summary>
-    public RenderActionContainer RenderActions;
+    public readonly RenderActionContainer RenderActions;
 
     /// <summary>
     /// Is the current actor valid and usable. False once the actor has been invalidated.
@@ -61,7 +61,7 @@ public class Actor {
     /// <summary>
     /// The position of the actor. Relative to its current parent.
     /// </summary>
-    public ActorPosition Position;
+    public ActorPosition Position { get; }
 
     /// <summary>
     /// If the actor's components should render.

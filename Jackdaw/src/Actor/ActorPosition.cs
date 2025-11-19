@@ -6,7 +6,7 @@ namespace Jackdaw;
 /// <summary>
 /// Position data for an Actor's local, global, and display positions.
 /// </summary>
-public struct ActorPosition {
+public class ActorPosition {
     /// <summary>
     /// The actor storing the position.
     /// </summary>
@@ -133,24 +133,24 @@ public struct ActorPosition {
     /// <summary>
     /// The actor's local display position, representing the actor's local position combined with any local render action offsets.
     /// </summary>
-    public readonly Matrix3x2 LocalDisplayMatrix => localDisplayMatrix.Matrix;
+    public Matrix3x2 LocalDisplayMatrix => localDisplayMatrix.Matrix;
 
     /// <summary>
     /// An inverted matrix of the actor's local display position, useful for undoing tranformations.
     /// </summary>
-    public readonly Matrix3x2 LocalDisplayMatrixInverse => localDisplayMatrix.MatrixInverse;
+    public Matrix3x2 LocalDisplayMatrixInverse => localDisplayMatrix.MatrixInverse;
 
     InvertableMatrix globalDisplayMatrix = Transform.Identity;
 
     /// <summary>
     /// The actor's local display position, representing the actor's global position combined with any local or parent render action offsets.
     /// </summary>
-    public readonly Matrix3x2 GlobalDisplayMatrix => globalDisplayMatrix.Matrix;
+    public Matrix3x2 GlobalDisplayMatrix => globalDisplayMatrix.Matrix;
 
     /// <summary>
     /// An inverted matrix of the actor's global display position, useful for undoing tranformations.
     /// </summary>
-    public readonly Matrix3x2 GlobalDisplayMatrixInverse => globalDisplayMatrix.MatrixInverse;
+    public Matrix3x2 GlobalDisplayMatrixInverse => globalDisplayMatrix.MatrixInverse;
 
     /// <summary>
     /// Create a new position for an actor.
