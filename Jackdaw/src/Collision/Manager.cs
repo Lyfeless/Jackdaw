@@ -312,7 +312,6 @@ public class CollisionManager {
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Vector2 velocity)
         => GetSweptCollision(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse, velocity);
@@ -323,7 +322,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, ActorPosition position, Vector2 velocity)
         => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity);
@@ -334,7 +332,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Transform position, Vector2 velocity)
         => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity);
@@ -345,7 +342,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity) {
         Matrix3x2.Invert(position, out Matrix3x2 positionInv);
@@ -359,7 +355,6 @@ public class CollisionManager {
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
         => GetSweptCollision(e => CheckComponent(collider, e), collider.Collider, position, positionInv, velocity);
@@ -370,7 +365,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, ActorPosition position, Vector2 velocity)
         => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, velocity);
@@ -381,7 +375,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, Transform position, Vector2 velocity)
         => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, velocity);
@@ -392,7 +385,6 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity) {
         Matrix3x2.Invert(position, out Matrix3x2 positionInv);
@@ -406,7 +398,6 @@ public class CollisionManager {
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
-    /// <param name="allowNegative">If the final cast position is allowed to be behind the starting point.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
         => GetSweptCollision(CheckComponent, collider, position, positionInv, velocity);
