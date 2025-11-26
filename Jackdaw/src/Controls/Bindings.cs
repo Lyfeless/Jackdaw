@@ -17,6 +17,16 @@ public class Bindings() {
     public VirtualAction GetAction(string name) => Actions.TryGetValue(name, out VirtualAction? value) ? value : throw new Exception("Attempting to access undefinined action binding");
 
     /// <summary>
+    /// Remove a button input binding
+    /// </summary>
+    /// <param name="name">The binding name to remove.</param>
+    /// <returns></returns>
+    public Bindings RemoveAction(string name) {
+        Actions.Remove(name);
+        return this;
+    }
+
+    /// <summary>
     /// Add a new button input binding.
     /// </summary>
     /// <param name="name">The binding name.</param>
@@ -38,6 +48,16 @@ public class Bindings() {
     public VirtualStick GetStick(string name) => Sticks.TryGetValue(name, out VirtualStick? value) ? value : throw new Exception("Attempting to access undefinined stick binding");
 
     /// <summary>
+    /// Remove a stick input binding
+    /// </summary>
+    /// <param name="name">The binding name to remove.</param>
+    /// <returns></returns>
+    public Bindings RemoveStick(string name) {
+        Sticks.Remove(name);
+        return this;
+    }
+
+    /// <summary>
     /// Add a new stick input binding.
     /// </summary>
     /// <param name="name">The binding name.</param>
@@ -57,6 +77,16 @@ public class Bindings() {
     /// <returns>The axis input binding.</returns>
     /// <exception cref="Exception"></exception>
     public VirtualAxis GetAxis(string name) => Axis.TryGetValue(name, out VirtualAxis? value) ? value : throw new Exception("Attempting to access undefinined axis binding");
+
+    /// <summary>
+    /// Remove an axis input binding
+    /// </summary>
+    /// <param name="name">The binding name to remove.</param>
+    /// <returns></returns>
+    public Bindings RemoveAxis(string name) {
+        Axis.Remove(name);
+        return this;
+    }
 
     /// <summary>
     /// Add a new axis input binding.
