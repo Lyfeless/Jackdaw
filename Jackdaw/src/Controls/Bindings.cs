@@ -37,6 +37,16 @@ public class Bindings() {
         return this;
     }
 
+    /// <summary>
+    /// Add a new button input binding using the built-in action name.
+    /// </summary>
+    /// <param name="action">The button input action.</param>
+    /// <returns>The binding manager.</returns>
+    public Bindings Add(VirtualAction action) {
+        Actions.Add(action.Name, action);
+        return this;
+    }
+
     readonly Dictionary<string, VirtualStick> Sticks = [];
 
     /// <summary>
@@ -68,6 +78,16 @@ public class Bindings() {
         return this;
     }
 
+    /// <summary>
+    /// Add a new stick input binding using the built-in action name.
+    /// </summary>
+    /// <param name="action">The stick input action.</param>
+    /// <returns></returns>
+    public Bindings Add(VirtualStick action) {
+        Sticks.Add(action.Name, action);
+        return this;
+    }
+
     readonly Dictionary<string, VirtualAxis> Axis = [];
 
     /// <summary>
@@ -96,6 +116,16 @@ public class Bindings() {
     /// <returns></returns>
     public Bindings Add(string name, VirtualAxis action) {
         Axis.Add(name, action);
+        return this;
+    }
+
+    /// <summary>
+    /// Add a new axis input binding using the built-in action name.
+    /// </summary>
+    /// <param name="action">The axis input action.</param>
+    /// <returns></returns>
+    public Bindings Add(VirtualAxis action) {
+        Axis.Add(action.Name, action);
         return this;
     }
 }
