@@ -47,7 +47,7 @@ public class Assets {
     public Subtexture GetTexture(string name) {
         if (Textures.TryGetValue(name, out Subtexture output)) { return output; }
         Log.Warning($"ASSETS: Failed to find texture {name}, returning default");
-        return Textures["error"];
+        return Textures["fallback"];
     }
     const string TextureFallbackName = "Fallback.texture.png";
     const string ManFallbackName = "Fallback.man.png";
@@ -61,7 +61,7 @@ public class Assets {
     public SpriteFont GetFont(string name) {
         if (Fonts.TryGetValue(name, out SpriteFont? output)) { return output; }
         Log.Warning($"ASSETS: Failed to find font {name}, returning default");
-        return Fonts["error"];
+        return Fonts["fallback"];
     }
     const string FontFallbackName = "Fallback.font.ttf";
 
@@ -74,7 +74,7 @@ public class Assets {
     public Shader GetShader(string name) {
         if (Shaders.TryGetValue(name, out Shader? output)) { return output; }
         Log.Warning($"ASSETS: Failed to find shader {name}, returning default");
-        return Shaders["error"];
+        return Shaders["fallback"];
     }
 
     readonly Dictionary<string, AnimationData> Animations = [];
@@ -86,7 +86,7 @@ public class Assets {
     public AnimationData GetAnimation(string name) {
         if (Animations.TryGetValue(name, out AnimationData? output)) { return output; }
         Log.Warning($"ASSETS: Failed to find animation {name}, returning default");
-        return Animations["error"];
+        return Animations["fallback"];
     }
 
     #endregion
@@ -119,7 +119,7 @@ public class Assets {
             };
 
             // Load fallback texture
-            packer.Add("error", FallbackTexture(assembly, assemblyName!, TextureFallbackName));
+            packer.Add("fallback", FallbackTexture(assembly, assemblyName!, TextureFallbackName));
             packer.Add("fallback-man", FallbackTexture(assembly, assemblyName!, ManFallbackName));
 
             // Load all textures in asset directory
@@ -162,7 +162,7 @@ public class Assets {
         {
             // Load fallback font
             using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{FontFallbackName}")!;
-            Fonts.Add("error", new SpriteFont(graphicsDevice, stream, 16));
+            Fonts.Add("fallback", new SpriteFont(graphicsDevice, stream, 16));
 
             // Load all fonts in asset directory
             if (Directory.Exists(FontPath)) {
@@ -180,7 +180,7 @@ public class Assets {
         // Shaders
         {
             // Load fallback shader
-            Shaders.Add("error", new BatcherShader(graphicsDevice));
+            Shaders.Add("fallback", new BatcherShader(graphicsDevice));
 
             // Load shaders from config
             //      Shaders are built from more data than just files, so read directly off the config
@@ -227,7 +227,7 @@ public class Assets {
         // Animation Data
         {
             // Create fallback animation
-            Animations.Add("error", new(this));
+            Animations.Add("fallback", GetDefaultAnimation());
 
             // Load all animations and groups from directory
             if (Directory.Exists(AnimationPath)) {
@@ -262,38 +262,74 @@ public class Assets {
         }
     }
 
+    #region Animation Loading
+
     AnimationData? GetAnimationData(AnimationConfig config) {
-        if (config.HorizontalFrames != 0 && config.VerticalFrames != 0) {
-            return new(
-                texture: GetTexture(config.Textures[0]),
-                horizontalFrames: config.HorizontalFrames,
-                verticalFrames: config.VerticalFrames,
-                frameTime: config.FrameTime,
-                looping: config.Looping,
-                positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
-            );
+        // Console.WriteLine(config.AnimationType);
+        return config.AnimationType switch {
+            AnimationType.SPRITESHEET => GetSpriteSheetAnimation(config),
+            AnimationType.MULTI_TEXTURE => GetMultiTextureAnimation(config),
+            _ => null
+        };
+    }
+
+    AnimationData? GetSpriteSheetAnimation(AnimationConfig config) {
+        Subtexture spritesheet = GetTexture(config.Spritesheet);
+        Point2 frameSize = new(
+            (int)spritesheet.Width / config.HorizontalFrames,
+            (int)spritesheet.Height / config.VerticalFrames
+        );
+
+        AnimationFrame[] frames;
+        if (config.Frames.Length > 0) {
+            frames = [.. config.Frames.Select(frame => new AnimationFrame(
+                texture: 0,
+                duration: frame.Duration,
+                clip: SpriteSheetClip(frameSize, frame.FrameX, frame.FrameY),
+                positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
+                flipX: frame.FlipX,
+                flipY: frame.FlipY,
+                embeddedData: frame.EmbeddedData
+            ))];
         }
-        else if (config.Frames.Length > 0) {
-            return new(
-                frames: [..config.Frames.Select(frame => new AnimationFrame(
-                    texture: GetTexture(config.Textures[frame.Texture]),
-                    duration: frame.Duration,
-                    flipX: frame.FlipX,
-                    flipY: frame.FlipY,
-                    positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
-                    clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null,
-                    embeddedData: frame.EmbeddedData
-                ))],
-                looping: config.Looping,
-                positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
-            );
+        else {
+            frames = new AnimationFrame[config.HorizontalFrames * config.HorizontalFrames];
+            for (int y = 0; y < config.VerticalFrames; ++y) {
+                for (int x = 0; x < config.HorizontalFrames; ++x) {
+                    frames[x + (y * config.HorizontalFrames)] = new(0, config.FrameTime, SpriteSheetClip(frameSize, x, y));
+                }
+            }
         }
 
-        return null;
+        return new(
+            texture: spritesheet,
+            frames: frames,
+            looping: config.Looping,
+            positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
+        );
+    }
+
+    static RectInt SpriteSheetClip(Point2 frameSize, int x, int y)
+        => new(frameSize * new Point2(x, y), frameSize);
+
+    AnimationData? GetMultiTextureAnimation(AnimationConfig config) {
+        return new(
+            GetAllTextures(config.Textures),
+            frames: [..config.Frames.Select(frame => new AnimationFrame(
+                texture: frame.Texture,
+                duration: frame.Duration,
+                flipX: frame.FlipX,
+                flipY: frame.FlipY,
+                positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
+                clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null,
+                embeddedData: frame.EmbeddedData
+            ))],
+            looping: config.Looping,
+            positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
+        );
     }
 
     AnimationData? GetAnimationData(string name, Aseprite aseprite) {
-        float startDelay = 0;
         bool looping = true;
         Point2 positionOffset = Point2.Zero;
         AsepriteFrameConfig[] frameConfigs = [];
@@ -301,38 +337,54 @@ public class Assets {
         if (File.Exists(path)) {
             AsepriteConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AsepriteConfig);
             if (config != null) {
-                startDelay = config.StartDelay;
                 looping = config.Looping;
                 positionOffset = new(config.PositionOffsetX, config.PositionOffsetY);
                 frameConfigs = config.FrameData;
             }
         }
 
-        return new(
-            frames: [.. aseprite.Frames.Select((e, i) => {
-                bool flipX = false;
-                bool flipY = false;
-                string embeddedData = string.Empty;
-                AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
-                if(frameConfig != null) {
-                    flipX = frameConfig.FlipX;
-                    flipY = frameConfig.FlipY;
-                    embeddedData = frameConfig.EmbeddedData;
-                }
+        Subtexture[] textures = new Subtexture[aseprite.Frames.Length];
+        AnimationFrame[] frames = new AnimationFrame[aseprite.Frames.Length];
+        for (int i = 0; i < aseprite.Frames.Length; ++i) {
+            bool flipX = false;
+            bool flipY = false;
+            string embeddedData = string.Empty;
+            AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
+            if (frameConfig != null) {
+                flipX = frameConfig.FlipX;
+                flipY = frameConfig.FlipY;
+                embeddedData = frameConfig.EmbeddedData;
+            }
 
-                return new AnimationFrame(
-                    texture: GetTexture(GetFrameName(name, i)),
-                    duration: e.Duration,
-                    flipX: flipX,
-                    flipY: flipY,
-                    embeddedData: embeddedData
-                );
-            })],
-            startDelay: startDelay,
+            textures[i] = GetTexture(GetFrameName(name, i));
+            frames[i] = new AnimationFrame(
+                texture: i,
+                duration: aseprite.Frames[i].Duration,
+                flipX: flipX,
+                flipY: flipY,
+                embeddedData: embeddedData
+            );
+        }
+
+        return new(
+            textures: textures,
+            frames: frames,
             looping: looping,
             positionOffset: positionOffset
         );
     }
+
+    Subtexture[] GetAllTextures(string[] names) {
+        Subtexture[] textures = new Subtexture[names.Length];
+        for (int i = 0; i < names.Length; ++i) {
+            textures[i] = GetTexture(names[i]);
+        }
+        return textures;
+    }
+
+    AnimationData GetDefaultAnimation() => new(GetTexture("fallback"), [new(0, 0)], 0);
+
+    #endregion
 
     /// <summary>
     /// Remove extra information from a file path to create a unique asset identifier

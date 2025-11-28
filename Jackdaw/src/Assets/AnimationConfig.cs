@@ -2,6 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw;
 
+internal enum AnimationType {
+    SPRITESHEET,
+    MULTI_TEXTURE
+}
+
 internal class AnimationGroupConfig {
     [JsonPropertyName("entries")]
     public AnimationConfigEntry[] Entries { get; set; } = [];
@@ -16,6 +21,13 @@ internal class AnimationConfigEntry {
 }
 
 internal class AnimationConfig {
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter<AnimationType>))]
+    public AnimationType AnimationType { get; set; } = AnimationType.SPRITESHEET;
+
+    [JsonPropertyName("spritesheet")]
+    public string Spritesheet { get; set; } = "";
+
     [JsonPropertyName("textures")]
     public string[] Textures { get; set; } = [];
 
@@ -72,6 +84,12 @@ internal class AnimationConfigFrame {
 
     [JsonPropertyName("clipHeight")]
     public int ClipHeight { get; set; } = 0;
+
+    [JsonPropertyName("frameX")]
+    public int FrameX { get; set; } = 0;
+
+    [JsonPropertyName("frameY")]
+    public int FrameY { get; set; } = 0;
 
     [JsonPropertyName("flipX")]
     public bool FlipX { get; set; } = false;

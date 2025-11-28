@@ -3,8 +3,6 @@ using System.Text.Json.Serialization;
 namespace Jackdaw;
 
 internal class AsepriteConfig {
-    [JsonPropertyName("startDelay")]
-    public float StartDelay { get; set; } = 0;
 
     [JsonPropertyName("looping")]
     public bool Looping { get; set; } = true;

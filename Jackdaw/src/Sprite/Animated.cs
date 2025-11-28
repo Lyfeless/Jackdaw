@@ -7,8 +7,7 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="game">The current game instance.</param>
 /// <param name="animation">The sprite animation to use.</param>
-/// <param name="startDelay">The time in milliseconds before the animation should start running.</param>
-public class SpriteAnimated(Game game, AnimationData animation, float startDelay = 0) : Sprite {
+public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     readonly AnimationData Animation = animation;
 
     /// <summary>
@@ -16,13 +15,12 @@ public class SpriteAnimated(Game game, AnimationData animation, float startDelay
     /// </summary>
     public readonly Timer Timer = new(
         game: game,
-        duration: animation.Duration,
-        startTime: -startDelay
+        duration: animation.Duration
     ) {
         Looping = animation.Looping
     };
 
-    readonly RectInt bounds = (RectInt)new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, e.Texture.Size))]).Rect;
+    readonly RectInt bounds = (RectInt)new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect;
     public override Point2 Size => bounds.Size;
     public override RectInt Bounds => bounds.Translate(Offset);
 
@@ -44,6 +42,6 @@ public class SpriteAnimated(Game game, AnimationData animation, float startDelay
         AnimationFrame frame = Frame;
         bool flipX = frame.FlipX != FlipX;
         bool flipY = frame.FlipY != FlipY;
-        batcher.Image(frame.Texture, Animation.PositionOffset + frame.PositionOffset + Offset + (bounds.Size / 2), bounds.Center - Animation.PositionOffset - frame.PositionOffset, FlipScale(flipX, flipY), 0, Color);
+        batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Offset + (bounds.Size / 2), bounds.Center - Animation.PositionOffset - frame.PositionOffset, FlipScale(flipX, flipY), 0, Color);
     }
 }

@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -6,6 +7,11 @@ namespace Jackdaw;
 /// Sprite-based animation data
 /// </summary>
 public class AnimationData {
+    /// <summary>
+    /// All textures used for the animation
+    /// </summary>
+    public readonly Subtexture[] Textures = [];
+
     /// <summary>
     /// Individual frame data.
     /// </summary>
@@ -27,82 +33,67 @@ public class AnimationData {
     public readonly Point2 PositionOffset;
 
     /// <summary>
-    /// Create an animation by dividing a single sprite sheet into a grid of frames
+    /// Create an animation using predefined frame data.
     /// </summary>
-    /// <param name="assets">The asset container for the current game instance.</param>
-    /// <param name="texture">The sprite sheet asset id.</param>
-    /// <param name="horizontalFrames">The number of frames the fit horizontally across the spritesheet.</param>
-    /// <param name="verticalFrames">The number of frames the fit vertically across the spritesheet.</param>
-    /// <param name="frameTime">The time to spend on each frame in the animation, in milliseconds..</param>
-    /// <param name="maxFrames">The total number of frames, useful if the spritesheet doesnt use the entire grid. Set to 0 to use every available space on the spritesheet</param>
-    /// <param name="startDelay">The time to wait before starting the animation, in milliseconds.. Defaults to 0.</param>
+    /// <param name="texture">The texture used for all frames of the animation.</param>
+    /// <param name="frames">Each individual frame to display in order.</param>
     /// <param name="looping">If the animation should loop back to the start when finished.</param>
-    /// <param name="positionOffset">The amount to offset the entire animation from the origin.</param>
-    public AnimationData(
-        Assets assets,
-        string texture,
-        int horizontalFrames,
-        int verticalFrames,
-        float frameTime,
-        int maxFrames = 0,
-        float startDelay = 0,
-        bool looping = true,
-        Point2? positionOffset = null
-    ) : this(assets.GetTexture(texture), horizontalFrames, verticalFrames, frameTime, maxFrames, looping, positionOffset) { }
-
-    /// <summary>
-    /// Create an animation by dividing a single sprite sheet into a grid of frames
-    /// </summary>
-    /// <param name="texture">The sprite sheet.</param>
-    /// <param name="horizontalFrames">The number of frames the fit horizontally across the spritesheet.</param>
-    /// <param name="verticalFrames">The number of frames the fit vertically across the spritesheet.</param>
-    /// <param name="frameTime">The time to spend on each frame in the animation, in milliseconds..</param>
-    /// <param name="maxFrames">The total number of frames, useful if the spritesheet doesnt use the entire grid. Set to 0 to use every available space on the spritesheet</param>
-    /// <param name="startDelay">The time to wait before starting the animation, in milliseconds.. Defaults to 0.</param>
-    /// <param name="looping">If the animation should loop back to the start when finished.</param>
-    /// <param name="positionOffset">The amount to offset the entire animation from the origin.</param>
+    /// <param name="positionOffset">The amount to offset the entire animation's position from the origin.</param>
     public AnimationData(
         Subtexture texture,
-        int horizontalFrames,
-        int verticalFrames,
-        float frameTime,
-        int maxFrames = 0,
-        bool looping = true,
+        AnimationFrame[] frames,
+        bool looping = false,
         Point2? positionOffset = null
-    ) : this(looping, positionOffset) {
-        int frameCount = horizontalFrames * verticalFrames;
-        if (maxFrames != 0) { frameCount = Math.Min(frameCount, maxFrames); }
-        Frames = new AnimationFrame[frameCount];
-        int width = (int)(texture.Width / horizontalFrames);
-        int height = (int)(texture.Height / verticalFrames);
-        Duration = frameCount * frameTime;
-        for (int x = 0; x < horizontalFrames; ++x) {
-            for (int y = 0; y < verticalFrames; ++y) {
-                int index = (y * horizontalFrames) + x;
-                if (index >= frameCount) { return; }
-                Frames[index] = new(texture, frameTime, new(x * width, y * height, width, height));
-            }
-        }
-    }
+    ) : this([texture], frames, frames.Sum(e => e.Duration), looping, positionOffset) { }
 
     /// <summary>
     /// Create an animation using predefined frame data.
     /// </summary>
+    /// <param name="textures">All textures used for the animation.</param>
     /// <param name="frames">Each individual frame to display in order.</param>
-    /// <param name="startDelay">The time to wait before starting the animation, in milliseconds.. Defaults to 0.</param>
     /// <param name="looping">If the animation should loop back to the start when finished.</param>
     /// <param name="positionOffset">The amount to offset the entire animation's position from the origin.</param>
     public AnimationData(
+        Subtexture[] textures,
         AnimationFrame[] frames,
-        float startDelay = 0,
         bool looping = false,
         Point2? positionOffset = null
-    ) : this(looping, positionOffset) {
-        Frames = frames;
-        Duration = frames.Sum(e => e.Duration);
-    }
+    ) : this(textures, frames, frames.Sum(e => e.Duration), looping, positionOffset) { }
 
-    AnimationData(bool looping = false, Point2? positionOffset = null) {
+    /// <summary>
+    /// Create an animation using predefined frame data.
+    /// </summary>
+    /// <param name="texture">All textures used for the animation.</param>
+    /// <param name="frames">Each individual frame to display in order.</param>
+    /// <param name="duration">The full length of the animation.</param>
+    /// <param name="looping">If the animation should loop back to the start when finished.</param>
+    /// <param name="positionOffset">The amount to offset the entire animation's position from the origin.</param>
+    public AnimationData(
+        Subtexture texture,
+        AnimationFrame[] frames,
+        float duration,
+        bool looping = false,
+        Point2? positionOffset = null
+    ) : this([texture], frames, duration, looping, positionOffset) { }
+
+    /// <summary>
+    /// Create an animation using predefined frame data.
+    /// </summary>
+    /// <param name="textures">All textures used for the animation.</param>
+    /// <param name="frames">Each individual frame to display in order.</param>
+    /// <param name="duration">The full length of the animation.</param>
+    /// <param name="looping">If the animation should loop back to the start when finished.</param>
+    /// <param name="positionOffset">The amount to offset the entire animation's position from the origin.</param>
+    public AnimationData(
+        Subtexture[] textures,
+        AnimationFrame[] frames,
+        float duration,
+        bool looping = false,
+        Point2? positionOffset = null
+    ) {
+        Textures = textures;
+        Frames = frames;
+        Duration = duration;
         Looping = looping;
         PositionOffset = positionOffset ?? Point2.Zero;
     }
@@ -121,8 +112,13 @@ public class AnimationData {
         return Frames[^1];
     }
 
-    // Only used for error fallback
-    internal AnimationData(Assets assets) {
-        Frames = [new(assets.GetTexture("error"), new())];
+    public Subtexture FrameTexture(float duration)
+        => FrameTexture(GetFrame(duration));
+
+    public Subtexture FrameTexture(AnimationFrame frame) {
+        Subtexture texture = Textures[frame.Texture];
+        RectInt clip = frame.Clip;
+        if (clip.Size == Vector2.Zero) { clip = new((int)texture.Width, (int)texture.Height); }
+        return texture.GetClipSubtexture(clip);
     }
 }
