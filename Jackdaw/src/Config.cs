@@ -13,12 +13,6 @@ public struct GameConfig() {
     public string ApplicationName { get; set; } = "JackdawGame";
 
     /// <summary>
-    /// The title to display on the window.
-    /// </summary>
-    [JsonPropertyName("windowTitle")]
-    public string WindowTitle { get; set; } = "Jackdaw Game";
-
-    /// <summary>
     /// Configuration data for the window.
     /// </summary>
     [JsonPropertyName("window")]
@@ -36,16 +30,22 @@ public struct GameConfig() {
 /// </summary>
 public struct GameWindowConfig() {
     /// <summary>
+    /// The title to display on the window.
+    /// </summary>
+    [JsonPropertyName("title")]
+    public string Title { get; set; } = "Jackdaw Game";
+
+    /// <summary>
     /// Initial width of the full window.
     /// </summary>
-    [JsonPropertyName("windowWidth")]
-    public int WindowWidth { get; set; } = 600;
+    [JsonPropertyName("width")]
+    public int Width { get; set; } = 600;
 
     /// <summary>
     /// Initial height of the full window.
     /// </summary>
-    [JsonPropertyName("windowHeight")]
-    public int WindowHeight { get; set; } = 600;
+    [JsonPropertyName("height")]
+    public int Height { get; set; } = 600;
 
     /// <summary>
     /// Whether or not the window can be resized by the user.

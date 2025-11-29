@@ -88,9 +88,9 @@ public class Game : App {
     /// <param name="config">The game's configuration data.</param>
     public Game(GameConfig config) : base(new AppConfig() {
         ApplicationName = config.ApplicationName,
-        WindowTitle = config.WindowTitle,
-        Width = config.Window.WindowWidth,
-        Height = config.Window.WindowHeight,
+        WindowTitle = config.Window.Title,
+        Width = config.Window.Width,
+        Height = config.Window.Height,
         Resizable = true
     }) {
         Assets = new(GraphicsDevice, config.Content);
