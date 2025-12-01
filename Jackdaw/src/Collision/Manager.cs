@@ -441,11 +441,6 @@ public class CollisionManager {
         Vector2 velocityScaled = velocity * componentInfo[minCollider].Fraction;
         Vector2 velocityScaledClamped = velocity * componentInfo[minCollider].FractionClamped;
 
-        // Failsafe: Collision bugs occasionally let object intersect after a sweep, if that happens to move is cancelled.
-        //  The hope is this only occurs with precision due to colliders being very close so the cancel shouldn't be too noticable.
-        //  Need to find the solution in the algorithm eventually though.
-        if (GetFirstCollision(collider, Matrix3x2.CreateTranslation(velocityScaled) * position).Collided) { return new(true, Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero, []); }
-
         SweptCollisionComponentInfo[] outputComponentInfo = [.. componentInfo.OrderBy(e => e.Fraction.LengthSquared())];
 
         return new(
@@ -470,8 +465,8 @@ public class CollisionManager {
 
             Vector2 fraction = pair.Fraction;
             // Apply small pushback to stop objects getting stuck inside one another
-            // fraction -= ctx.VelocityA * (SWEEP_TOLERANCE + float.Epsilon);
-            fraction -= ctx.VelocityA * (SWEEP_TOLERANCE + float.Epsilon);
+            if (ctx.VelocityA.X != 0) { fraction.X -= SWEEP_TOLERANCE + float.Epsilon; }
+            if (ctx.VelocityA.Y != 0) { fraction.Y -= SWEEP_TOLERANCE + float.Epsilon; }
             Vector2 fractionClamped = FractionNegative(fraction) ? Vector2.Zero : fraction;
 
             SweptColliderInfo info = new(pair.B, fraction, fractionClamped, pair.Normal);
@@ -804,12 +799,8 @@ public class CollisionManager {
         if (ctx.ColliderB.Multi) { return ColliderIntersectionFraction(FlipContext(ctx), !reversed); }
 
         CollisionSweepInfo collision = GetRayIntersectionFraction(ctx);
-        if (FractionNegative(collision.Fraction)) {
-            // Sweep calculation sometimes gives results for colliders that aren't initially colliding
-            if (ColliderOverlapCheck(ctx).Length == 0) {
-                return [];
-            }
-        }
+        // Sweep calculation sometimes gives results for colliders that aren't initially colliding
+        if (FractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0) { return []; }
         return [reversed ? new(ctx.ColliderB, ctx.ColliderA, collision.Fraction, collision.Normal) : new(ctx.ColliderA, ctx.ColliderB, collision.Fraction, collision.Normal)];
     }
     #endregion
