@@ -100,7 +100,7 @@ public class Game : App {
         Events = new();
         Convert = new(this);
 
-        BackgroundColor = Color.FromHexStringRGB(config.Window.ClearColor);
+        BackgroundColor = config.Window.ClearColor;
         Window.Resizable = config.Window.Resizable;
 
         Batcher = new(GraphicsDevice);

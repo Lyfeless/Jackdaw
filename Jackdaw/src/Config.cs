@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Foster.Framework;
 
 namespace Jackdaw;
 
@@ -58,7 +59,7 @@ public struct GameWindowConfig() {
     /// Used as the letterbox color when using fixed viewport.
     /// </summary>
     [JsonPropertyName("clearColor")]
-    public string ClearColor { get; set; } = "0x000000";
+    public Color ClearColor { get; set; } = Color.Black;
 }
 
 /// <summary>
