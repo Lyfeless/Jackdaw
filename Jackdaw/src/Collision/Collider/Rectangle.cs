@@ -35,6 +35,6 @@ public class RectangleCollider(Rect rect) : Collider {
 
     public override Vector2 Support(Vector2 direction) {
         Vector2 halfRect = Rect.Size / 2;
-        return Rect.Position + halfRect + (halfRect * new Vector2(MathF.Sign(direction.X), MathF.Sign(direction.Y)));
+        return Rect.Position + halfRect + (halfRect * new Vector2(CalcExtra.NormalizedSign(direction.X), CalcExtra.NormalizedSign(direction.Y)));
     }
 }

@@ -135,4 +135,9 @@ public static class CalcExtra {
             Vector2.Transform(rect.BottomRight, transform)
         ).Rect;
     }
+
+    //! FIXME (Alex): BUSTED!!!
+    public static int NormalizedSign(float value) {
+        return value >= 0 ? 1 : -1;
+    }
 }
