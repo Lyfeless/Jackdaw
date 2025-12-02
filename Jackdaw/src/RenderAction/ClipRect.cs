@@ -28,7 +28,7 @@ public class RenderActionClipRect(GraphicsDevice device, BoundsComponent bounds)
 
     public override void PostRender(RenderActionContainer container) {
         Batcher.Render(Target);
-        container.CurrentBatcher.Image(Target, Bounds.Position, Color.White);
         container.PopBatcher();
+        container.CurrentBatcher.Image(Target, Bounds.Position, Color.White);
     }
 }
