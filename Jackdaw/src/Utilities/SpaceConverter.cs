@@ -74,7 +74,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position should be local to.</param>
     /// <returns>The global position in local space.</returns>
     public Matrix3x2 GlobalToLocal(Matrix3x2 position, Actor localActor)
-        => localActor.Position.GlobalToLocal(position);
+        => localActor.Transform.GlobalToLocal(position);
 
     /// <summary>
     /// Convert a global position to an actor's local space.
@@ -87,7 +87,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position should be local to.</param>
     /// <returns>The global position in local space.</returns>
     public Vector2 GlobalToLocal(Vector2 position, Actor localActor)
-        => localActor.Position.GlobalToLocal(position);
+        => localActor.Transform.GlobalToLocal(position);
 
     /// <summary>
     /// Convert a global position to an actor's local display space.
@@ -100,7 +100,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position should be local to.</param>
     /// <returns>The global position in local space.</returns>
     public Matrix3x2 GlobalToDisplayLocal(Matrix3x2 position, Actor displayActor)
-        => displayActor.Position.GlobalToDisplay(position);
+        => displayActor.Transform.GlobalToDisplay(position);
 
     /// <summary>
     /// Convert a global position to an actor's local display space.
@@ -113,7 +113,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position should be local to.</param>
     /// <returns>The global position in local space.</returns>
     public Vector2 GlobalToDisplayLocal(Vector2 position, Actor displayActor)
-        => displayActor.Position.GlobalToDisplay(position);
+        => displayActor.Transform.GlobalToDisplay(position);
 
     /// <summary>
     /// Convert a global position to a grid's local space.
@@ -141,7 +141,7 @@ public class SpaceConverter(Game game) {
     /// <param name="grid">The spatial grid.</param>
     /// <returns>The global position in tile space.</returns>
     public Vector2 GlobalToTile<Tin, Tout>(Vector2 position, Actor localActor, ISpatialGrid<Tin, Tout> grid)
-        => grid.LocalToTileCoord(localActor.Position.GlobalToLocal(position));
+        => grid.LocalToTileCoord(localActor.Transform.GlobalToLocal(position));
 
     /// <summary>
     /// Convert a global position to a grid's local display position.
@@ -184,7 +184,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local position in global space.</returns>
     public Matrix3x2 LocalToGlobal(Matrix3x2 position, Actor localActor)
-        => localActor.Position.LocalToGlobal(position);
+        => localActor.Transform.LocalToGlobal(position);
 
     /// <summary>
     /// Convert a local position to global space.
@@ -197,7 +197,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local position in global space.</returns>
     public Vector2 LocalToGlobal(Vector2 position, Actor localActor)
-        => localActor.Position.LocalToGlobal(position);
+        => localActor.Transform.LocalToGlobal(position);
 
     /// <summary>
     /// Convert an actor's local position to another actor's local display space.
@@ -211,7 +211,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position should be local to.</param>
     /// <returns>The local position converted to a different local display space.</returns>
     public Matrix3x2 LocalToDisplayLocal(Matrix3x2 position, Actor localActor, Actor displayActor)
-        => displayActor.Position.GlobalToDisplay(LocalToGlobal(position, localActor));
+        => displayActor.Transform.GlobalToDisplay(LocalToGlobal(position, localActor));
 
     /// <summary>
     /// Convert an actor's local position to another actor's local display space.
@@ -225,7 +225,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position should be local to.</param>
     /// <returns>The local position converted to a different local display space.</returns>
     public Vector2 LocalToDisplayLocal(Vector2 position, Actor localActor, Actor displayActor)
-        => displayActor.Position.GlobalToDisplay(LocalToGlobal(position, localActor));
+        => displayActor.Transform.GlobalToDisplay(LocalToGlobal(position, localActor));
 
     /// <summary>
     /// Convert a local position into the same actor's local display space.
@@ -238,7 +238,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position is relative to.</param>
     /// <returns>The local position converted to local display space.</returns>
     public Matrix3x2 LocalToDisplayLocal(Matrix3x2 position, Actor displayActor)
-        => displayActor.Position.LocalToDisplay(position);
+        => displayActor.Transform.LocalToDisplay(position);
 
     /// <summary>
     /// Convert a local position into the same actor's local display space.
@@ -251,7 +251,7 @@ public class SpaceConverter(Game game) {
     /// <param name="displayActor">The actor the position is relative to.</param>
     /// <returns>The local position converted to local display space.</returns>
     public Vector2 LocalToDisplayLocal(Vector2 position, Actor displayActor)
-        => displayActor.Position.LocalToDisplay(position);
+        => displayActor.Transform.LocalToDisplay(position);
 
     /// <summary>
     /// Convert a local position into another actor's local space.
@@ -263,7 +263,7 @@ public class SpaceConverter(Game game) {
     /// <param name="targetLocalActor">The actor the position should be relative to.</param>
     /// <returns>The local position converted to the other actor's local space.</returns>
     public Matrix3x2 LocalToLocal(Matrix3x2 position, Actor originLocalActor, Actor targetLocalActor)
-        => targetLocalActor.Position.FromOtherLocal(position, originLocalActor);
+        => targetLocalActor.Transform.FromOtherLocal(position, originLocalActor);
 
     /// <summary>
     /// Convert a local position into another actor's local space.
@@ -275,7 +275,7 @@ public class SpaceConverter(Game game) {
     /// <param name="targetLocalActor">The actor the position should be relative to.</param>
     /// <returns>The local position converted to the other actor's local space.</returns>
     public Vector2 LocalToLocal(Vector2 position, Actor originLocalActor, Actor targetLocalActor)
-        => targetLocalActor.Position.FromOtherLocal(position, originLocalActor);
+        => targetLocalActor.Transform.FromOtherLocal(position, originLocalActor);
 
     /// <summary>
     /// Convert a local position into tile space on the same actor.
@@ -402,7 +402,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local display position converted to global space.</returns>
     public Matrix3x2 DisplayLocalToGlobal(Matrix3x2 position, Actor localActor)
-        => localActor.Position.DisplayToGlobal(position);
+        => localActor.Transform.DisplayToGlobal(position);
 
     /// <summary>
     /// Convert a local display position to global space.
@@ -415,7 +415,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local display position converted to global space.</returns>
     public Vector2 DisplayLocalToGlobal(Vector2 position, Actor localActor)
-        => localActor.Position.DisplayToGlobal(position);
+        => localActor.Transform.DisplayToGlobal(position);
 
     /// <summary>
     /// Convert a local display position to local space on the same actor.
@@ -428,7 +428,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local display position converted to local space.</returns>
     public Matrix3x2 DisplayLocalToLocal(Matrix3x2 position, Actor localActor)
-        => localActor.Position.DisplayToLocal(position);
+        => localActor.Transform.DisplayToLocal(position);
 
     /// <summary>
     /// Convert a local display position to local space on the same actor.
@@ -441,7 +441,7 @@ public class SpaceConverter(Game game) {
     /// <param name="localActor">The actor the position is local to.</param>
     /// <returns>The local display position converted to local space.</returns>
     public Vector2 DisplayLocalToLocal(Vector2 position, Actor localActor)
-        => localActor.Position.DisplayToLocal(position);
+        => localActor.Transform.DisplayToLocal(position);
 
     /// <summary>
     /// Convert a local display position to local space on a different actor.
@@ -481,7 +481,7 @@ public class SpaceConverter(Game game) {
     /// <param name="targetLocalActor"The actor the position should be local to.></param>
     /// <returns>The local display position converted to local display space on the target actor.</returns>
     public Matrix3x2 DisplayLocalToDisplayLocal(Matrix3x2 position, Actor originLocalActor, Actor targetLocalActor)
-        => targetLocalActor.Position.GlobalToDisplay(originLocalActor.Position.DisplayToGlobal(position));
+        => targetLocalActor.Transform.GlobalToDisplay(originLocalActor.Transform.DisplayToGlobal(position));
 
     /// <summary>
     /// Convert a local display position to local display space on a different actor.
@@ -493,7 +493,7 @@ public class SpaceConverter(Game game) {
     /// <param name="targetLocalActor"The actor the position should be local to.></param>
     /// <returns>The local display position converted to local display space on the target actor.</returns>
     public Vector2 DisplayLocalToDisplayLocal(Vector2 position, Actor originLocalActor, Actor targetLocalActor)
-        => targetLocalActor.Position.GlobalToDisplay(originLocalActor.Position.DisplayToGlobal(position));
+        => targetLocalActor.Transform.GlobalToDisplay(originLocalActor.Transform.DisplayToGlobal(position));
 
     /// <summary>
     /// Convert a local display position to tile space on the same actor.
@@ -507,7 +507,7 @@ public class SpaceConverter(Game game) {
     /// <param name="grid">The spatial grid.</param>
     /// <returns>The local display position converted to tile space.</returns>
     public Matrix3x2 DisplayLocalToTile<Tin, Tout>(Matrix3x2 position, Actor localActor, ISpatialGrid<Tin, Tout> grid)
-        => grid.LocalToTileCoord(localActor.Position.DisplayToLocal(position));
+        => grid.LocalToTileCoord(localActor.Transform.DisplayToLocal(position));
 
     /// <summary>
     /// Convert a local display position to tile space on the same actor.
@@ -521,7 +521,7 @@ public class SpaceConverter(Game game) {
     /// <param name="grid">The spatial grid.</param>
     /// <returns>The local display position converted to tile space.</returns>
     public Vector2 DisplayLocalToTile<Tin, Tout>(Vector2 position, Actor localActor, ISpatialGrid<Tin, Tout> grid)
-        => grid.LocalToTileCoord(localActor.Position.DisplayToLocal(position));
+        => grid.LocalToTileCoord(localActor.Transform.DisplayToLocal(position));
 
     /// <summary>
     /// Convert a local display position to tile space on a different actor.
@@ -679,7 +679,7 @@ public class SpaceConverter(Game game) {
     /// <param name="grid">The spatial grid.</param>
     /// <returns>The tile position in global space.</returns>
     public Matrix3x2 TileToGlobal<Tin, Tout>(Matrix3x2 position, Actor localActor, ISpatialGrid<Tin, Tout> grid)
-        => localActor.Position.LocalToGlobal(grid.TileCoordToLocal(position));
+        => localActor.Transform.LocalToGlobal(grid.TileCoordToLocal(position));
 
     /// <summary>
     /// Convert a tile position to global space
@@ -693,7 +693,7 @@ public class SpaceConverter(Game game) {
     /// <param name="grid">The spatial grid.</param>
     /// <returns>The tile position in global space.</returns>
     public Vector2 TileToGlobal<Tin, Tout>(Vector2 position, Actor localActor, ISpatialGrid<Tin, Tout> grid)
-        => localActor.Position.LocalToGlobal(grid.TileCoordToLocal(position));
+        => localActor.Transform.LocalToGlobal(grid.TileCoordToLocal(position));
 
     /// <summary>
     /// Convert a tile position to another tile space on the same actor.

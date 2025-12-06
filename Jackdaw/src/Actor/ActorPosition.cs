@@ -205,16 +205,16 @@ public class ActorPosition {
 
     internal void MakeDirty() {
         isDirty = true;
-        Actor.Children.RunAll(e => e.Position.MakeDirty());
+        Actor.Children.RunAll(e => e.Transform.MakeDirty());
     }
 
     void CachePosition() {
         isDirty = false;
 
         if (Actor.ParentValid) {
-            globalMatrix.Matrix = transform.Matrix * Actor.Parent.Position.GlobalMatrix;
-            globalPosition = Vector2.Transform(LocalPosition, Actor.Parent.Position.GlobalMatrix);
-            globalRotation = LocalRotation + Actor.Parent.Position.GlobalRotation;
+            globalMatrix.Matrix = transform.Matrix * Actor.Parent.Transform.GlobalMatrix;
+            globalPosition = Vector2.Transform(LocalPosition, Actor.Parent.Transform.GlobalMatrix);
+            globalRotation = LocalRotation + Actor.Parent.Transform.GlobalRotation;
         }
         else {
             globalMatrix.Matrix = transform.Matrix;
@@ -234,7 +234,7 @@ public class ActorPosition {
         }
 
         if (Actor.ParentValid) {
-            Matrix3x2 globalDisplay = localDisplay * Actor.Parent.Position.GlobalDisplayMatrix;
+            Matrix3x2 globalDisplay = localDisplay * Actor.Parent.Transform.GlobalDisplayMatrix;
             if (GlobalDisplayMatrix != globalDisplay) {
                 globalDisplayMatrix.Matrix = globalDisplay;
             }
@@ -296,7 +296,7 @@ public class ActorPosition {
     /// <param name="matrix">The local position to transform.</param>
     /// <param name="other">The actor the position is relative to.</param>
     /// <returns>The position in the new local space.</returns>
-    public Matrix3x2 FromOtherLocal(Matrix3x2 matrix, Actor other) => FromOtherLocal(matrix, other.Position);
+    public Matrix3x2 FromOtherLocal(Matrix3x2 matrix, Actor other) => FromOtherLocal(matrix, other.Transform);
 
     /// <summary>
     /// Convert a position to local space from another actor's local.
@@ -316,7 +316,7 @@ public class ActorPosition {
     /// <param name="position">The local position to transform.</param>
     /// <param name="other">The actor the position is relative to.</param>
     /// <returns>The position in the new local space.</returns>
-    public Vector2 FromOtherLocal(Vector2 position, Actor other) => FromOtherLocal(position, other.Position);
+    public Vector2 FromOtherLocal(Vector2 position, Actor other) => FromOtherLocal(position, other.Transform);
 
     /// <summary>
     /// Convert a position to local space from another actor's local.
@@ -335,7 +335,7 @@ public class ActorPosition {
     /// </summary>
     /// <param name="other">The actor to get the position from.</param>
     /// <returns>The position in the new local space.</returns>
-    public Matrix3x2 FromOtherLocal(Actor other) => GlobalToLocal(other.Position.GlobalMatrix);
+    public Matrix3x2 FromOtherLocal(Actor other) => GlobalToLocal(other.Transform.GlobalMatrix);
 
     /// <summary>
     /// Convert a another actor's position to local space.

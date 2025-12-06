@@ -67,7 +67,7 @@ public class CachedRenderComponent : Component {
     }
 
     protected override void Render(Batcher batcher) {
-        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(new Rect(position, RenderedComponent.SizeInPixels()), Actor.Position.GlobalDisplayMatrix))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(new Rect(position, RenderedComponent.SizeInPixels()), Actor.Transform.GlobalDisplayMatrix))) { return; }
         batcher.Image(RenderedComponent, position, Color.White);
     }
 }

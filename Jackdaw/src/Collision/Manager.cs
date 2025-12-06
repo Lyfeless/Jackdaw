@@ -69,7 +69,7 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <returns>Information about collision check results.</returns>
     public AllCollisionInfo GetAllCollisions(CollisionComponent collider)
-        => GetAllCollisions(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse);
+        => GetAllCollisions(collider, collider.Actor.Transform.GlobalMatrix, collider.Actor.Transform.GlobalMatrixInverse);
 
     /// <summary>
     /// Get all collisions between given collider component and all registered collision components at a given location.
@@ -142,8 +142,8 @@ public class CollisionManager {
                 positionInv,
                 Vector2.Zero,
                 other.Collider,
-                other.Actor.Position.GlobalMatrix,
-                other.Actor.Position.GlobalMatrixInverse,
+                other.Actor.Transform.GlobalMatrix,
+                other.Actor.Transform.GlobalMatrixInverse,
                 Vector2.Zero
             ));
             if (pairs.Length == 0) { continue; }
@@ -163,7 +163,7 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <returns>Information about collision check results.</returns>
     public SingleCollisionInfo GetFirstCollision(CollisionComponent collider)
-        => GetFirstCollision(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse);
+        => GetFirstCollision(collider, collider.Actor.Transform.GlobalMatrix, collider.Actor.Transform.GlobalMatrixInverse);
 
     /// <summary>
     /// Get the first object the given collider component collides with at a given location.
@@ -241,8 +241,8 @@ public class CollisionManager {
                 positionInv,
                 Vector2.Zero,
                 other.Collider,
-                other.Actor.Position.GlobalMatrix,
-                other.Actor.Position.GlobalMatrixInverse,
+                other.Actor.Transform.GlobalMatrix,
+                other.Actor.Transform.GlobalMatrixInverse,
                 Vector2.Zero
             ));
             if (pairs.Length > 0) {
@@ -261,7 +261,7 @@ public class CollisionManager {
     /// <param name="component">The raycast component to check against.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetRayCollision(RaycastComponent component)
-        => GetRayCollision(component, component.Actor.Position);
+        => GetRayCollision(component, component.Actor.Transform);
 
     /// <summary>
     /// Get all collision data from a ray.
@@ -318,7 +318,7 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Vector2 velocity)
-        => GetSweptCollision(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse, velocity);
+        => GetSweptCollision(collider, collider.Actor.Transform.GlobalMatrix, collider.Actor.Transform.GlobalMatrixInverse, velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -423,8 +423,8 @@ public class CollisionManager {
                 positionInv,
                 velocity,
                 other.Collider,
-                other.Actor.Position.GlobalMatrix,
-                other.Actor.Position.GlobalMatrixInverse,
+                other.Actor.Transform.GlobalMatrix,
+                other.Actor.Transform.GlobalMatrixInverse,
                 Vector2.Zero
             ), other);
 
@@ -507,7 +507,7 @@ public class CollisionManager {
     /// <param name="collider">The collision component to check against.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider)
-        => GetCollisionPushout(collider, collider.Actor.Position.GlobalMatrix, collider.Actor.Position.GlobalMatrixInverse);
+        => GetCollisionPushout(collider, collider.Actor.Transform.GlobalMatrix, collider.Actor.Transform.GlobalMatrixInverse);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry.
@@ -620,7 +620,7 @@ public class CollisionManager {
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Vector2 direction)
-        => GetCollisionPushoutInDirection(collider, collider.Actor.Position.GlobalMatrix, direction);
+        => GetCollisionPushoutInDirection(collider, collider.Actor.Transform.GlobalMatrix, direction);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry in a given direction.
@@ -690,8 +690,8 @@ public class CollisionManager {
             positionInv,
             Vector2.Zero,
             other.Collider,
-            other.Actor.Position.GlobalMatrix,
-            other.Actor.Position.GlobalMatrixInverse,
+            other.Actor.Transform.GlobalMatrix,
+            other.Actor.Transform.GlobalMatrixInverse,
             Vector2.Zero
         ));
         if (collisionPairs.Length == 0) { return null; }

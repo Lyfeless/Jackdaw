@@ -44,7 +44,7 @@ public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid
         : this(game, position, new Grid<Sprite>(gridSize), tileSize) { }
 
     protected override void Render(Batcher batcher) {
-        Rect bounds = CalcExtra.TransformRect(new(Game.Window.Width, Game.Window.Height), Actor.Position.GlobalDisplayMatrixInverse);
+        Rect bounds = CalcExtra.TransformRect(new(Game.Window.Width, Game.Window.Height), Actor.Transform.GlobalDisplayMatrixInverse);
 
         Vector2 topLeft = Game.Convert.LocalToTile(bounds.TopLeft, this);
         Vector2 bottomRight = Game.Convert.LocalToTile(bounds.BottomRight, this);

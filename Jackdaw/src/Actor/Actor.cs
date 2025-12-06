@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -59,9 +60,43 @@ public class Actor {
     public bool ParentValid => Parent != null && Parent.IsValid;
 
     /// <summary>
-    /// The position of the actor. Relative to its current parent.
+    /// The position transformation for the actor.
     /// </summary>
-    public ActorPosition Position { get; }
+    public ActorPosition Transform { get; }
+
+    /// <summary>
+    /// The local translation of the actor. Can be accessed from <see cref="Actor.Transform.LocalPosition" />.
+    /// </summary>
+    public Vector2 Position {
+        get => Transform.LocalPosition;
+        set => Transform.LocalPosition = value;
+    }
+
+    /// <summary>
+    /// The local rotation of the actor. Can be accessed from <see cref="Actor.Transform.LocalRotation" />.
+    /// </summary>
+    public float Rotation {
+        get => Transform.LocalRotation;
+        set => Transform.LocalRotation = value;
+    }
+
+    /// <summary>
+    /// The local scale of the actor. Can be accessed from <see cref="Actor.Transform.LocalScale" />.
+    /// </summary>
+    public Vector2 Scale {
+        get => Transform.LocalScale;
+        set => Transform.LocalScale = value;
+    }
+
+    /// <summary>
+    /// The Global translation of the actor. Can be accessed from <see cref="Actor.Transform.GlobalPosition" />.
+    /// </summary>
+    public Vector2 GlobalPosition => Transform.GlobalPosition;
+
+    /// <summary>
+    /// The global rotation of the actor. Can be accessed from <see cref="Actor.Transform.GlobalRotation" />.
+    /// </summary>
+    public float GlobalRotation => Transform.GlobalRotation;
 
     /// <summary>
     /// If the actor's components should render.
@@ -183,7 +218,7 @@ public class Actor {
         Game = game;
         Parent = Invalid;
 
-        Position = new(this);
+        Transform = new(this);
         Match = new(this);
         Children = new(this);
         Components = new(this);
@@ -208,9 +243,9 @@ public class Actor {
     internal void Render(Batcher batcher) {
         if (!Visible) { return; }
 
-        Position.CacheDisplay();
+        Transform.CacheDisplay();
 
-        batcher.PushMatrix(Position.LocalMatrix);
+        batcher.PushMatrix(Transform.LocalMatrix);
 
         RenderActions.PreRender(batcher);
         Batcher currentBatcher = RenderActions.CurrentBatcher;
@@ -259,7 +294,7 @@ public class Actor {
         ParentTickingChanged();
         ParentVisibilityChanged();
 
-        Position.MakeDirty();
+        Transform.MakeDirty();
     }
 
     internal void ParentRemoved() {
@@ -270,7 +305,7 @@ public class Actor {
         ParentTickingChanged();
         ParentVisibilityChanged();
 
-        Position.MakeDirty();
+        Transform.MakeDirty();
     }
 
     /// <summary>
