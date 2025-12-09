@@ -441,6 +441,14 @@ public class CollisionManager {
         Vector2 velocityScaled = velocity * componentInfo[minCollider].Fraction;
         Vector2 velocityScaledClamped = velocity * componentInfo[minCollider].FractionClamped;
 
+        // Failsafe: Collision bugs occasionally let object intersect after a sweep, if that happens to move is cancelled.
+        //  The hope is this only occurs with precision due to colliders being very close so the cancel shouldn't be too noticable.
+        //  Need to find the solution in the algorithm eventually though.
+        if (GetFirstCollision(collider, Matrix3x2.CreateTranslation(velocityScaled) * position).Collided) {
+            velocityScaled = Vector2.Zero;
+            velocityScaledClamped = Vector2.Zero;
+        }
+
         SweptCollisionComponentInfo[] outputComponentInfo = [.. componentInfo.OrderBy(e => e.Fraction.LengthSquared())];
 
         return new(
