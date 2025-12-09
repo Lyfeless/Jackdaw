@@ -11,9 +11,9 @@ namespace Jackdaw;
 /// <param name="grid">The grid instance.</param>
 /// <param name="tileSize">The size of each tile.</param>
 public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), ISpatialGrid<Sprite?, Sprite?> {
-    readonly Grid<Sprite> Grid = grid;
+    protected readonly Grid<Sprite> Grid = grid;
 
-    Point2 position = position;
+    protected Point2 position = position;
 
     /// <summary>
     /// The grid position.
@@ -23,7 +23,7 @@ public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid
         set => position = (Point2)value;
     }
 
-    Point2 tileSize = tileSize;
+    protected Point2 tileSize = tileSize;
 
     /// <summary>
     /// The size of each tile.

@@ -7,9 +7,9 @@ namespace Jackdaw;
 /// </summary>
 public class CachedRenderComponent : Component {
     readonly ICacheableObject CachedObject;
-    Target RenderedComponent;
+    public Target RenderedComponent { get; private set; }
 
-    Point2 position;
+    public Point2 Position;
 
     bool uncached = true;
     RectInt bounds;
@@ -67,8 +67,8 @@ public class CachedRenderComponent : Component {
     }
 
     protected override void Render(Batcher batcher) {
-        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(new Rect(position, RenderedComponent.SizeInPixels()), Actor.Transform.GlobalDisplayMatrix))) { return; }
-        batcher.Image(RenderedComponent, position, Color.White);
+        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(new Rect(Position, RenderedComponent.SizeInPixels()), Actor.Transform.GlobalDisplayMatrix))) { return; }
+        batcher.Image(RenderedComponent, Position, Color.White);
     }
 }
 
