@@ -28,8 +28,15 @@ public class CircleComponent(Game game, Circle circle, int steps, Color color) :
     /// </summary>
     public Color Color = color;
 
-    readonly int Steps = steps;
+    /// <summary>
+    /// The circle's render resolution.
+    /// More steps will result in a smoother result but will take longer to render.
+    /// </summary>
+    public int Steps = steps;
 
+    /// <summary>
+    /// The rectangular region the circle occupies.
+    /// </summary>
     public Rect Bounds { get; private set; } = GetBounds(circle);
 
     protected override void Render(Batcher batcher) {

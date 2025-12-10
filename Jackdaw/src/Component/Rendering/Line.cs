@@ -21,7 +21,7 @@ public class LineComponent : Component {
     }
 
     /// <summary>
-    /// The bounds of the line.
+    /// The rectangular region the line occupies.
     /// </summary>
     public Rect Bounds { get; private set; }
 
