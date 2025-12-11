@@ -136,7 +136,12 @@ public static class CalcExtra {
         ).Rect;
     }
 
-    //! FIXME (Alex): BUSTED!!!
+    /// <summary>
+    /// Get the sign of a number that is always either 1 or -1.
+    /// Functions the same as Math.Sign in all cases except 0.
+    /// </summary>
+    /// <param name="value">The value to get the sign of.</param>
+    /// <returns>The sign of the value, treated as 1 for a value of 0.</returns>
     public static int NormalizedSign(float value) {
         return value >= 0 ? 1 : -1;
     }
