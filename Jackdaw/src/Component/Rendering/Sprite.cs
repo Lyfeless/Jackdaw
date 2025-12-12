@@ -46,7 +46,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="color">The sprite's color tint.</param>
     /// <param name="offset">The position offset.</param>
     public SpriteComponent(Game game, string sprite, Color color, Point2? offset = null)
-        : this(game, game.Assets.GetTexture(sprite), color, offset) { }
+        : this(game, game.Assets.GetSubtexture(sprite), color, offset) { }
 
     /// <summary>
     /// A component that renders a <seealso cref="Sprite" /> object.
@@ -55,7 +55,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="sprite">The sprite asset name.</param>
     /// <param name="offset">The position offset.</param>
     public SpriteComponent(Game game, string sprite, Point2? offset = null)
-        : this(game, game.Assets.GetTexture(sprite), offset) { }
+        : this(game, game.Assets.GetSubtexture(sprite), offset) { }
 
     protected override void Render(Batcher batcher) {
         if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Sprite.Bounds.Translate(offset ?? Point2.Zero), Actor.Transform.GlobalDisplayMatrix))) { return; }

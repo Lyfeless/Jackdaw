@@ -170,7 +170,7 @@ public readonly struct PathSegmentLinear(Vector2 offset) : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 2) {
-            Log.Warning("PATH: Not enough points provided to make a path of segments");
+            Log.Warning("Path: Not enough points provided to make a path of segments");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
@@ -215,13 +215,13 @@ public readonly struct PathSegmentQuadraticBezier : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 3) {
-            Log.Warning("PATH: Not enough points provided to make a path of quadratic beziers");
+            Log.Warning("Path: Not enough points provided to make a path of quadratic beziers");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
         int length = points.Length;
         if (length % 2 != 1) {
-            Log.Warning($"PATH: Point count must be odd to properly make a quadratic bezier path, ignoring the last point");
+            Log.Warning($"Path: Point count must be odd to properly make a quadratic bezier path, ignoring the last point");
             length--;
         }
 
@@ -288,14 +288,14 @@ public readonly struct PathSegmentCubicBezier : IPathSegment {
     /// <returns>A multi-segment path.</returns>
     public static MultiSegmentPath FromRelative(params Vector2[] points) {
         if (points.Length < 4) {
-            Log.Warning("PATH: Not enough points provided to make a path of cubic beziers");
+            Log.Warning("Path: Not enough points provided to make a path of cubic beziers");
             return new(points.Length == 0 ? Vector2.Zero : points[0], []);
         }
 
         int length = points.Length;
         if (length % 3 != 1) {
             int pointReduction = length - ((length - 1) / 3 * 3) + 1;
-            Log.Warning($"PATH: Point count must be 3n + 1 to properly make a cubic bezier path, ignoring the last {pointReduction} points");
+            Log.Warning($"Path: Point count must be 3n + 1 to properly make a cubic bezier path, ignoring the last {pointReduction} points");
             length -= pointReduction;
         }
 

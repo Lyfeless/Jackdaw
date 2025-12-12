@@ -130,7 +130,7 @@ public class SpriteNineslice : Sprite {
     /// <param name="extend">The method used to extend the texture past its regular size.</param>
     /// <param name="constrain">The method used to limit the minimum size.</param>
     public SpriteNineslice(Assets assets, string texture, RectInt center, BoundsComponent bounds, ExtendBehavior extend = ExtendBehavior.TILE, ConstrainBehavior constrain = ConstrainBehavior.NONE)
-        : this(assets.GetTexture(texture), center, bounds, extend, constrain) { }
+        : this(assets.GetSubtexture(texture), center, bounds, extend, constrain) { }
 
     public override void Render(Batcher batcher) {
         batcher.PushMatrix((Point2)BoundsComponent.Position);

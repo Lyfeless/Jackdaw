@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text.Json;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -8,383 +7,212 @@ namespace Jackdaw;
 /// Manager class used for storing and loading game assets including textures, sounds, fonts, etc
 /// </summary>
 public class Assets {
-    #region File/path definitions
-    /// <summary>
-    /// The game's asset-related config data.
-    /// </summary>
-    public GameContentConfig Config;
+    readonly Dictionary<Type, AssetStorage<object>> LoadedAssets = [];
+    readonly List<AssetLoaderStage> LoaderStages = [];
+    bool Loaded = false;
+
+    readonly Dictionary<Type, string> TypeWarnings = [];
 
     /// <summary>
-    /// All file extensions the texture loader will search for.
+    /// Configuration data for how assets should be loaded.
     /// </summary>
-    public readonly string[] TextureExtensions = [".png", ".jpg"];
+    public readonly GameContentConfig Config;
 
     /// <summary>
-    /// All file extensions the aseprite loader will search for.
+    /// The game's graphics device, used for creating assets
     /// </summary>
-    public readonly string[] AsepriteExtensions = [".aseprite", ".ase"];
+    public readonly GraphicsDevice GraphicsDevice;
 
     /// <summary>
-    /// All file extensions the font loader will search for.
+    /// The library's file assembly. <br/>
+    /// Most default fallback data is stored inside the embedded assembly
     /// </summary>
-    public readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
-
-    string TexturePath;
-    string FontPath;
-    string ShaderPath;
-    string ShaderConfigPath;
-    string AnimationPath;
-
-    #endregion
-
-    #region Assets storage and accessors
-    readonly Dictionary<string, Subtexture> Textures = [];
-    /// <summary>
-    /// Find a texture from the loaded texture data.
-    /// </summary>
-    /// <param name="name">The asset name.</param>
-    /// <returns>The requested texture, or the default texture if nothing was found.</returns>
-    public Subtexture GetTexture(string name) {
-        if (Textures.TryGetValue(name, out Subtexture output)) { return output; }
-        Log.Warning($"ASSETS: Failed to find texture {name}, returning default");
-        return Textures["fallback"];
-    }
-    const string TextureFallbackName = "Fallback.texture.png";
-    const string ManFallbackName = "Fallback.man.png";
-
-    readonly Dictionary<string, SpriteFont> Fonts = [];
-    /// <summary>
-    /// Find a font from the loaded font data.
-    /// </summary>
-    /// <param name="name">The asset name.</param>
-    /// <returns>The requested font, or the default font if nothing was found.</returns>
-    public SpriteFont GetFont(string name) {
-        if (Fonts.TryGetValue(name, out SpriteFont? output)) { return output; }
-        Log.Warning($"ASSETS: Failed to find font {name}, returning default");
-        return Fonts["fallback"];
-    }
-    const string FontFallbackName = "Fallback.font.ttf";
-
-    readonly Dictionary<string, Shader> Shaders = [];
-    /// <summary>
-    /// Find a shader from the loaded shader data.
-    /// </summary>
-    /// <param name="name">The asset name.</param>
-    /// <returns>The requested shader, or the default shader if nothing was found.</returns>
-    public Shader GetShader(string name) {
-        if (Shaders.TryGetValue(name, out Shader? output)) { return output; }
-        Log.Warning($"ASSETS: Failed to find shader {name}, returning default");
-        return Shaders["fallback"];
-    }
-
-    readonly Dictionary<string, AnimationData> Animations = [];
-    /// <summary>
-    /// Find a animation from the loaded animation data.
-    /// </summary>
-    /// <param name="name">The asset name.</param>
-    /// <returns>The requested animation, or the default animation if nothing was found.</returns>
-    public AnimationData GetAnimation(string name) {
-        if (Animations.TryGetValue(name, out AnimationData? output)) { return output; }
-        Log.Warning($"ASSETS: Failed to find animation {name}, returning default");
-        return Animations["fallback"];
-    }
-
-    #endregion
+    public readonly Assembly Assembly;
 
     /// <summary>
-    /// Load and initialize all asset types
+    /// The name of the library's executing assembly.
     /// </summary>
+    public readonly string AssemblyName;
+
     public Assets(GraphicsDevice graphicsDevice, GameContentConfig config) {
         Config = config;
+        GraphicsDevice = graphicsDevice;
 
-        // Assembly data for fallback
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        string? assemblyName = assembly.GetName().Name;
+        Assembly = Assembly.GetExecutingAssembly();
+        AssemblyName = Assembly.GetName().Name ?? "";
 
-        TexturePath = Path.Join(Config.RootFolder, Config.TextureFolder);
-        FontPath = Path.Join(Config.RootFolder, Config.FontFolder);
-        ShaderPath = Path.Join(Config.RootFolder, Config.ShaderFolder);
-        ShaderConfigPath = Path.Join(Config.RootFolder, Config.ShaderConfig);
-        AnimationPath = Path.Join(config.RootFolder, config.AnimationFolder);
+        TextureLoader textureLoader = new();
+        TextureFallbackLoader textureFallbackLoader = new();
+        PackerLoader packerLoader = new();
+        AsepriteLoader asepriteLoader = new();
+        FontLoader fontLoader = new();
+        AnimationLoader animationLoader = new();
+        ShaderLoader shaderLoader = new();
 
-        Dictionary<string, Aseprite> asepriteAnims = [];
+        textureLoader.SetBefore<PackerLoader>();
+        asepriteLoader.SetBefore<PackerLoader>();
+        animationLoader.SetAfter<PackerLoader>();
+        textureFallbackLoader.SetAfter<PackerLoader>();
 
-        // Textures
-        {
-            // Create asset packer
-            Packer packer = new() {
-                Trim = false,
-                CombineDuplicates = false,
-                Padding = 1
-            };
+        RegisterLoaderStage(textureLoader);
+        RegisterLoaderStage(textureFallbackLoader);
+        RegisterLoaderStage(asepriteLoader);
+        RegisterLoaderStage(packerLoader);
+        RegisterLoaderStage(animationLoader);
+        RegisterLoaderStage(fontLoader);
+        RegisterLoaderStage(shaderLoader);
 
-            // Load fallback texture
-            packer.Add("fallback", FallbackTexture(assembly, assemblyName!, TextureFallbackName));
-            packer.Add("fallback-man", FallbackTexture(assembly, assemblyName!, ManFallbackName));
-
-            // Load all textures in asset directory
-            if (Directory.Exists(TexturePath)) {
-                // Standard files
-                foreach (string file in Directory.EnumerateFiles(TexturePath, "*.*", SearchOption.AllDirectories).Where(e => TextureExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(TexturePath, file);
-                    packer.Add(name, file);
-                }
-                // Aseprite files
-                foreach (string file in Directory.EnumerateFiles(TexturePath, "*.*", SearchOption.AllDirectories).Where(e => AsepriteExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(TexturePath, file);
-                    Aseprite aseprite = new(file);
-                    if (aseprite.Frames.Length == 0) { continue; }
-                    if (aseprite.Frames.Length == 1) { packer.Add(name, aseprite.RenderFrame(0)); continue; }
-                    Image[] frames = aseprite.RenderAllFrames();
-                    for (int i = 0; i < frames.Length; ++i) {
-                        packer.Add(GetFrameName(name, i), frames[i]);
-                    }
-
-                    asepriteAnims.Add(name, aseprite);
-                }
-            }
-
-            // Run packer on processed textures
-            var output = packer.Pack();
-            List<Texture> pages = [];
-
-            foreach (var page in output.Pages) {
-                // page.Premultiply();
-                pages.Add(new Texture(graphicsDevice, page));
-            }
-
-            foreach (var entry in output.Entries) {
-                Textures.Add(entry.Name, new Subtexture(pages[entry.Page], entry.Source, entry.Frame));
-            }
-        }
-
-        // Fonts
-        {
-            // Load fallback font
-            using Stream stream = assembly.GetManifestResourceStream($"{assemblyName}.{FontFallbackName}")!;
-            Fonts.Add("fallback", new SpriteFont(graphicsDevice, stream, 16));
-
-            // Load all fonts in asset directory
-            if (Directory.Exists(FontPath)) {
-                string configPath = Path.Join(Config.RootFolder, Config.FontConfig);
-                FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
-
-                foreach (string file in Directory.EnumerateFiles(FontPath, "*.*", SearchOption.AllDirectories).Where(e => FontExtensions.Any(e.EndsWith))) {
-                    string name = GetAssetName(FontPath, file);
-                    FontConfigEntry? configEntry = fontConfig?.FontConfigs.FirstOrDefault(e => e.Name == name);
-                    Fonts.Add(name, new SpriteFont(graphicsDevice, file, configEntry?.Size ?? FontConfig.DefaultFontSize));
-                }
-            }
-        }
-
-        // Shaders
-        {
-            // Load fallback shader
-            Shaders.Add("fallback", new BatcherShader(graphicsDevice));
-
-            // Load shaders from config
-            //      Shaders are built from more data than just files, so read directly off the config
-            string shaderExtension = graphicsDevice.Driver.GetShaderExtension(); graphicsDevice.Driver.GetShaderExtension();
-            if (Path.Exists(ShaderConfigPath)) {
-                ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(ShaderConfigPath), SourceGenerationContext.Default.ShaderConfig);
-
-                if (shaderConfig != null) {
-                    foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
-                        // Find files from config entry
-                        string vertexPath = Path.Join(ShaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
-                        string fragmentPath = Path.Join(ShaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
-                        if (!Path.Exists(vertexPath) || !Path.Exists(fragmentPath)) { continue; }
-
-                        // Load files into bytes
-                        byte[] vertexBytes;
-                        byte[] fragmentBytes;
-                        vertexBytes = File.ReadAllBytes(vertexPath);
-                        fragmentBytes = vertexPath == fragmentPath ? vertexBytes : File.ReadAllBytes(fragmentPath);
-
-                        // Build shader info
-                        ShaderCreateInfo createInfo = new(
-                            Vertex: new(
-                                Code: vertexBytes,
-                                SamplerCount: entry.Vertex.Samplers,
-                                UniformBufferCount: entry.Vertex.Uniforms,
-                                EntryPoint: entry.Vertex.EntryPoint
-                            ),
-                            Fragment: new(
-                                Code: fragmentBytes,
-                                SamplerCount: entry.Fragment.Samplers,
-                                UniformBufferCount: entry.Fragment.Uniforms,
-                                EntryPoint: entry.Fragment.EntryPoint
-                            )
-                        );
-
-                        // Add shader to dict
-                        Shaders.Add(entry.Name, new Shader(graphicsDevice, createInfo));
-                    }
-                }
-            }
-        }
-
-        // Animation Data
-        {
-            // Create fallback animation
-            Animations.Add("fallback", GetDefaultAnimation());
-
-            // Load all animations and groups from directory
-            if (Directory.Exists(AnimationPath)) {
-                // Load single animations
-                foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationExtension))) {
-                    string name = GetAssetName(AnimationPath, file);
-                    AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
-                    if (data != null) {
-                        AnimationData? anim = GetAnimationData(data);
-                        if (anim != null) { Animations.Add(name, anim); }
-
-                    }
-                }
-
-                // Load animation group files
-                foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(Config.AnimationGroupExtension))) {
-                    AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationGroupConfig);
-                    if (data != null) {
-                        foreach (AnimationConfigEntry entry in data.Entries) {
-                            AnimationData? anim = GetAnimationData(entry.Animation);
-                            if (anim != null) { Animations.Add(entry.Name, anim); }
-                        }
-                    }
-                }
-            }
-
-            // Load animations from aseprite files
-            foreach ((string name, Aseprite aseprite) in asepriteAnims) {
-                AnimationData? anim = GetAnimationData(name, aseprite);
-                if (anim != null) { Animations.Add(name, anim); }
-            }
-        }
+        AddTypeWarning<Image>("Use Subtexture to access auto-loaded image data.");
+        AddTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");
+        AddTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
     }
 
-    #region Animation Loading
-
-    AnimationData? GetAnimationData(AnimationConfig config) {
-        // Console.WriteLine(config.AnimationType);
-        return config.AnimationType switch {
-            AnimationType.SPRITESHEET => GetSpriteSheetAnimation(config),
-            AnimationType.MULTI_TEXTURE => GetMultiTextureAnimation(config),
-            _ => null
-        };
+    /// <summary>
+    /// Add an asset loader stage to the queue. Currently only one loader of each type is supported. <br/>
+    /// Adding custom loaders requires the game config option <see cref="GameContentConfig.EnableCustomLoaders" />.
+    /// </summary>
+    /// <param name="loader">The loader to add to the load queue.</param>
+    public void RegisterLoaderStage(AssetLoaderStage loader) {
+        if (LoaderStages.Any(e => e.GetType() == loader.GetType())) {
+            Log.Warning($"Trying to add a second loader of type {loader.GetType()}. Behavior is currently unsupported, skipping.");
+            return;
+        }
+        LoaderStages.Add(loader);
     }
 
-    AnimationData? GetSpriteSheetAnimation(AnimationConfig config) {
-        Subtexture spritesheet = GetTexture(config.Spritesheet);
-        Point2 frameSize = new(
-            (int)spritesheet.Width / config.HorizontalFrames,
-            (int)spritesheet.Height / config.VerticalFrames
-        );
+    /// <summary>
+    /// Find an asset loader stage in the queue by type. Currently only one loader of each type is supported.
+    /// </summary>
+    /// <typeparam name="T">The loader type to find.</typeparam>
+    /// <returns>The asset loader, null if no loader matches the given type.</returns>
+    public T? FindLoaderStage<T>() where T : AssetLoaderStage => (T?)LoaderStages.FirstOrDefault(e => e.GetType() == typeof(T));
 
-        AnimationFrame[] frames;
-        if (config.Frames.Length > 0) {
-            frames = [.. config.Frames.Select(frame => new AnimationFrame(
-                texture: 0,
-                duration: frame.Duration,
-                clip: SpriteSheetClip(frameSize, frame.FrameX, frame.FrameY),
-                positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
-                flipX: frame.FlipX,
-                flipY: frame.FlipY,
-                embeddedData: frame.EmbeddedData
-            ))];
+    /// <summary>
+    /// Info to append to exceptions when searching for an asset of a specified type. <br/>
+    /// Used mostly for informing programs searching for the wrong asset types.
+    /// </summary>
+    /// <typeparam name="T">The asset type to show the warning for.</typeparam>
+    /// <param name="warning">The warning to show in exceptions.</param>
+    public void AddTypeWarning<T>(string warning) => AddTypeWarning(typeof(T), warning);
+
+    /// <summary>
+    /// Info to append to exceptions when searching for an asset of a specified type. <br/>
+    /// Used mostly for informing programs searching for the wrong asset types.
+    /// </summary>
+    /// <param name="type">The asset type to show the warning for.</param>
+    /// <param name="warning">The warning to show in exceptions.</param>
+    public void AddTypeWarning(Type type, string warning) => TypeWarnings.Add(type, warning);
+
+    /// <summary>
+    /// Load assets from all registered loader stages. <br/>
+    /// Runs automatically on game creation unless <see cref="GameContentConfig.EnableCustomLoaders" /> is enabled.
+    /// </summary>
+    /// <exception cref="Exception">If the registered loaders have conflicts in load order preventing them from executing.</exception>
+    public void Load() {
+        if (Loaded) {
+            Log.Warning("Assets: Attempting to run asset load after load has already run, skipping.");
+            return;
         }
-        else {
-            frames = new AnimationFrame[config.HorizontalFrames * config.HorizontalFrames];
-            for (int y = 0; y < config.VerticalFrames; ++y) {
-                for (int x = 0; x < config.HorizontalFrames; ++x) {
-                    frames[x + (y * config.HorizontalFrames)] = new(0, config.FrameTime, SpriteSheetClip(frameSize, x, y));
-                }
+
+        for (int i = LoaderStages.Count; i > 0; --i) {
+            AssetLoaderStage? loader = NextLoaderStage() ?? throw new Exception("Assets: AssetLoader ordering error, can't finish loading assets due to dependancy loop.");
+            loader.Run(this);
+            LoaderStages.Remove(loader);
+        }
+
+        Loaded = true;
+    }
+
+    AssetLoaderStage? NextLoaderStage() {
+        foreach (AssetLoaderStage loader in LoaderStages) {
+            if (CanRunLoaderStage(loader)) { return loader; }
+        }
+
+        return null;
+    }
+
+    bool CanRunLoaderStage(AssetLoaderStage loader) {
+        foreach (AssetLoaderStage other in LoaderStages) {
+            if (loader == other) { continue; }
+            if (other.IsBefore(loader) || loader.IsAfter(other)) { return false; }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Add a loaded asset to storage.
+    /// </summary>
+    /// <typeparam name="T">The type of asset to add.</typeparam>
+    /// <param name="name">The asset name id. Must be unique within the asset type.</param>
+    /// <param name="asset">The asset to add.</param>
+    public void Add<T>(string name, T asset) => GetStorage<T>(true).Add(name, asset);
+
+    /// <summary>
+    /// Set the fallback asset for a specific type. <br/>
+    /// The fallback is given when an asset lookup fails.
+    /// </summary>
+    /// <typeparam name="T">The type of asset to set the fallback for.</typeparam>
+    /// <param name="asset">The asset to set as fallback.</param>
+    public void SetFallback<T>(T asset) => GetStorage<T>(true).AddFallback(asset);
+
+    /// <summary>
+    /// Get a loaded asset from storage.
+    /// </summary>
+    /// <typeparam name="T">The type of asset to find.</typeparam>
+    /// <param name="name">The name id of the asset to find.</param>
+    /// <returns>The requested asset, or the asset type's fallback if the name id isn't present.</returns>
+    public T Get<T>(string name) => (T)GetStorage<T>().Get(name);
+
+    /// <summary>
+    /// Get the fallback asset for the given type.
+    /// The fallback is normally given when an asset lookup fails.
+    /// </summary>
+    /// <typeparam name="T">The asset type to get the fallback for.</typeparam>
+    /// <returns>The asset type's fallback value.</returns>
+    public T GetFallback<T>() => (T)GetStorage<T>().Fallback;
+
+    /// <summary>
+    /// Get a loaded texture asset from storage.
+    /// </summary>
+    /// <param name="name">The name id of the texture asset to find.</param>
+    /// <returns>The requested texture asset, or the fallback texture if the name id isn't present.</returns>
+    public Subtexture GetSubtexture(string name) => Get<Subtexture>(name);
+
+    /// <summary>
+    /// Get a loaded font asset from storage.
+    /// </summary>
+    /// <param name="name">The name id of the font asset to find.</param>
+    /// <returns>The requested font asset, or the fallback font if the name id isn't present.</returns>
+    public SpriteFont GetSpriteFont(string name) => Get<SpriteFont>(name);
+
+    /// <summary>
+    /// Get a loaded shader asset from storage.
+    /// </summary>
+    /// <param name="name">The name id of the shader asset to find.</param>
+    /// <returns>The requested shader asset, or the fallback shader if the name id isn't present.</returns>
+    public Shader GetShader(string name) => Get<Shader>(name);
+
+    /// <summary>
+    /// Get a loaded animation asset from storage.
+    /// </summary>
+    /// <param name="name">The name id of the animation asset to find.</param>
+    /// <returns>The requested animation asset, or the fallback animation if the name id isn't present.</returns>
+    public AnimationData GetAnimationData(string name) => Get<AnimationData>(name);
+
+    AssetStorage<object> GetStorage<T>(bool create = false) {
+        Type type = typeof(T);
+        if (!LoadedAssets.TryGetValue(type, out AssetStorage<object>? value)) {
+            if (create) {
+                value = new(); LoadedAssets.Add(type, value);
+            }
+            else {
+                TypeWarnings.TryGetValue(typeof(T), out string? warning);
+                throw new Exception($"Assets: No assets initialized for type {type}, could not send fallback. {warning}");
             }
         }
-
-        return new(
-            texture: spritesheet,
-            frames: frames,
-            looping: config.Looping,
-            positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
-        );
+        return value;
     }
-
-    static RectInt SpriteSheetClip(Point2 frameSize, int x, int y)
-        => new(frameSize * new Point2(x, y), frameSize);
-
-    AnimationData? GetMultiTextureAnimation(AnimationConfig config) {
-        return new(
-            GetAllTextures(config.Textures),
-            frames: [..config.Frames.Select(frame => new AnimationFrame(
-                texture: frame.Texture,
-                duration: frame.Duration,
-                flipX: frame.FlipX,
-                flipY: frame.FlipY,
-                positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
-                clip: (frame.ClipWidth > 0 && frame.ClipHeight > 0) ? new(frame.ClipX, frame.ClipY, frame.ClipWidth, frame.ClipHeight) : null,
-                embeddedData: frame.EmbeddedData
-            ))],
-            looping: config.Looping,
-            positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
-        );
-    }
-
-    AnimationData? GetAnimationData(string name, Aseprite aseprite) {
-        bool looping = true;
-        Point2 positionOffset = Point2.Zero;
-        AsepriteFrameConfig[] frameConfigs = [];
-        string path = Path.Join(TexturePath, $"{name}{Config.AsepriteConfigExtension}");
-        if (File.Exists(path)) {
-            AsepriteConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AsepriteConfig);
-            if (config != null) {
-                looping = config.Looping;
-                positionOffset = new(config.PositionOffsetX, config.PositionOffsetY);
-                frameConfigs = config.FrameData;
-            }
-        }
-
-        Subtexture[] textures = new Subtexture[aseprite.Frames.Length];
-        AnimationFrame[] frames = new AnimationFrame[aseprite.Frames.Length];
-        for (int i = 0; i < aseprite.Frames.Length; ++i) {
-            bool flipX = false;
-            bool flipY = false;
-            string embeddedData = string.Empty;
-            AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
-            if (frameConfig != null) {
-                flipX = frameConfig.FlipX;
-                flipY = frameConfig.FlipY;
-                embeddedData = frameConfig.EmbeddedData;
-            }
-
-            textures[i] = GetTexture(GetFrameName(name, i));
-            frames[i] = new AnimationFrame(
-                texture: i,
-                duration: aseprite.Frames[i].Duration,
-                flipX: flipX,
-                flipY: flipY,
-                embeddedData: embeddedData
-            );
-        }
-
-        return new(
-            textures: textures,
-            frames: frames,
-            looping: looping,
-            positionOffset: positionOffset
-        );
-    }
-
-    Subtexture[] GetAllTextures(string[] names) {
-        Subtexture[] textures = new Subtexture[names.Length];
-        for (int i = 0; i < names.Length; ++i) {
-            textures[i] = GetTexture(names[i]);
-        }
-        return textures;
-    }
-
-    AnimationData GetDefaultAnimation() => new(GetTexture("fallback"), [new(0, 0)], 0);
-
-    #endregion
 
     /// <summary>
     /// Remove extra information from a file path to create a unique asset identifier
@@ -401,12 +229,14 @@ public class Assets {
         return name;
     }
 
-    static string GetFrameName(string name, int frame) {
-        return $"{name}{frame}";
-    }
-
-    static Image FallbackTexture(Assembly assembly, string assemblyName, string name) {
-        using Stream streamError = assembly.GetManifestResourceStream($"{assemblyName}.{name}")!;
-        return new Image(streamError);
+    /// <summary>
+    /// Get all files from a directory and all subdirectories that match the given extensions.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="extensions">The file extensions to search for.</param>
+    /// <returns>All files in the directory with a matching extension.</returns>
+    public static IEnumerable<string> GetEnumeratedFiles(string path, params string[] extensions) {
+        if (!Directory.Exists(path)) { return []; }
+        return Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).Where(e => extensions.Any(e.EndsWith));
     }
 }

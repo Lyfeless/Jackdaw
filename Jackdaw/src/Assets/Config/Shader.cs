@@ -2,12 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Jackdaw;
 
-internal class ShaderConfig {
+internal class ShaderConfig
+{
     [JsonPropertyName("entries")]
     public ShaderConfigEntry[] ShaderConfigs { get; set; } = [];
 }
 
-internal class ShaderConfigEntry {
+internal class ShaderConfigEntry
+{
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
@@ -18,7 +20,8 @@ internal class ShaderConfigEntry {
     public ShaderConfigEntryStage Fragment { get; set; } = new();
 }
 
-internal class ShaderConfigEntryStage {
+internal class ShaderConfigEntryStage
+{
     [JsonPropertyName("path")]
     public string Path { get; set; } = string.Empty;
 

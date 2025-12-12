@@ -36,7 +36,7 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="animation">The animation name.</param>
-    public SpriteAnimated(Game game, string animation) : this(game, game.Assets.GetAnimation(animation)) { }
+    public SpriteAnimated(Game game, string animation) : this(game, game.Assets.GetAnimationData(animation)) { }
 
     public override void Render(Batcher batcher) {
         AnimationFrame frame = Frame;

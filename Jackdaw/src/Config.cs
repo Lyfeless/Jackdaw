@@ -141,4 +141,11 @@ public struct GameContentConfig() {
     /// </summary>
     [JsonPropertyName("asepriteConfigExtension")]
     public string AsepriteConfigExtension { get; set; } = ".asedef";
+
+    /// <summary>
+    /// If the game is using custom content loaders. <br/>
+    /// If enabled, requires calling <see cref="Assets.Load"/>
+    /// </summary>
+    [JsonPropertyName("enableCustomLoaders")]
+    public bool EnableCustomLoaders { get; set; } = false;
 }

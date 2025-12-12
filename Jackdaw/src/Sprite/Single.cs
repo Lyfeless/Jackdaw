@@ -17,7 +17,7 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     /// </summary>
     /// <param name="assets">The current game's asset manager.</params>
     /// <param name="texture">The texture name.</param>
-    public SpriteSingle(Assets assets, string texture) : this(assets.GetTexture(texture)) { }
+    public SpriteSingle(Assets assets, string texture) : this(assets.GetSubtexture(texture)) { }
 
     public override void Render(Batcher batcher) {
         batcher.Image(Texture, Offset + (Bounds.Size / 2), Bounds.Center, FlipScale(), 0, Color);

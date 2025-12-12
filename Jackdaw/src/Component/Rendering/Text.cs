@@ -123,7 +123,7 @@ public class TextComponent(Game game, string text, SpriteFont font, Color color)
     /// <param name="text">The text to render.</param>
     /// <param name="font">The font asset name.</param>
     /// <param name="color">The text color.</param>
-    public TextComponent(Game game, string text, string font, Color color) : this(game, text, game.Assets.GetFont(font), color) { }
+    public TextComponent(Game game, string text, string font, Color color) : this(game, text, game.Assets.GetSpriteFont(font), color) { }
 
     protected override void Render(Batcher batcher) {
         if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Bounds, Actor.Transform.GlobalDisplayMatrix))) { return; }
