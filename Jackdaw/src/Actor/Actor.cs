@@ -244,8 +244,7 @@ public class Actor {
         if (!Visible) { return; }
 
         Transform.CacheDisplay();
-
-        batcher.PushMatrix(Transform.LocalMatrix);
+        batcher.PushMatrix(Transform.LocalDisplayMatrix);
 
         RenderActions.PreRender(batcher);
         Batcher currentBatcher = RenderActions.CurrentBatcher;

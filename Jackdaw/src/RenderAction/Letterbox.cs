@@ -45,8 +45,6 @@ public class RenderActionLetterbox(GraphicsDevice device, BoundsComponent fillBo
         container.PopBatcher();
 
         Batcher.Render(Target);
-        container.CurrentBatcher.PushMatrix(DisplayScale);
         container.CurrentBatcher.Image(Target, Color.White);
-        container.CurrentBatcher.PopMatrix();
     }
 }
