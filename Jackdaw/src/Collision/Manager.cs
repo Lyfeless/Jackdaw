@@ -787,11 +787,11 @@ public class CollisionManager {
     static SweepColliderPair[] ColliderIntersectionFraction(ColliderContext ctx, bool reversed = false) {
         if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
 
-        Rect sweptBoundsA = SweptBounds(ctx.ColliderA, ctx.VelocityA);
+        Rect boundAOffset = CalcExtra.TransformRect(ctx.ColliderA.Bounds, ctx.PositionA);
         Rect sweptBoundsB = SweptBounds(ctx.ColliderB, ctx.VelocityB);
-        Rect sweptBoundsAOffset = CalcExtra.TransformRect(sweptBoundsA, ctx.PositionA);
-        Rect sweptBoundsBOffset = CalcExtra.TransformRect(sweptBoundsB, ctx.PositionB);
-        if (!sweptBoundsAOffset.Overlaps(sweptBoundsBOffset)) {
+        Rect sweptBoundsBCombined = SweptBounds(sweptBoundsB, -ctx.VelocityA);
+        Rect sweptBoundsBCombinedOffset = CalcExtra.TransformRect(sweptBoundsBCombined, ctx.PositionB);
+        if (!sweptBoundsBCombinedOffset.Overlaps(boundAOffset)) {
             return [];
         }
 
@@ -1059,9 +1059,12 @@ public class CollisionManager {
         return direction;
     }
 
-    static Rect SweptBounds(Collider collider, Vector2 velocity) {
-        Vector2 min = Vector2.Min(collider.Bounds.TopLeft, collider.Bounds.TopLeft + velocity);
-        Vector2 max = Vector2.Max(collider.Bounds.BottomRight, collider.Bounds.BottomRight + velocity);
+    static Rect SweptBounds(Collider collider, Vector2 velocity)
+        => SweptBounds(collider.Bounds, velocity);
+
+    static Rect SweptBounds(Rect rect, Vector2 velocity) {
+        Vector2 min = Vector2.Min(rect.TopLeft, rect.TopLeft + velocity);
+        Vector2 max = Vector2.Max(rect.BottomRight, rect.BottomRight + velocity);
         return new(min, max - min);
     }
 
