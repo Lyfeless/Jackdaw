@@ -126,7 +126,7 @@ public class TextComponent(Game game, string text, SpriteFont font, Color color)
     public TextComponent(Game game, string text, string font, Color color) : this(game, text, game.Assets.GetSpriteFont(font), color) { }
 
     protected override void Render(Batcher batcher) {
-        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Bounds, Actor.Transform.GlobalDisplayMatrix))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(Bounds.TransformAABB(Actor.Transform.GlobalDisplayMatrix))) { return; }
         batcher.Text(Font, Text, Bounds.Position, Color);
     }
 

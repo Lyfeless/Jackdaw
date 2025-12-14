@@ -40,7 +40,7 @@ public class CircleComponent(Game game, Circle circle, int steps, Color color) :
     public Rect Bounds { get; private set; } = GetBounds(circle);
 
     protected override void Render(Batcher batcher) {
-        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Bounds, Actor.Transform.GlobalDisplayMatrix))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(Bounds.TransformAABB(Actor.Transform.GlobalDisplayMatrix))) { return; }
         batcher.Circle(Circle, Steps, Color);
     }
 

@@ -19,7 +19,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
         get => point1;
         set {
             bounds = GetBounds(value, point2, radius);
-            center = CalcExtra.LineMidpoint(point1, point2);
+            center = new Line(point1, point2).Midpoint;
             point1 = value;
         }
     }
@@ -33,7 +33,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
         get => point2;
         set {
             bounds = GetBounds(point1, value, radius);
-            center = CalcExtra.LineMidpoint(point1, point2);
+            center = new Line(point1, point2).Midpoint;
             point2 = value;
         }
     }
@@ -47,7 +47,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
         get => radius;
         set {
             bounds = GetBounds(point1, point2, value);
-            center = CalcExtra.LineMidpoint(point1, point2);
+            center = new Line(point1, point2).Midpoint;
             radius = value;
         }
     }
@@ -94,7 +94,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     Rect bounds = GetBounds(point1, point2, radius);
     public override Rect Bounds => bounds;
 
-    Vector2 center = CalcExtra.LineMidpoint(point1, point2);
+    Vector2 center = new Line(point1, point2).Midpoint;
     public override Vector2 Center => center;
 
     public override bool Multi => false;

@@ -20,7 +20,7 @@ public class RectComponent(Game game, Rect rect, Color color) : Component(game) 
     public Color Color = color;
 
     protected override void Render(Batcher batcher) {
-        if (!Game.Window.BoundsInPixels().Overlaps(CalcExtra.TransformRect(Rect, Actor.Transform.GlobalDisplayMatrix))) { return; }
+        if (!Game.Window.BoundsInPixels().Overlaps(Rect.TransformAABB(Actor.Transform.GlobalDisplayMatrix))) { return; }
         batcher.Rect(Rect, Color);
     }
 }

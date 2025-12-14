@@ -731,14 +731,14 @@ public class CollisionManager {
     static SimplexColliderPair[] ColliderOverlapCheck(ColliderContext ctx, bool reversed = false) {
         if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
 
-        Rect boundsAOffset = CalcExtra.TransformRect(ctx.ColliderA.Bounds, ctx.PositionA);
-        Rect boundsBOffset = CalcExtra.TransformRect(ctx.ColliderB.Bounds, ctx.PositionB);
+        Rect boundsAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
+        Rect boundsBOffset = ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB);
         if (!boundsAOffset.Overlaps(boundsBOffset)) {
             return [];
         }
 
         if (ctx.ColliderA.Multi) {
-            Collider[] subs = ctx.ColliderA.GetSubColliders(CalcExtra.TransformRect(ctx.ColliderB.Bounds, ctx.PositionB * ctx.PositionAInv));
+            Collider[] subs = ctx.ColliderA.GetSubColliders(ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB * ctx.PositionAInv));
             List<SimplexColliderPair> pairs = [];
             foreach (Collider collider in subs) {
                 SimplexColliderPair[] subCollisions = ColliderOverlapCheck(ctx with { ColliderA = collider }, reversed);
@@ -758,14 +758,14 @@ public class CollisionManager {
     static PushoutColliderPair[] ColliderPushout(ColliderContext ctx, bool reversed = false) {
         if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
 
-        Rect boundsAOffset = CalcExtra.TransformRect(ctx.ColliderA.Bounds, ctx.PositionA);
-        Rect boundsBOffset = CalcExtra.TransformRect(ctx.ColliderB.Bounds, ctx.PositionB);
+        Rect boundsAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
+        Rect boundsBOffset = ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB);
         if (!boundsAOffset.Overlaps(boundsBOffset)) {
             return [];
         }
 
         if (ctx.ColliderA.Multi) {
-            Collider[] subs = ctx.ColliderA.GetSubColliders(CalcExtra.TransformRect(ctx.ColliderB.Bounds, ctx.PositionB * ctx.PositionAInv));
+            Collider[] subs = ctx.ColliderA.GetSubColliders(ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB * ctx.PositionAInv));
             List<PushoutColliderPair> pairs = [];
             foreach (Collider collider in subs) {
                 PushoutColliderPair[] subCollisions = ColliderPushout(ctx with { ColliderA = collider }, reversed);
@@ -787,17 +787,17 @@ public class CollisionManager {
     static SweepColliderPair[] ColliderIntersectionFraction(ColliderContext ctx, bool reversed = false) {
         if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
 
-        Rect boundAOffset = CalcExtra.TransformRect(ctx.ColliderA.Bounds, ctx.PositionA);
+        Rect boundAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
         Rect sweptBoundsB = SweptBounds(ctx.ColliderB, ctx.VelocityB);
         Rect sweptBoundsBCombined = SweptBounds(sweptBoundsB, -ctx.VelocityA);
-        Rect sweptBoundsBCombinedOffset = CalcExtra.TransformRect(sweptBoundsBCombined, ctx.PositionB);
+        Rect sweptBoundsBCombinedOffset = sweptBoundsBCombined.TransformAABB(ctx.PositionB);
         if (!sweptBoundsBCombinedOffset.Overlaps(boundAOffset)) {
             return [];
         }
 
         if (ctx.ColliderA.Multi) {
             List<SweepColliderPair> pairs = [];
-            foreach (Collider collider in ctx.ColliderA.GetSubColliders(CalcExtra.TransformRect(sweptBoundsB, ctx.PositionB * ctx.PositionAInv))) {
+            foreach (Collider collider in ctx.ColliderA.GetSubColliders(sweptBoundsB.TransformAABB(ctx.PositionB * ctx.PositionAInv))) {
                 SweepColliderPair[] subCollisions = ColliderIntersectionFraction(ctx with { ColliderA = collider }, reversed);
                 if (subCollisions.Length > 0) { pairs.AddRange(subCollisions); }
             }
@@ -828,7 +828,7 @@ public class CollisionManager {
         // Point C
         Vector2 AInv = -pointA;
         Vector2 AB = pointB + AInv;
-        direction = CalcExtra.TripleProduct(AB, AInv, AB);
+        direction = Calc.TripleProduct(AB, AInv, AB);
         Vector2 pointC = Support(ctx, direction);
         if (!PointCrossesOrigin(pointC, direction)) { return new(pointA, pointB, pointC, false); }
 
@@ -837,8 +837,8 @@ public class CollisionManager {
             Vector2 CInv = -pointC;
             Vector2 CB = pointB + CInv;
             Vector2 CA = pointA + CInv;
-            Vector2 perpCB = CalcExtra.TripleProduct(CA, CB, CB);
-            Vector2 perpCA = CalcExtra.TripleProduct(CB, CA, CA);
+            Vector2 perpCB = Calc.TripleProduct(CA, CB, CB);
+            Vector2 perpCA = Calc.TripleProduct(CB, CA, CA);
             if (Vector2.Dot(perpCB, CInv) > 0) {
                 pointA = pointB;
                 pointB = pointC;
@@ -924,7 +924,7 @@ public class CollisionManager {
         Vector2 pointA = Support(ctx, direction);
 
         // Point B
-        direction = CalcExtra.TripleProduct(direction, -pointA, direction);
+        direction = Calc.TripleProduct(direction, -pointA, direction);
         Vector2 pointB = Support(ctx, direction);
 
         float crossA = Calc.Cross(velocityDifference, pointA);
@@ -979,8 +979,8 @@ public class CollisionManager {
     static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
 
     static Vector2 Support(ColliderContext ctx, Vector2 direction) {
-        Vector2 directionAdjustedA = CalcExtra.TransformDirection(direction, ctx.PositionAInv);
-        Vector2 directionAdjustedB = CalcExtra.TransformDirection(-direction, ctx.PositionBInv);
+        Vector2 directionAdjustedA = direction.TransformDirection(ctx.PositionAInv);
+        Vector2 directionAdjustedB = -direction.TransformDirection(ctx.PositionBInv);
         Vector2 supportA = Vector2.Transform(ctx.ColliderA.Support(directionAdjustedA), ctx.PositionA);
         Vector2 supportB = Vector2.Transform(ctx.ColliderB.Support(directionAdjustedB), ctx.PositionB);
         return supportA - supportB;
@@ -1035,7 +1035,7 @@ public class CollisionManager {
 
     // Expects velocityLength to be a squared distance
     static CollisionSweepInfo SweepLineIntersection(Vector2 pointA, Vector2 pointB, Vector2 velocity, float velocityLength) {
-        if (!CalcExtra.LineAndLineSegmentIntersection(Vector2.Zero, velocity, pointA, pointB, out Vector2 intersection)) {
+        if (!new Line(Vector2.Zero, velocity).IntersectionLineSegment(new(pointA, pointB), out Vector2 intersection)) {
             return new(Vector2.One, Vector2.UnitY, false);
         }
 
@@ -1054,7 +1054,7 @@ public class CollisionManager {
 
     static Vector2 PerpDirection(Vector2 pointA, Vector2 pointB, Vector2 facingDirection) {
         Vector2 line = pointB - pointA;
-        Vector2 direction = CalcExtra.TripleProduct(line, pointA, line);
+        Vector2 direction = Calc.TripleProduct(line, pointA, line);
         if (Vector2.Dot(direction, facingDirection) < 0) { direction = -direction; }
         return direction;
     }
