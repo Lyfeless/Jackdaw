@@ -39,10 +39,7 @@ public class AnimationLoader() : AssetLoaderStage() {
             _ => null
         };
 
-        if (anim != null) {
-            Console.WriteLine(name);
-            assets.Add(name, anim);
-        }
+        if (anim != null) { assets.Add(name, anim); }
     }
 
     static AnimationData? GetSpriteSheetAnimation(Assets assets, AnimationConfig config) {
