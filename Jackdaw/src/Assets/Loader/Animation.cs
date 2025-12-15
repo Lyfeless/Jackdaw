@@ -15,9 +15,9 @@ public class AnimationLoader() : AssetLoaderStage() {
 
         // Load single animations
         foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(assets.Config.AnimationExtension))) {
-            string name = Assets.GetAssetName(AnimationPath, file);
             AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
             if (data == null) { continue; }
+            string name = Assets.GetAssetName(AnimationPath, file);
             AddAnimation(assets, name, data);
         }
 
@@ -26,7 +26,8 @@ public class AnimationLoader() : AssetLoaderStage() {
             AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationGroupConfig);
             if (data == null) { continue; }
             foreach (AnimationConfigEntry entry in data.Entries) {
-                AddAnimation(assets, entry.Name, entry.Animation);
+                string name = $"{Assets.GetAssetName(AnimationPath, file)}/{entry.Name}";
+                AddAnimation(assets, name, entry.Animation);
             }
         }
     }
@@ -38,7 +39,10 @@ public class AnimationLoader() : AssetLoaderStage() {
             _ => null
         };
 
-        if (anim != null) { assets.Add(name, anim); }
+        if (anim != null) {
+            Console.WriteLine(name);
+            assets.Add(name, anim);
+        }
     }
 
     static AnimationData? GetSpriteSheetAnimation(Assets assets, AnimationConfig config) {

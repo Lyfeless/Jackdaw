@@ -224,8 +224,6 @@ public class Assets {
         string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
         name = Path.GetRelativePath(relativePath, name);
         name = name.Replace("\\", "/");
-        name = name.Replace("/", "/");
-
         return name;
     }
 
