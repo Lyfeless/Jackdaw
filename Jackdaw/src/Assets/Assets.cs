@@ -43,15 +43,19 @@ public class Assets {
 
         TextureLoader textureLoader = new();
         TextureFallbackLoader textureFallbackLoader = new();
-        PackerLoader packerLoader = new();
         AsepriteLoader asepriteLoader = new();
+        AsepriteAnimationLoader asepriteAnimationLoader = new();
+        PackerLoader packerLoader = new();
         FontLoader fontLoader = new();
         AnimationLoader animationLoader = new();
         ShaderLoader shaderLoader = new();
 
         textureLoader.SetBefore<PackerLoader>();
         asepriteLoader.SetBefore<PackerLoader>();
+        asepriteLoader.SetBefore<AsepriteAnimationLoader>();
+
         animationLoader.SetAfter<PackerLoader>();
+        asepriteAnimationLoader.SetAfter<PackerLoader>();
         textureFallbackLoader.SetAfter<PackerLoader>();
 
         RegisterLoaderStage(textureLoader);
