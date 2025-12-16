@@ -808,7 +808,7 @@ public class CollisionManager {
 
         CollisionSweepInfo collision = GetRayIntersectionFraction(ctx);
         // Sweep calculation sometimes gives results for colliders that aren't initially colliding
-        if (FractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0) { return []; }
+        if (!collision.Collided || (FractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0)) { return []; }
         return [reversed ? new(ctx.ColliderB, ctx.ColliderA, collision.Fraction, collision.Normal) : new(ctx.ColliderA, ctx.ColliderB, collision.Fraction, collision.Normal)];
     }
     #endregion
