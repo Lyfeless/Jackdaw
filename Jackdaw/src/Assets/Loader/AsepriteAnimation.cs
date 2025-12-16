@@ -4,7 +4,7 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// Asset loader for storing the texture fallback, as the fallback isn't created until after the <see cref="PackerLoader"> runs.
+/// Asset loader for creating animations from aseprite files, needs to bne run after <see cref="PackerLoader"> runs so the textures exist.
 /// </summary>
 public class AsepriteAnimationLoader() : AssetLoaderStage() {
     record struct Animation(string Name, Aseprite Data);
