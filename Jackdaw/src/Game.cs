@@ -49,8 +49,6 @@ public class Game : App {
 
     readonly Batcher Batcher;
 
-    internal bool LockContainers { get; private set; } = false;
-
     Actor root;
 
     /// <summary>
@@ -67,13 +65,13 @@ public class Game : App {
 
             root = value;
             root.EnterTree();
+            if (containersLocked) { root.SetContainerQueuing(true); }
         }
     }
 
-    record struct ComponentInvalidation(Component Component);
-    record struct ActorInvalidation(Actor Actor, bool InvalidateChildren, bool InvalidateComponents);
-    readonly List<ComponentInvalidation> ComponentInvalidateQueue = [];
-    readonly List<ActorInvalidation> ActorInvalidateQueue = [];
+    readonly List<IElementInvalidation> InvalidateQueue = [];
+
+    bool containersLocked = false;
 
     /// <summary>
     /// Create a new game instance using a configuration file.
@@ -115,8 +113,6 @@ public class Game : App {
     /// Automatically handles crashlog creation when running in release.
     /// </summary>
     public void Start() {
-        LockContainers = true;
-
 #if DEBUG
         // Crash normally in debug so error debugging still works
         Run();
@@ -138,6 +134,11 @@ public class Game : App {
     protected override void Shutdown() { }
 
     protected override void Update() {
+        if (!containersLocked) {
+            containersLocked = true;
+            Root?.SetContainerQueuing(true);
+        }
+
         Controls.Update();
         Timers.Update();
 
@@ -145,21 +146,10 @@ public class Game : App {
 
         Collision.Update();
 
-        if (ComponentInvalidateQueue.Count > 0) {
-            foreach (ComponentInvalidation item in ComponentInvalidateQueue) {
-                item.Component.OnInvalidated();
-            }
-            ComponentInvalidateQueue.Clear();
-        }
-
-        if (ActorInvalidateQueue.Count > 0) {
-            foreach (ActorInvalidation item in ActorInvalidateQueue) {
-                item.Actor.Invalidate(item.InvalidateChildren, item.InvalidateComponents);
-            }
-            ActorInvalidateQueue.Clear();
-        }
-
         Root?.ApplyChanges();
+        if (RunInvalidation()) {
+            Root?.ApplyChanges();
+        }
     }
 
     protected override void Render() {
@@ -171,6 +161,16 @@ public class Game : App {
         Batcher.Render(Window);
     }
 
-    internal void QueueInvalidate(Component component) => ComponentInvalidateQueue.Add(new(component));
-    internal void QueueInvalidate(Actor actor, bool invalidateChildren = true, bool invalidateComponents = true) => ActorInvalidateQueue.Add(new(actor, invalidateChildren, invalidateComponents));
+    internal void QueueInvalidate(Component component)
+        => InvalidateQueue.Add(new ComponentInvalidation(component));
+    internal void QueueInvalidate(Actor actor, bool invalidateChildren = true, bool invalidateComponents = true)
+        => InvalidateQueue.Add(new ActorInvalidation(actor, invalidateChildren, invalidateComponents));
+    bool RunInvalidation() {
+        if (InvalidateQueue.Count == 0) { return false; }
+        for (int i = 0; i < InvalidateQueue.Count; ++i) {
+            InvalidateQueue[i].Invalidate();
+        }
+        InvalidateQueue.Clear();
+        return true;
+    }
 }

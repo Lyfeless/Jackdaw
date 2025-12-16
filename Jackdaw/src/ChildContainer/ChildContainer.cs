@@ -18,6 +18,29 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         set => Elements[index] = value;
     }
 
+    /// <summary>
+    /// The number of elements currently stored in the container.
+    /// </summary>
+    public int Count => Elements.Count;
+
+    /// <summary>
+    /// If the container should store any change actions in a queue instead of executing immediately. <br/>
+    /// If enabled, requires <see cref="ApplyChanges" /> to be run to change elements array.
+    /// </summary>
+    public bool QueueActions {
+        get => queueActions;
+        set {
+            queueActions = value;
+            if (!value) { ApplyChangesUntilEmpty(); }
+        }
+    }
+
+    /// <summary>
+    /// If the container has any queued actions to run.
+    /// </summary>
+    public bool HasQueuedActions => modifyActions.Count > 0;
+
+    bool queueActions = false;
     internal readonly List<ChildContainerModifyAction<Telement, Towner>> modifyActions = [];
 
     #region Overridable Functions
@@ -39,12 +62,6 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     /// <param name="child">The child to be added.</param>
     /// <returns>If the child can be added.</returns>
     public abstract bool CanAdd(Telement child);
-
-    /// <summary>
-    /// Check if the container is locked and should queue any modifications.
-    /// </summary>
-    /// <returns></returns>
-    public abstract bool Locked();
 
     /// <summary>
     /// Get printable string for an element.
@@ -163,9 +180,45 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
 
     #endregion
 
-    #region Internal Utilities
+    /// <summary>
+    /// Run code as all elements currently stored in the container. <br/>
+    /// Only elements currently in the container will run, all elements added through the action will be skipped.
+    /// </summary>
+    /// <param name="action">The action to run.</param>
+    public void RunAll(Action<Telement> action) {
+        bool locked = QueueActions;
+        // lock actions to avoid conflicts if new elements are added
+        QueueActions = true;
+        foreach (Telement element in Elements) { action(element); }
+        QueueActions = locked;
+    }
+
+    /// <summary>
+    /// Apply all queued changes. Only necessary if <see cref="QueueActions" /> is enabled. <br/>
+    /// Only applies current changes. If applying changes causes more actions to be queued, the function needs to be re-run. <br/>
+    /// The container can be checked for new queued actions with <see cref="HasQueuedActions"/>.
+    /// </summary>
+    public void ApplyChanges() {
+        if (!HasQueuedActions) { return; }
+
+        List<ChildContainerModifyAction<Telement, Towner>> modifyActionsCopy = [.. modifyActions];
+        modifyActions.Clear();
+
+        for (int i = 0; i < modifyActionsCopy.Count; ++i) {
+            modifyActionsCopy[i].Execute();
+        }
+    }
+
+    /// <summary>
+    /// Apply queued changes, accounting for new items queued while applying.
+    /// Only necessary if <see cref="QueueActions" /> is enabled. <br/>
+    /// </summary>
+    public void ApplyChangesUntilEmpty() {
+        while (HasQueuedActions) { ApplyChanges(); }
+    }
+
     Towner Action(ChildContainerModifyAction<Telement, Towner> action) {
-        if (Locked()) {
+        if (QueueActions) {
             modifyActions.Add(action);
         }
         else {
@@ -175,22 +228,9 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
         return Owner;
     }
 
-    public void RunAll(Action<Telement> action) {
-        foreach (Telement element in Elements) { action(element); }
-    }
-
-    public void ApplyChanges() {
-        if (modifyActions.Count == 0) { return; }
-        for (int i = 0; i < modifyActions.Count; ++i) {
-            modifyActions[i].Execute();
-        }
-        modifyActions.Clear();
-    }
-
-    public void HandleClear() {
+    internal void HandleClear() {
         for (int i = 0; i < Elements.Count; ++i) {
             HandleRemove(Elements[i]);
         }
     }
-    #endregion
 }

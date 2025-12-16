@@ -7,8 +7,6 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="actor">The owning actor.</param>
 public class ComponentContainer(Actor actor) : RecursiveSearchableChildContainer<Component, Actor>(actor) {
-    public override bool Locked() => !Owner.IsValid || (Owner.InTree && (Owner.Game == null || Owner.Game.LockContainers));
-
     public override bool CanAdd(Component child) {
         if (!child.IsValid) {
             Log.Warning($"ComponentContainer: Cannot add object {child}, Component is invalid");

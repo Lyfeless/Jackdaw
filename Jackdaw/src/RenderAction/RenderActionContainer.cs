@@ -8,8 +8,6 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="owner">The owning actor.</param>
 public class RenderActionContainer(Actor owner) : SearchableChildContainer<ActorRenderAction, Actor>(owner) {
-    bool Active = false;
-
     readonly Stack<Batcher> batcherStack = [];
 
     /// <summary>
@@ -30,7 +28,7 @@ public class RenderActionContainer(Actor owner) : SearchableChildContainer<Actor
         batcherStack.Clear();
         batcherStack.Push(batcher);
 
-        Active = true;
+        QueueActions = true;
 
         for (int i = 0; i < Elements.Count; ++i) {
             Elements[i].PreRender(this);
@@ -42,7 +40,8 @@ public class RenderActionContainer(Actor owner) : SearchableChildContainer<Actor
             Elements[i].PostRender(this);
         }
 
-        Active = false;
+        ApplyChangesUntilEmpty();
+        QueueActions = false;
     }
 
     /// <summary>
@@ -63,8 +62,6 @@ public class RenderActionContainer(Actor owner) : SearchableChildContainer<Actor
             batcherStack.Pop();
         }
     }
-
-    public override bool Locked() => Active;
 
     public override bool CanAdd(ActorRenderAction child) => true;
 

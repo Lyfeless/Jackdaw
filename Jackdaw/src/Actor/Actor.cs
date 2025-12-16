@@ -6,7 +6,7 @@ namespace Jackdaw;
 /// <summary>
 /// The primary game object element, responsible for storing, updating, and rending all of its children and components.
 /// </summary>
-public class Actor {
+public sealed class Actor {
     /// <summary>
     /// Create a new actor with no children or components.
     /// </summary>
@@ -206,13 +206,13 @@ public class Actor {
     /// </summary>
     public bool InTree { get; internal set; } = false;
 
+    internal bool containerQueuing = false;
+
     bool componentsVisible = true;
     bool childrenVisible = true;
 
     bool componentsTicking = true;
     bool childrenTicking = true;
-
-    bool addedToTree = false;
 
     public Actor(Game game) {
         Game = game;
@@ -266,19 +266,16 @@ public class Actor {
     internal void EnterTree() {
         InTree = true;
 
-        if (!addedToTree) {
-            EnterTreeFirst();
-            addedToTree = true;
-        }
+        if (ParentValid) { SetContainerQueuing(Parent.containerQueuing); }
 
         Components.RunAll(e => e.OnEnterTree());
         Children.RunAll(e => e.EnterTree());
     }
 
-    internal void EnterTreeFirst() { }
-
     internal void ExitTree() {
         InTree = false;
+
+        SetContainerQueuing(false);
 
         Components.RunAll(e => e.OnExitTree());
         Children.RunAll(e => e.ExitTree());
@@ -356,6 +353,13 @@ public class Actor {
     internal void ChildrenVisibilityChanged() => Children.RunAll(e => e.ParentVisibilityChanged());
 
     internal void ComponentVisibilityChanged() => Components.RunAll(e => e.OnVisibilityChanged());
+
+    internal void SetContainerQueuing(bool state) {
+        containerQueuing = state;
+        Children.QueueActions = state;
+        Components.QueueActions = state;
+        Children.RunAll(e => e.SetContainerQueuing(state));
+    }
 
     /// <summary>
     /// Create a new actor pre-assigned with the supplied children.
