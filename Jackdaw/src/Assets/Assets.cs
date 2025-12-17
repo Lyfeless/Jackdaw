@@ -61,6 +61,7 @@ public class Assets {
         RegisterLoaderStage(textureLoader);
         RegisterLoaderStage(textureFallbackLoader);
         RegisterLoaderStage(asepriteLoader);
+        RegisterLoaderStage(asepriteAnimationLoader);
         RegisterLoaderStage(packerLoader);
         RegisterLoaderStage(animationLoader);
         RegisterLoaderStage(fontLoader);
