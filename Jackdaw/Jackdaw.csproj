@@ -10,7 +10,7 @@
     <NoWarn>CS1591</NoWarn>
 
     <Title>Jackdaw</Title>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Authors>Lyfeless</Authors>
     <Description>A simple 2D game library/engine.</Description>
     <RepositoryType>git</RepositoryType>
