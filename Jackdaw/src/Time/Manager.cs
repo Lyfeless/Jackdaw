@@ -107,9 +107,9 @@ public class TimeManager(Game game) {
 
     /// <summary>
     /// Set the speed scale of a tracker, causing it to run faster or slower.
-    /// </summary>
     /// <param name="name">The tracker to set.</param>
-    /// <param name="scale">The scale to set the tracker to./param>
+    /// <param name="scale">The scale to set the tracker to.</param>
+    /// </summary>
     public void SetScale(string name, float scale) {
         if (!trackers.TryGetValue(name, out TimeTracker? tracker)) { return; }
         tracker.SetScale(scale);

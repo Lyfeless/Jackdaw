@@ -17,7 +17,7 @@ public sealed class Actor {
     /// <summary>
     /// An invalid actor. Any actors with this as a parent are not part of the scene tree.
     /// </summary>
-    public readonly static Actor Invalid = new(null) { IsValid = false, Ticking = false, Visible = false };
+    public readonly static Actor Invalid = new(null!) { IsValid = false, Ticking = false, Visible = false };
 
     /// <summary>
     /// The active game instance.
@@ -25,7 +25,7 @@ public sealed class Actor {
     public Game Game { get; internal set; }
 
     /// <summary>
-    /// The actor's parent in the node tree. <see cref="Invalid"> if no parent is assigned.
+    /// The actor's parent in the node tree. <see cref="Invalid" /> if no parent is assigned.
     /// </summary>
     public Actor Parent { get; internal set; }
 
@@ -65,7 +65,7 @@ public sealed class Actor {
     public ActorPosition Transform { get; }
 
     /// <summary>
-    /// The local translation of the actor. Can be accessed from <see cref="Actor.Transform.LocalPosition" />.
+    /// The local translation of the actor. Can be accessed from <see cref="ActorPosition.LocalPosition" />.
     /// </summary>
     public Vector2 Position {
         get => Transform.LocalPosition;
@@ -73,7 +73,7 @@ public sealed class Actor {
     }
 
     /// <summary>
-    /// The local rotation of the actor. Can be accessed from <see cref="Actor.Transform.LocalRotation" />.
+    /// The local rotation of the actor. Can be accessed from <see cref="ActorPosition.LocalRotation" />.
     /// </summary>
     public float Rotation {
         get => Transform.LocalRotation;
@@ -81,7 +81,7 @@ public sealed class Actor {
     }
 
     /// <summary>
-    /// The local scale of the actor. Can be accessed from <see cref="Actor.Transform.LocalScale" />.
+    /// The local scale of the actor. Can be accessed from <see cref="ActorPosition.LocalScale" />.
     /// </summary>
     public Vector2 Scale {
         get => Transform.LocalScale;
@@ -89,12 +89,12 @@ public sealed class Actor {
     }
 
     /// <summary>
-    /// The Global translation of the actor. Can be accessed from <see cref="Actor.Transform.GlobalPosition" />.
+    /// The Global translation of the actor. Can be accessed from <see cref="ActorPosition.GlobalPosition" />.
     /// </summary>
     public Vector2 GlobalPosition => Transform.GlobalPosition;
 
     /// <summary>
-    /// The global rotation of the actor. Can be accessed from <see cref="Actor.Transform.GlobalRotation" />.
+    /// The global rotation of the actor. Can be accessed from <see cref="ActorPosition.GlobalRotation" />.
     /// </summary>
     public float GlobalRotation => Transform.GlobalRotation;
 

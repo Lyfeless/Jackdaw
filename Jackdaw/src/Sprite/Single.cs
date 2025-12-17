@@ -15,7 +15,7 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     /// <summary>
     /// A single-image sprite.
     /// </summary>
-    /// <param name="assets">The current game's asset manager.</params>
+    /// <param name="assets">The current game's asset manager.</param>
     /// <param name="texture">The texture name.</param>
     public SpriteSingle(Assets assets, string texture) : this(assets.GetSubtexture(texture)) { }
 

@@ -10,7 +10,7 @@ public class RenderActionSampler(TextureSampler sampler) : ActorRenderAction() {
     public TextureSampler Sampler = sampler;
 
     public override void PreRender(RenderActionContainer container) {
-        container.CurrentBatcher.PushSampler(sampler);
+        container.CurrentBatcher.PushSampler(Sampler);
     }
 
     public override void PostRender(RenderActionContainer container) {

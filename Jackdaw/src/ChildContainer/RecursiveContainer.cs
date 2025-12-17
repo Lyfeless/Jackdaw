@@ -162,7 +162,7 @@ public abstract class RecursiveSearchableChildContainer<Telement, Towner>(Towner
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool HasRecursive(Func<ObjectIdentifier<Telement>, bool> func, out Telement foundElement) {
-        foundElement = FindRecursive(func);
+        foundElement = FindRecursive(func)!;
         return foundElement != null;
     }
 
@@ -174,7 +174,7 @@ public abstract class RecursiveSearchableChildContainer<Telement, Towner>(Towner
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool HasRecursive<T>(Func<ObjectIdentifier<Telement>, bool> func, out T foundElement) where T : class, Telement {
-        foundElement = FindRecursive<T>(func);
+        foundElement = FindRecursive<T>(func)!;
         return foundElement != null;
     }
 
@@ -185,7 +185,7 @@ public abstract class RecursiveSearchableChildContainer<Telement, Towner>(Towner
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool HasRecursive<T>(out T foundElement) where T : class, Telement {
-        foundElement = FindRecursive<T>();
+        foundElement = FindRecursive<T>()!;
         return foundElement != null;
     }
     #endregion

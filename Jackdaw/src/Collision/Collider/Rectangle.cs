@@ -22,7 +22,7 @@ public class RectangleCollider(Rect rect) : Collider {
     /// <summary>
     /// Create a new rectangle collider.
     /// </summary>
-    /// <param name="size">The position of the rectangle.</param>
+    /// <param name="position">The position of the rectangle.</param>
     /// <param name="size">The size of the rectangle.</param>
     public RectangleCollider(Vector2 position, Vector2 size) : this(new Rect(position, size)) { }
 

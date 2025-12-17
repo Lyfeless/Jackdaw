@@ -150,7 +150,7 @@ public class Assets {
     /// <typeparam name="T">The type of asset to add.</typeparam>
     /// <param name="name">The asset name id. Must be unique within the asset type.</param>
     /// <param name="asset">The asset to add.</param>
-    public void Add<T>(string name, T asset) => GetStorage<T>(true).Add(name, asset);
+    public void Add<T>(string name, T asset) => GetStorage<T>(true).Add(name, asset!);
 
     /// <summary>
     /// Set the fallback asset for a specific type. <br/>
@@ -158,7 +158,7 @@ public class Assets {
     /// </summary>
     /// <typeparam name="T">The type of asset to set the fallback for.</typeparam>
     /// <param name="asset">The asset to set as fallback.</param>
-    public void SetFallback<T>(T asset) => GetStorage<T>(true).AddFallback(asset);
+    public void SetFallback<T>(T asset) => GetStorage<T>(true).AddFallback(asset!);
 
     /// <summary>
     /// Get a loaded asset from storage.

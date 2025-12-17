@@ -4,18 +4,16 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// Asset loader for creating animations from aseprite files, needs to bne run after <see cref="PackerLoader"> runs so the textures exist.
+/// Asset loader for creating animations from aseprite files, needs to bne run after <see cref="PackerLoader" /> runs so the textures exist.
 /// </summary>
 public class AsepriteAnimationLoader() : AssetLoaderStage() {
     record struct Animation(string Name, Aseprite Data);
     readonly List<Animation> animations = [];
 
-    string texturePath;
-
     public override void Run(Assets assets) {
-        texturePath = Path.Join(assets.Config.RootFolder, assets.Config.TextureFolder);
+        string texturePath = Path.Join(assets.Config.RootFolder, assets.Config.TextureFolder);
         foreach (Animation animation in animations) {
-            AnimationData? anim = GetAnimationData(assets, animation.Name, animation.Data);
+            AnimationData? anim = GetAnimationData(assets, animation.Name, animation.Data, texturePath);
             if (anim != null) { assets.Add(animation.Name, anim); }
         }
     }
@@ -28,7 +26,7 @@ public class AsepriteAnimationLoader() : AssetLoaderStage() {
     public void AddAnimation(string name, Aseprite data)
         => animations.Add(new(name, data));
 
-    AnimationData? GetAnimationData(Assets assets, string name, Aseprite aseprite) {
+    static AnimationData? GetAnimationData(Assets assets, string name, Aseprite aseprite, string texturePath) {
         bool looping = true;
         Point2 positionOffset = Point2.Zero;
         AsepriteFrameConfig[] frameConfigs = [];

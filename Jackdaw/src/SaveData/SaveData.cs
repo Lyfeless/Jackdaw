@@ -96,7 +96,7 @@ public abstract class SaveData(string path) {
     /// <summary>
     /// Load savedata from the the assigned location. <br/>
     /// It's not recommended to use this function directly,
-    /// use <see cref="LoadByVersion"> to get a loader with the correct version for the save data.
+    /// use <see cref="LoadByVersion" /> to get a loader with the correct version for the save data.
     /// </summary>
     public abstract void Load();
 

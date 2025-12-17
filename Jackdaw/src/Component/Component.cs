@@ -76,13 +76,13 @@ public abstract class Component {
 
     /// <summary>
     /// Ticking function, called once per tree tick when attached to an actor in the node tree.
-    /// Doesn't run if <see cref="Ticking"> is false.
+    /// Doesn't run if <see cref="Ticking" /> is false.
     /// </summary>
     protected virtual void Update() { }
 
     /// <summary>
     /// Display function, called once per tree render when attached to an actor in the node tree.
-    /// Doesn't run if <see cref="Visible"> is false.
+    /// Doesn't run if <see cref="Visible" /> is false.
     /// </summary>
     /// <param name="batcher"></param>
     protected virtual void Render(Batcher batcher) { }

@@ -44,7 +44,6 @@ public abstract class Collider {
     /// <summary>
     /// The gjk support function for the shape.
     /// </summary>
-    /// <param name="position">The collider's global position</param>
     /// <param name="direction">the ray direction vector.</param>
     /// <returns>The nearest support point in the given direction.</returns>
     public abstract Vector2 Support(Vector2 direction);

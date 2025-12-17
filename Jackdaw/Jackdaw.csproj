@@ -7,9 +7,10 @@
     <Nullable>enable</Nullable>
     <IsAotCompatible>true</IsAotCompatible>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CS1591</NoWarn>
 
     <Title>Jackdaw</Title>
-    <Version>0.1.1</Version>
+    <Version>0.2.0</Version>
     <Authors>Lyfeless</Authors>
     <Description>A simple 2D game library/engine.</Description>
     <RepositoryType>git</RepositoryType>

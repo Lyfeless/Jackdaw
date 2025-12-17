@@ -33,7 +33,7 @@ public class WeightedRandom<T>(Game game) {
     public T Get() {
         if (values.Count == 0) {
             Log.Warning("WeightedRandom: Attempting to get a weight random with no values, returning default");
-            return default;
+            return default!;
         }
 
         int value = Game.Random.Int(weightTotal);
@@ -44,6 +44,6 @@ public class WeightedRandom<T>(Game game) {
         }
 
         // Unreachable, just a fallback
-        return default;
+        return default!;
     }
 }

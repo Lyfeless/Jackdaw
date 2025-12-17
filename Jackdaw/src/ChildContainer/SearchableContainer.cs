@@ -168,7 +168,7 @@ public abstract class SearchableChildContainer<Telement, Towner>(Towner owner) :
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool Has(Func<ObjectIdentifier<Telement>, bool> func, out Telement foundElement) {
-        foundElement = Find(func);
+        foundElement = Find(func)!;
         return foundElement != null;
     }
 
@@ -180,7 +180,7 @@ public abstract class SearchableChildContainer<Telement, Towner>(Towner owner) :
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool Has<T>(Func<ObjectIdentifier<Telement>, bool> func, out T foundElement) where T : class, Telement {
-        foundElement = Find<T>(func);
+        foundElement = Find<T>(func)!;
         return foundElement != null;
     }
 
@@ -191,7 +191,7 @@ public abstract class SearchableChildContainer<Telement, Towner>(Towner owner) :
     /// <param name="foundElement">The first matching element found.</param>
     /// <returns>If a matching element was found.</returns>
     public bool Has<T>(out T foundElement) where T : class, Telement {
-        foundElement = Find<T>();
+        foundElement = Find<T>()!;
         return foundElement != null;
     }
 

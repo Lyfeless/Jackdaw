@@ -5,7 +5,7 @@ namespace Jackdaw;
 /// <summary>
 /// An action designed to modify the rendering of all child and component elements on an actor.
 /// </summary>
-public abstract class ActorRenderAction() {
+public abstract class ActorRenderAction {
     /// <summary>
     /// Component identifier, used for searching render elements attached to an actor.
     /// </summary>
@@ -15,6 +15,10 @@ public abstract class ActorRenderAction() {
     /// The display transform caused by applying the render action.
     /// </summary>
     public virtual Matrix3x2 PositionOffset { get; } = Matrix3x2.Identity;
+
+    public ActorRenderAction() {
+        Match = new(this);
+    }
 
     /// <summary>
     /// Apply render changes. Pre render actions are called in the order set by the actor's action container.
