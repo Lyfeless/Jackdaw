@@ -69,6 +69,8 @@ public class Assets {
         AddTypeWarning<Image>("Use Subtexture to access auto-loaded image data.");
         AddTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");
         AddTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
+
+        if (!config.EnableCustomLoaders) { Load(); }
     }
 
     /// <summary>
@@ -166,7 +168,7 @@ public class Assets {
     /// <typeparam name="T">The type of asset to find.</typeparam>
     /// <param name="name">The name id of the asset to find.</param>
     /// <returns>The requested asset, or the asset type's fallback if the name id isn't present.</returns>
-    public T Get<T>(string name) => (T)GetStorage<T>().Get(name);
+    public T Get<T>(string name) => (T)GetStorage<T>().Get(name, typeof(T));
 
     /// <summary>
     /// Get the fallback asset for the given type.

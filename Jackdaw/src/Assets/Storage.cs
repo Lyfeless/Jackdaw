@@ -9,12 +9,12 @@ internal class AssetStorage<T>() {
     public void Add(string name, T asset) => Assets.Add(name, asset);
     public void AddFallback(T asset) {
         Fallback = asset;
-        Add("error", asset);
+        Assets["error"] = asset;
     }
 
-    public T Get(string name) {
+    public T Get(string name, Type type) {
         if (Assets.TryGetValue(name, out T? output)) { return output; }
-        Log.Warning($"ASSETS: Failed to find {typeof(T)} {name}, returning default");
+        Log.Warning($"ASSETS: Failed to find {type} \"{name}\", returning default");
         return Fallback;
     }
 }

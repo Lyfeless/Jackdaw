@@ -104,8 +104,6 @@ public class Game : App {
         Batcher = new(GraphicsDevice);
 
         root = Actor.Invalid;
-
-        Assets.Load();
     }
 
     /// <summary>
