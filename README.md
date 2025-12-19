@@ -11,17 +11,17 @@ Creating a basic project with Jackdaw is as simple as creating a game instance a
 // Create the game instance with a basic configuration
 Game game = new(new GameConfig() {
     ApplicationName = "JackdawExample",
-    WindowTitle = "My First Jackdaw Game",
     Window = new() {
-        WindowWidth = 320,
-        WindowHeight = 180,
-        ClearColor = "0x6495ED"
+        Title = "My First Jackdaw Game",
+        Width = 320,
+        Height = 180,
+        ClearColor = Color.CornflowerBlue
     }
 });
 
 // Create a new actor to use as the root
 Actor rootActor = new(game);
-rootActor.Position.LocalPosition = new(100, 50);
+rootActor.Position = new(100, 50);
 
 // Add a component to the root
 rootActor.Components.Add(new SpriteComponent(game, "fallback-man"));
