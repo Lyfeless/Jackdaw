@@ -1,17 +1,32 @@
-using Foster.Framework;
-
 namespace Jackdaw;
 
 /// <summary>
-/// Simple system for storing key/value pairs as save data. Automatically handles saving and loading into a userpath folder.
+/// Simple system for storing key/value pairs as save data. Automatically handles saving and loading into a userpath folder. <br/>
+/// Create a new save data storage using <see cref="Load"/>
 /// </summary>
-/// <param name="path">The file path to read the data from.</param>
-public abstract class SaveData(string path) {
-    protected string SavePath = path;
+public class SaveData {
+    public enum Format {
+        BINARY,
+        JSON
+    }
+
+    /// <summary>
+    /// The save format to use when saving to file.
+    /// </summary>
+    public Format SaveFormat = Format.BINARY;
+
+    /// <summary>
+    /// The path to save the file to.
+    /// </summary>
+    public string SavePath { get; private set; }
     protected readonly Dictionary<string, string> Strings = [];
-    protected readonly Dictionary<string, int> Ints = [];
     protected readonly Dictionary<string, float> Floats = [];
+    protected readonly Dictionary<string, int> Ints = [];
     protected readonly Dictionary<string, bool> Bools = [];
+
+    internal SaveData(string path) {
+        SavePath = path;
+    }
 
     /// <summary>
     /// Find a stored string value.
@@ -21,18 +36,18 @@ public abstract class SaveData(string path) {
     public string? GetString(string id) => Strings.TryGetValue(id, out string? value) ? value : null;
 
     /// <summary>
-    /// Find a stored int value.
-    /// </summary>
-    /// <param name="id">The value's assigned name.</param>
-    /// <returns>The int assigned to the name, or null if no int value has that name.</returns>
-    public int? GetInt(string id) => Ints.TryGetValue(id, out int value) ? value : null;
-
-    /// <summary>
     /// Find a stored float value.
     /// </summary>
     /// <param name="id">The value's assigned name.</param>
     /// <returns>The float assigned to the name, or null if no float value has that name.</returns>
     public float? GetFloat(string id) => Floats.TryGetValue(id, out float value) ? value : null;
+
+    /// <summary>
+    /// Find a stored int value.
+    /// </summary>
+    /// <param name="id">The value's assigned name.</param>
+    /// <returns>The int assigned to the name, or null if no int value has that name.</returns>
+    public int? GetInt(string id) => Ints.TryGetValue(id, out int value) ? value : null;
 
     /// <summary>
     /// Find a stored bool value.
@@ -49,18 +64,18 @@ public abstract class SaveData(string path) {
     public void SetString(string id, string value) => Strings[id] = value;
 
     /// <summary>
-    /// Set a int in the save data using a name.
-    /// </summary>
-    /// <param name="id">The value's name.</param>
-    /// <param name="value">The int value.</param>
-    public void SetInt(string id, int value) => Ints[id] = value;
-
-    /// <summary>
     /// Set a float in the save data using a name.
     /// </summary>
     /// <param name="id">The value's name.</param>
     /// <param name="value">The float value.</param>
     public void SetFloat(string id, float value) => Floats[id] = value;
+
+    /// <summary>
+    /// Set a int in the save data using a name.
+    /// </summary>
+    /// <param name="id">The value's name.</param>
+    /// <param name="value">The int value.</param>
+    public void SetInt(string id, int value) => Ints[id] = value;
 
     /// <summary>
     /// Set a bool in the save data using a name.
@@ -73,62 +88,69 @@ public abstract class SaveData(string path) {
     /// Get the names of all existing string values.
     /// </summary>
     /// <returns>An array of value names.</returns>
-    public string[] StringKeys() => [.. Strings.Keys];
-
-    /// <summary>
-    /// Get the names of all existing int values.
-    /// </summary>
-    /// <returns>An array of value names.</returns>
-    public string[] IntKeys() => [.. Ints.Keys];
+    public string[] StringKeys => [.. Strings.Keys];
 
     /// <summary>
     /// Get the names of all existing float values.
     /// </summary>
     /// <returns>An array of value names.</returns>
-    public string[] FloatKeys() => [.. Floats.Keys];
+    public string[] FloatKeys => [.. Floats.Keys];
+
+    /// <summary>
+    /// Get the names of all existing int values.
+    /// </summary>
+    /// <returns>An array of value names.</returns>
+    public string[] IntKeys => [.. Ints.Keys];
 
     /// <summary>
     /// Get the names of all existing bool values.
     /// </summary>
     /// <returns>An array of value names.</returns>
-    public string[] BoolKeys() => [.. Bools.Keys];
+    public string[] BoolKeys => [.. Bools.Keys];
 
     /// <summary>
-    /// Load savedata from the the assigned location. <br/>
-    /// It's not recommended to use this function directly,
-    /// use <see cref="LoadByVersion" /> to get a loader with the correct version for the save data.
+    /// Get the number of stored string values.
     /// </summary>
-    public abstract void Load();
+    public int StringCount => Strings.Count;
 
     /// <summary>
-    /// Save all stored data to file.
+    /// Get the number of stored float values.
     /// </summary>
-    public abstract void Save();
+    public int FloatCount => Floats.Count;
 
     /// <summary>
-    /// Determine the save data version and create the appropriate manager.
+    /// Get the number of stored int values.
     /// </summary>
-    /// <param name="savePath">The path to read from, relative to the program's save location.</param>
-    /// <returns>A new savedata instance, or null if the file can't load.</returns>
-    public static SaveData? LoadByVersion(string savePath) {
-        BinaryReader? reader = CreateReader(savePath);
-        if (reader == null) {
-            Log.Warning($"SaveData: Failed to read Save Data at path: {savePath}");
-            return null;
-        }
-        int version = reader.ReadInt32();
-        return version switch {
-            1 => new SaveDataV1(savePath, reader),
-            _ => null
-        };
-    }
+    public int IntCount => Ints.Count;
 
-    protected static BinaryReader? CreateReader(string savePath) {
-        if (!File.Exists(savePath)) { return null; }
-        return new(File.Open(savePath, FileMode.Open));
-    }
+    /// <summary>
+    /// Get the number of stored bool values.
+    /// </summary>
+    public int BoolCount => Bools.Count;
 
-    protected static BinaryWriter CreateWriter(string savePath) {
-        return new(File.Open(savePath, FileMode.OpenOrCreate));
-    }
+    /// <summary>
+    /// Create a new save data storage. <br/>
+    /// Automatically populates with data if any exists. Use <see cref="CreateEmpty"/> to ignore existing data.
+    /// </summary>
+    /// <param name="savePath">The path to using when saving or loading data.</param>
+    /// <returns>The new save data storage.</returns>
+    public static SaveData Load(string savePath) => SaveFileLoader.Load(savePath);
+
+    /// <summary>
+    /// Create a new save data storage, ignoring any data currently stored at the save path.
+    /// </summary>
+    /// <param name="savePath">The path to using when saving or loading data.</param>
+    /// <returns>The new save data storage.</returns>
+    public static SaveData CreateEmpty(string savePath) => new(savePath);
+
+    /// <summary>
+    /// Save all stored data to file in the save data's <see cref="SaveFormat" />.
+    /// </summary>
+    public void Save() => SaveFileLoader.Save(this);
+
+    /// <summary>
+    /// Save all stored data to file in the given format.
+    /// </summary>
+    /// <param name="fileFormat">The format to save the file in.</param>
+    public void Save(Format fileFormat) => SaveFileLoader.Save(this, fileFormat);
 }
