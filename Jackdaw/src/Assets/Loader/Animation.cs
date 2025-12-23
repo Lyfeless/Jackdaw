@@ -14,7 +14,7 @@ public class AnimationLoader() : AssetLoaderStage() {
         if (!Directory.Exists(AnimationPath)) { return; }
 
         // Load single animations
-        foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(assets.Config.AnimationExtension))) {
+        foreach (string file in Assets.GetEnumeratedFiles(AnimationPath, assets.Config.AnimationExtension)) {
             AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
             if (data == null) { continue; }
             string name = Assets.GetAssetName(AnimationPath, file);
@@ -22,7 +22,7 @@ public class AnimationLoader() : AssetLoaderStage() {
         }
 
         // Load animation group files
-        foreach (string file in Directory.EnumerateFiles(AnimationPath, "*.*", SearchOption.AllDirectories).Where(e => e.EndsWith(assets.Config.AnimationGroupExtension))) {
+        foreach (string file in Assets.GetEnumeratedFiles(AnimationPath, assets.Config.AnimationGroupExtension)) {
             AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationGroupConfig);
             if (data == null) { continue; }
             foreach (AnimationConfigEntry entry in data.Entries) {
