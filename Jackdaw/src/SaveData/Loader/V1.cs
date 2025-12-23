@@ -4,7 +4,7 @@ namespace Jackdaw;
 
 internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
     /*
-        Layout:
+        Binary Layout:
             int32: Version (already read if skipVersion is true)
             int32: String Count
             for String Count value:
@@ -33,7 +33,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         for (int i = 0; i < stringCount; ++i) {
             string key = reader.ReadString();
             string value = reader.ReadString();
-            savedata.SetString(key, value);
+            savedata.Strings.Add(key, value);
         }
 
         // Floats
@@ -41,7 +41,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         for (int i = 0; i < floatCount; ++i) {
             string key = reader.ReadString();
             float value = reader.ReadSingle();
-            savedata.SetFloat(key, value);
+            savedata.Floats.Add(key, value);
         }
 
         // Ints
@@ -49,7 +49,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         for (int i = 0; i < intCount; ++i) {
             string key = reader.ReadString();
             int value = reader.ReadInt32();
-            savedata.SetInt(key, value);
+            savedata.Ints.Add(key, value);
         }
 
         // Bools
@@ -57,7 +57,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         for (int i = 0; i < boolCount; ++i) {
             string key = reader.ReadString();
             bool value = reader.ReadBoolean();
-            savedata.SetBool(key, value);
+            savedata.Bools.Add(key, value);
         }
 
         reader.Close();
@@ -65,12 +65,12 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         return savedata;
     }
 
-    public SaveData LoadJson(SaveData savedata, JsonNode rootNode) {
+    public SaveData LoadJSON(SaveData savedata, JsonNode rootNode) {
         JsonObject? strings = rootNode["strings"]?.AsObject();
         if (strings != null) {
             foreach ((string key, JsonNode? node) in strings) {
                 if (node == null) { continue; }
-                savedata.SetString(key, node.GetValue<string>());
+                savedata.Strings[key] = node.GetValue<string>();
             }
         }
 
@@ -78,7 +78,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         if (floats != null) {
             foreach ((string key, JsonNode? node) in floats) {
                 if (node == null) { continue; }
-                savedata.SetFloat(key, node.GetValue<float>());
+                savedata.Floats[key] = node.GetValue<float>();
             }
         }
 
@@ -86,7 +86,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         if (ints != null) {
             foreach ((string key, JsonNode? node) in ints) {
                 if (node == null) { continue; }
-                savedata.SetInt(key, node.GetValue<int>());
+                savedata.Ints[key] = node.GetValue<int>();
             }
         }
 
@@ -94,7 +94,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         if (bools != null) {
             foreach ((string key, JsonNode? node) in bools) {
                 if (node == null) { continue; }
-                savedata.SetBool(key, node.GetValue<bool>());
+                savedata.Bools[key] = node.GetValue<bool>();
             }
         }
 
@@ -108,35 +108,31 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         writer.Write(1);
 
         // Strings
-        string[] strings = savedata.StringKeys;
-        writer.Write(strings.Length);
-        foreach (string key in strings) {
+        writer.Write(savedata.Strings.Count);
+        foreach ((string key, string value) in savedata.Strings) {
             writer.Write(key);
-            writer.Write(savedata.GetString(key) ?? "");
+            writer.Write(value);
         }
 
         // Floats
-        string[] floats = savedata.FloatKeys;
-        writer.Write(floats.Length);
-        foreach (string key in floats) {
+        writer.Write(savedata.Floats.Count);
+        foreach ((string key, float value) in savedata.Floats) {
             writer.Write(key);
-            writer.Write(savedata.GetFloat(key) ?? 0);
+            writer.Write(value);
         }
 
         // Ints
-        string[] ints = savedata.IntKeys;
-        writer.Write(ints.Length);
-        foreach (string key in ints) {
+        writer.Write(savedata.Ints.Count);
+        foreach ((string key, int value) in savedata.Ints) {
             writer.Write(key);
-            writer.Write(savedata.GetInt(key) ?? 0);
+            writer.Write(value);
         }
 
         // Bools
-        string[] bools = savedata.BoolKeys;
-        writer.Write(savedata.BoolCount);
-        foreach (string key in bools) {
+        writer.Write(savedata.Bools.Count);
+        foreach ((string key, bool value) in savedata.Bools) {
             writer.Write(key);
-            writer.Write(savedata.GetBool(key) ?? false);
+            writer.Write(value);
         }
 
         writer.Close();
@@ -144,26 +140,26 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
 
     public void SaveJson(SaveData savedata) {
         JsonObject node = [];
-        node["version"] = 1;
+        node[SaveFileLoader.VERSION_CONTAINER] = 1;
 
         JsonObject strings = [];
-        foreach (string key in savedata.StringKeys) {
-            strings[key] = savedata.GetString(key);
+        foreach ((string key, string value) in savedata.Strings) {
+            strings[key] = value;
         }
 
         JsonObject floats = [];
-        foreach (string key in savedata.FloatKeys) {
-            floats[key] = savedata.GetFloat(key);
+        foreach ((string key, float value) in savedata.Floats) {
+            strings[key] = value;
         }
 
         JsonObject ints = [];
-        foreach (string key in savedata.IntKeys) {
-            ints[key] = savedata.GetInt(key);
+        foreach ((string key, int value) in savedata.Ints) {
+            strings[key] = value;
         }
 
         JsonObject bools = [];
-        foreach (string key in savedata.BoolKeys) {
-            bools[key] = savedata.GetBool(key);
+        foreach ((string key, bool value) in savedata.Bools) {
+            strings[key] = value;
         }
 
         node["strings"] = strings;

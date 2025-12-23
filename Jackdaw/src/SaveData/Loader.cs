@@ -5,6 +5,8 @@ using Foster.Framework;
 namespace Jackdaw;
 
 internal static class SaveFileLoader {
+    public const string VERSION_CONTAINER = "version";
+
     public static SaveData Load(string savePath) {
         if (!File.Exists(savePath)) {
             Log.Warning($"SaveData: Failed to find save data at path {savePath}, could not load");
@@ -17,7 +19,7 @@ internal static class SaveFileLoader {
     public static void Save(SaveData saveData) => Save(saveData, saveData.SaveFormat);
 
     public static void Save(SaveData saveData, SaveData.Format format) {
-        SaveDataFileLoaderV1 loader = new();
+        SaveDataFileLoaderV2 loader = new();
         switch (format) {
             case SaveData.Format.BINARY: loader.SaveBinary(saveData); break;
             case SaveData.Format.JSON: loader.SaveJson(saveData); break;
@@ -49,11 +51,11 @@ internal static class SaveFileLoader {
         JsonNode? jsonObj = JsonNode.Parse(json);
         if (jsonObj == null) { return JsonDataInvalid(savePath); }
 
-        JsonNode? version = jsonObj["version"];
+        JsonNode? version = jsonObj[VERSION_CONTAINER];
         if (version == null) { return JsonDataInvalid(savePath); }
 
         SaveData data = new(savePath);
-        GetLoaderFromVersion((int)version)?.LoadJson(data, jsonObj);
+        GetLoaderFromVersion((int)version)?.LoadJSON(data, jsonObj);
         return data;
     }
 
@@ -64,6 +66,7 @@ internal static class SaveFileLoader {
 
     static ISaveDataFileVersion? GetLoaderFromVersion(int version) => version switch {
         1 => new SaveDataFileLoaderV1(),
+        2 => new SaveDataFileLoaderV2(),
         _ => null
     };
 

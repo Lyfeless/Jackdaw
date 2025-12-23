@@ -19,114 +19,62 @@ public class SaveData {
     /// The path to save the file to.
     /// </summary>
     public string SavePath { get; private set; }
-    protected readonly Dictionary<string, string> Strings = [];
-    protected readonly Dictionary<string, float> Floats = [];
-    protected readonly Dictionary<string, int> Ints = [];
-    protected readonly Dictionary<string, bool> Bools = [];
+
+    internal SaveDataNode RootNode { get; private set; } = new();
 
     internal SaveData(string path) {
         SavePath = path;
     }
 
     /// <summary>
-    /// Find a stored string value.
+    /// The root node's stored string values.
     /// </summary>
-    /// <param name="id">The value's assigned name.</param>
-    /// <returns>The string assigned to the name, or null if no string value has that name.</returns>
-    public string? GetString(string id) => Strings.TryGetValue(id, out string? value) ? value : null;
+    public Dictionary<string, string> Strings => RootNode.Strings;
 
     /// <summary>
-    /// Find a stored float value.
+    /// The root node's stored float values.
     /// </summary>
-    /// <param name="id">The value's assigned name.</param>
-    /// <returns>The float assigned to the name, or null if no float value has that name.</returns>
-    public float? GetFloat(string id) => Floats.TryGetValue(id, out float value) ? value : null;
+    public Dictionary<string, float> Floats => RootNode.Floats;
 
     /// <summary>
-    /// Find a stored int value.
+    /// The root node's stored int values.
     /// </summary>
-    /// <param name="id">The value's assigned name.</param>
-    /// <returns>The int assigned to the name, or null if no int value has that name.</returns>
-    public int? GetInt(string id) => Ints.TryGetValue(id, out int value) ? value : null;
+    public Dictionary<string, int> Ints => RootNode.Ints;
 
     /// <summary>
-    /// Find a stored bool value.
+    /// The root node's stored bool values.
     /// </summary>
-    /// <param name="id">The value's assigned name.</param>
-    /// <returns>The bool assigned to the name, or null if no bool value has that name.</returns>
-    public bool? GetBool(string id) => Bools.TryGetValue(id, out bool value) ? value : null;
+    public Dictionary<string, bool> Bools => RootNode.Bools;
 
     /// <summary>
-    /// Set a string in the save data using a name.
+    /// The root node's stored sub-node values.
     /// </summary>
-    /// <param name="id">The value's name.</param>
-    /// <param name="value">The string value.</param>
-    public void SetString(string id, string value) => Strings[id] = value;
+    public Dictionary<string, SaveDataNode> Children => RootNode.Children;
 
     /// <summary>
-    /// Set a float in the save data using a name.
+    /// The root node's stored string list values.
     /// </summary>
-    /// <param name="id">The value's name.</param>
-    /// <param name="value">The float value.</param>
-    public void SetFloat(string id, float value) => Floats[id] = value;
+    public Dictionary<string, List<string>> StringLists => RootNode.StringLists;
 
     /// <summary>
-    /// Set a int in the save data using a name.
+    /// The root node's stored float list values.
     /// </summary>
-    /// <param name="id">The value's name.</param>
-    /// <param name="value">The int value.</param>
-    public void SetInt(string id, int value) => Ints[id] = value;
+    public Dictionary<string, List<float>> FloatLists => RootNode.FloatLists;
 
     /// <summary>
-    /// Set a bool in the save data using a name.
+    /// The root node's stored int list values.
     /// </summary>
-    /// <param name="id">The value's name.</param>
-    /// <param name="value">The bool value.</param>
-    public void SetBool(string id, bool value) => Bools[id] = value;
+    public Dictionary<string, List<int>> IntLists => RootNode.IntLists;
 
     /// <summary>
-    /// Get the names of all existing string values.
+    /// The root node's stored bool list values.
     /// </summary>
-    /// <returns>An array of value names.</returns>
-    public string[] StringKeys => [.. Strings.Keys];
+    public Dictionary<string, List<bool>> BoolLists => RootNode.BoolLists;
 
     /// <summary>
-    /// Get the names of all existing float values.
+    /// The root node's stored sub-node list values.
     /// </summary>
-    /// <returns>An array of value names.</returns>
-    public string[] FloatKeys => [.. Floats.Keys];
-
-    /// <summary>
-    /// Get the names of all existing int values.
-    /// </summary>
-    /// <returns>An array of value names.</returns>
-    public string[] IntKeys => [.. Ints.Keys];
-
-    /// <summary>
-    /// Get the names of all existing bool values.
-    /// </summary>
-    /// <returns>An array of value names.</returns>
-    public string[] BoolKeys => [.. Bools.Keys];
-
-    /// <summary>
-    /// Get the number of stored string values.
-    /// </summary>
-    public int StringCount => Strings.Count;
-
-    /// <summary>
-    /// Get the number of stored float values.
-    /// </summary>
-    public int FloatCount => Floats.Count;
-
-    /// <summary>
-    /// Get the number of stored int values.
-    /// </summary>
-    public int IntCount => Ints.Count;
-
-    /// <summary>
-    /// Get the number of stored bool values.
-    /// </summary>
-    public int BoolCount => Bools.Count;
+    public Dictionary<string, List<SaveDataNode>> ChildrenLists => RootNode.ChildrenLists;
 
     /// <summary>
     /// Create a new save data storage. <br/>
