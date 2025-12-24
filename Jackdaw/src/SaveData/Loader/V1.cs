@@ -101,8 +101,8 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         return savedata;
     }
 
-    public void SaveBinary(SaveData savedata) {
-        BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savedata.SavePath);
+    public void SaveBinary(SaveData savedata, string savePath) {
+        BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savePath);
 
         // Version
         writer.Write(1);
@@ -138,7 +138,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         writer.Close();
     }
 
-    public void SaveJson(SaveData savedata) {
+    public void SaveJson(SaveData savedata, string savePath) {
         JsonObject node = [];
         node[SaveFileLoader.VERSION_CONTAINER] = 1;
 
@@ -167,6 +167,6 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         node["ints"] = ints;
         node["bools"] = bools;
 
-        SaveFileLoader.WriteJsonObject(node, savedata.SavePath);
+        SaveFileLoader.WriteJsonObject(node, savePath);
     }
 }

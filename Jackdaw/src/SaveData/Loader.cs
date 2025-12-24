@@ -7,11 +7,22 @@ namespace Jackdaw;
 internal static class SaveFileLoader {
     public const string VERSION_CONTAINER = "version";
 
-    public static SaveData Load(string savePath) {
-        if (!File.Exists(savePath)) {
-            Log.Warning($"SaveData: Failed to find save data at path {savePath}, could not load");
-            return new(savePath);
-        }
+    record struct DecomposedPath(string Directory, string Name, string Extension);
+    record struct FileBackupEntry(string FullPath, string Name, string FullName, string Extension, long Timestamp);
+
+    public static SaveData Load(string savePath, bool usesBackup) {
+        if (!usesBackup) { return LoadSaveData(savePath); }
+
+        FileBackupEntry[] backupFiles = GetBackupFileInfo(savePath);
+
+        SaveData data = LoadSaveData(backupFiles.Length == 0 ? savePath : backupFiles[^1].FullPath);
+        data.SavePath = savePath;
+        data.UseBackups = true;
+        return data;
+    }
+
+    static SaveData LoadSaveData(string savePath) {
+        if (!File.Exists(savePath)) { return new(savePath); }
         if (IsText(savePath, out char firstChar)) { return LoadText(savePath, firstChar); }
         return LoadBinary(savePath);
     }
@@ -19,10 +30,26 @@ internal static class SaveFileLoader {
     public static void Save(SaveData saveData) => Save(saveData, saveData.SaveFormat);
 
     public static void Save(SaveData saveData, SaveData.Format format) {
+        string savePath = saveData.SavePath;
+        if (saveData.UseBackups) {
+            DecomposedPath pathInfo = DecomposePath(saveData.SavePath);
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            savePath = Path.Join(pathInfo.Directory, $"{pathInfo.Name}-{timestamp}{pathInfo.Extension}");
+
+            // Remove old paths
+            FileBackupEntry[] backupFiles = GetBackupFileInfo(saveData.SavePath);
+            int diff = backupFiles.Length - saveData.BackupCount;
+            if (diff > 0) {
+                for (int i = 0; i < diff; ++i) {
+                    File.Delete(backupFiles[i].FullPath);
+                }
+            }
+        }
+
         SaveDataFileLoaderV2 loader = new();
         switch (format) {
-            case SaveData.Format.BINARY: loader.SaveBinary(saveData); break;
-            case SaveData.Format.JSON: loader.SaveJson(saveData); break;
+            case SaveData.Format.BINARY: loader.SaveBinary(saveData, savePath); break;
+            case SaveData.Format.JSON: loader.SaveJson(saveData, savePath); break;
         }
     }
 
@@ -99,5 +126,37 @@ internal static class SaveFileLoader {
         using FileStream file = new(path, FileMode.OpenOrCreate);
         using Utf8JsonWriter writer = new(file);
         node.WriteTo(writer);
+    }
+
+    static DecomposedPath DecomposePath(string path) => new(
+        Path.GetDirectoryName(path) ?? string.Empty,
+        Path.GetFileNameWithoutExtension(path),
+        Path.GetExtension(path)
+    );
+
+    static FileBackupEntry[] GetBackupFileInfo(string savePath) {
+        DecomposedPath path = DecomposePath(savePath);
+        return GetBackupFileInfo(path);
+    }
+
+    static FileBackupEntry[] GetBackupFileInfo(DecomposedPath path) {
+        List<FileBackupEntry> entries = [];
+        foreach (string file in Directory.EnumerateFiles(path.Directory, $"*{path.Extension}", SearchOption.TopDirectoryOnly)) {
+            string name = Path.GetFileNameWithoutExtension(file);
+            if (!name.StartsWith(path.Name)) { continue; }
+
+            string[] segments = name.Split('-');
+            if (segments.Length < 2 || !long.TryParse(segments[^1], out long fileTime)) { continue; }
+
+            entries.Add(new FileBackupEntry(
+                file,
+                path.Name,
+                name,
+                path.Extension,
+                fileTime
+            ));
+        }
+
+        return [.. entries.OrderBy(e => e.Timestamp)];
     }
 }

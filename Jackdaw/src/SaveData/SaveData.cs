@@ -16,9 +16,19 @@ public class SaveData {
     public Format SaveFormat = Format.BINARY;
 
     /// <summary>
+    /// If the data should save backup files when saving.
+    /// </summary>
+    public bool UseBackups = false;
+
+    /// <summary>
+    /// How many backup files to keep alongside the main file. Only used when <see cref="UseBackups"> is enabled.
+    /// </summary>
+    public int BackupCount = 2;
+
+    /// <summary>
     /// The path to save the file to.
     /// </summary>
-    public string SavePath { get; private set; }
+    public string SavePath { get; internal set; }
 
     internal SaveDataNode RootNode { get; private set; } = new();
 
@@ -81,8 +91,9 @@ public class SaveData {
     /// Automatically populates with data if any exists. Use <see cref="CreateEmpty"/> to ignore existing data.
     /// </summary>
     /// <param name="savePath">The path to using when saving or loading data.</param>
+    /// <param name="usesBackups">The save data is stored using backup files.</param>
     /// <returns>The new save data storage.</returns>
-    public static SaveData Load(string savePath) => SaveFileLoader.Load(savePath);
+    public static SaveData Load(string savePath, bool usesBackups = false) => SaveFileLoader.Load(savePath, usesBackups);
 
     /// <summary>
     /// Create a new save data storage, ignoring any data currently stored at the save path.

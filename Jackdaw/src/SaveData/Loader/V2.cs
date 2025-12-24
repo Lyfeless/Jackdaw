@@ -169,8 +169,8 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
     #endregion
 
     #region Binary saving
-    public void SaveBinary(SaveData savedata) {
-        using BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savedata.SavePath);
+    public void SaveBinary(SaveData savedata, string savePath) {
+        using BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savePath);
 
         // Version
         writer.Write(2);
@@ -212,10 +212,10 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
     #endregion
 
     #region JSON saving
-    public void SaveJson(SaveData savedata) {
+    public void SaveJson(SaveData savedata, string savePath) {
         JsonNode node = SaveNodeJson(savedata.RootNode);
         node[SaveFileLoader.VERSION_CONTAINER] = 2;
-        SaveFileLoader.WriteJsonObject(node, savedata.SavePath);
+        SaveFileLoader.WriteJsonObject(node, savePath);
     }
 
     static JsonNode SaveNodeJson(SaveDataNode savedata) {
