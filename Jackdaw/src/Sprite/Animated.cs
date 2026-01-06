@@ -13,7 +13,7 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     /// <summary>
     /// The timer controlling the animation playback.
     /// </summary>
-    public readonly Timer Timer = new(
+    public readonly TicklessTimer Timer = new(
         game: game,
         duration: animation.Duration
     ) {
@@ -29,7 +29,7 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     /// <summary>
     /// The current animation frame.
     /// </summary>
-    public AnimationFrame Frame => Animation.GetFrame((float)Timer.ElapsedTimeClamped);
+    public AnimationFrame Frame => Animation.GetFrame(Timer.ElapsedTimeClamped);
 
     /// <summary>
     /// An animated sprite, begins animated when created.

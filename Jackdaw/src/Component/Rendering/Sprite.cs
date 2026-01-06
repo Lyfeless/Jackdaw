@@ -8,7 +8,7 @@ namespace Jackdaw;
 /// <param name="game">The current game instance.</param>
 /// <param name="sprite">The sprite to render.</param>
 /// <param name="offset">The position offset.</param>
-public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : Component(game) {
+public class SpriteRenderComponent(Game game, Sprite sprite, Point2? offset = null) : Component(game) {
     /// <summary>
     /// The current rendering sprite.
     /// </summary>
@@ -26,7 +26,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="sprite">The sprite to render.</param>
     /// <param name="color">the sprite's color tint.</param>
     /// <param name="offset">The position offset.</param>
-    public SpriteComponent(Game game, Subtexture sprite, Color color, Point2? offset = null)
+    public SpriteRenderComponent(Game game, Subtexture sprite, Color color, Point2? offset = null)
         : this(game, new SpriteSingle(sprite) { Color = color }, offset) { }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite to render.</param>
     /// <param name="offset">The position offset.</param>
-    public SpriteComponent(Game game, Subtexture sprite, Point2? offset = null)
+    public SpriteRenderComponent(Game game, Subtexture sprite, Point2? offset = null)
         : this(game, new SpriteSingle(sprite), offset) { }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="sprite">The sprite asset name.</param>
     /// <param name="color">The sprite's color tint.</param>
     /// <param name="offset">The position offset.</param>
-    public SpriteComponent(Game game, string sprite, Color color, Point2? offset = null)
+    public SpriteRenderComponent(Game game, string sprite, Color color, Point2? offset = null)
         : this(game, game.Assets.GetSubtexture(sprite), color, offset) { }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class SpriteComponent(Game game, Sprite sprite, Point2? offset = null) : 
     /// <param name="game">The current game instance.</param>
     /// <param name="sprite">The sprite asset name.</param>
     /// <param name="offset">The position offset.</param>
-    public SpriteComponent(Game game, string sprite, Point2? offset = null)
+    public SpriteRenderComponent(Game game, string sprite, Point2? offset = null)
         : this(game, game.Assets.GetSubtexture(sprite), offset) { }
 
     protected override void Render(Batcher batcher) {

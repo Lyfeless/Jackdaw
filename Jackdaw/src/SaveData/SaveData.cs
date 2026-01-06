@@ -21,7 +21,7 @@ public class SaveData {
     public bool UseBackups = false;
 
     /// <summary>
-    /// How many backup files to keep alongside the main file. Only used when <see cref="UseBackups"> is enabled.
+    /// How many backup files to keep alongside the main file. Only used when <see cref="UseBackups" /> is enabled.
     /// </summary>
     public int BackupCount = 2;
 

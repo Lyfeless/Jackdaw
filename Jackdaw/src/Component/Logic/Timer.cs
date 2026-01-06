@@ -4,11 +4,11 @@ namespace Jackdaw;
 /// A wrapper for the timer object to automatically run actions when finished.
 /// </summary>
 /// <param name="game">The current game instance.</param>
-/// <param name="duration">The timer's duration in milliseconds.</param>
+/// <param name="duration">The timer's duration.</param>
 /// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
 /// <param name="startTime">The time offset the timer should begin with.</param>
-public class TimerComponent(Game game, float duration, string? timeTracker = null, float startTime = 0) : Component(game) {
-    readonly Timer Timer = new(game, duration, timeTracker, startTime);
+public class TimerComponent(Game game, TimeSpan duration, string? timeTracker = null, TimeSpan? startTime = null) : Component(game) {
+    readonly TicklessTimer Timer = new(game, duration, timeTracker, startTime);
 
     /// <summary>
     /// If the timer should reset when finished.
@@ -29,23 +29,23 @@ public class TimerComponent(Game game, float duration, string? timeTracker = nul
     /// A wrapper for the timer object to automatically run actions when finished.
     /// </summary>
     /// <param name="game">The current game instance.</param>
-    /// <param name="duration">The timer's duration in milliseconds.</param>
+    /// <param name="duration">The timer's duration.</param>
     /// <param name="callback">The action to run when the timer finishes or loops.</param>
     /// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
     /// <param name="startTime">The time offset the timer should begin with.</param>
-    public TimerComponent(Game game, float duration, Action callback, string? timeTracker = null, float startTime = 0) : this(game, duration, timeTracker, startTime) {
+    public TimerComponent(Game game, TimeSpan duration, Action callback, string? timeTracker = null, TimeSpan? startTime = null) : this(game, duration, timeTracker, startTime) {
         Callback = callback;
     }
 
     /// <summary>
     /// The time since the timer started. Resets when looping.
     /// </summary>
-    public double ElapsedTime => Timer.ElapsedTime;
+    public TimeSpan ElapsedTime => Timer.ElapsedTime;
 
     /// <summary>
     /// The elapsed time, stopping once the time goes past the timer's duration.
     /// </summary>
-    public double ElapsedTimeClamped => Timer.ElapsedTimeClamped;
+    public TimeSpan ElapsedTimeClamped => Timer.ElapsedTimeClamped;
 
     /// <summary>
     /// The percent of the total duration the timer has reached.

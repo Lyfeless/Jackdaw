@@ -6,7 +6,7 @@ namespace Jackdaw;
 /// <summary>
 /// A simple line renderer.
 /// </summary>
-public class LineComponent : Component {
+public class LineRenderComponent : Component {
     Line line;
 
     /// <summary>
@@ -43,7 +43,7 @@ public class LineComponent : Component {
     /// <param name="point2">The line end position.</param>
     /// <param name="weight">The width to render line with.</param>
     /// <param name="color">The color to render the line with.</param>
-    public LineComponent(Game game, Vector2 point1, Vector2 point2, int weight, Color color)
+    public LineRenderComponent(Game game, Vector2 point1, Vector2 point2, int weight, Color color)
         : this(game, new Line(point1, point2), weight, color) { }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class LineComponent : Component {
     /// <param name="line">The line to render.</param>
     /// <param name="weight">The width to render line with.</param>
     /// <param name="color">The color to render the line with.</param>
-    public LineComponent(Game game, Line line, int weight, Color color) : base(game) {
+    public LineRenderComponent(Game game, Line line, int weight, Color color) : base(game) {
         Line = line;
         Weight = weight;
         Color = color;

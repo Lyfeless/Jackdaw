@@ -9,7 +9,7 @@ namespace Jackdaw;
 /// <param name="circle">The circle to render.</param>
 /// <param name="steps">The number of segments to construct the shape with, higher steps makes a higher quailty circle.</param>
 /// <param name="color">The color to render the circle with.</param>
-public class CircleComponent(Game game, Circle circle, int steps, Color color) : Component(game) {
+public class CircleRenderComponent(Game game, Circle circle, int steps, Color color) : Component(game) {
     Circle circle = circle;
 
     /// <summary>

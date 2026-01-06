@@ -10,7 +10,7 @@ namespace Jackdaw;
 /// <param name="position">The grid position.</param>
 /// <param name="grid">The grid instance.</param>
 /// <param name="tileSize">The size of each tile.</param>
-public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), ISpatialGrid<Sprite?, Sprite?> {
+public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), ISpatialGrid<Sprite?, Sprite?> {
     protected readonly Grid<Sprite> Grid = grid;
 
     protected Point2 position = position;
@@ -40,7 +40,7 @@ public class GridRendererComponent(Game game, Point2 position, Grid<Sprite> grid
     /// <param name="position">The grid position.</param>
     /// <param name="gridSize">The grid tile dimensions.</param>
     /// <param name="tileSize">The size of each tile.</param>
-    public GridRendererComponent(Game game, Point2 position, Point2 gridSize, Point2 tileSize)
+    public GridRenderComponent(Game game, Point2 position, Point2 gridSize, Point2 tileSize)
         : this(game, position, new Grid<Sprite>(gridSize), tileSize) { }
 
     protected override void Render(Batcher batcher) {

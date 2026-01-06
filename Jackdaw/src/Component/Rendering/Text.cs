@@ -10,7 +10,7 @@ namespace Jackdaw;
 /// <param name="text">The text to render.</param>
 /// <param name="font">The font data.</param>
 /// <param name="color">The text color.</param>
-public class TextComponent(Game game, string text, SpriteFont font, Color color) : Component(game) {
+public class TextRenderComponent(Game game, string text, SpriteFont font, Color color) : Component(game) {
     /// <summary>
     /// How to position text relative to the position.
     /// </summary>
@@ -123,7 +123,7 @@ public class TextComponent(Game game, string text, SpriteFont font, Color color)
     /// <param name="text">The text to render.</param>
     /// <param name="font">The font asset name.</param>
     /// <param name="color">The text color.</param>
-    public TextComponent(Game game, string text, string font, Color color) : this(game, text, game.Assets.GetSpriteFont(font), color) { }
+    public TextRenderComponent(Game game, string text, string font, Color color) : this(game, text, game.Assets.GetSpriteFont(font), color) { }
 
     protected override void Render(Batcher batcher) {
         if (!Game.Window.BoundsInPixels().Overlaps(Bounds.TransformAABB(Actor.Transform.GlobalDisplayMatrix))) { return; }

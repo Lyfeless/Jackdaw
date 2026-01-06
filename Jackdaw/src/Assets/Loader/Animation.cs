@@ -8,7 +8,7 @@ namespace Jackdaw;
 /// </summary>
 public class AnimationLoader() : AssetLoaderStage() {
     public override void Run(Assets assets) {
-        assets.SetFallback(new AnimationData(assets.GetFallback<Subtexture>(), [new(0, 0)], 0));
+        assets.SetFallback(new AnimationData(assets.GetFallback<Subtexture>(), [new(0, TimeSpan.Zero)], TimeSpan.Zero));
 
         string AnimationPath = Path.Join(assets.Config.RootFolder, assets.Config.AnimationFolder);
         if (!Directory.Exists(AnimationPath)) { return; }
@@ -53,7 +53,7 @@ public class AnimationLoader() : AssetLoaderStage() {
         if (config.Frames.Length > 0) {
             frames = [.. config.Frames.Select(frame => new AnimationFrame(
                 texture: 0,
-                duration: frame.Duration,
+                duration: TimeSpan.FromMilliseconds(frame.Duration),
                 clip: SpriteSheetClip(frameSize, frame.FrameX, frame.FrameY),
                 positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),
                 flipX: frame.FlipX,
@@ -65,7 +65,7 @@ public class AnimationLoader() : AssetLoaderStage() {
             frames = new AnimationFrame[config.HorizontalFrames * config.HorizontalFrames];
             for (int y = 0; y < config.VerticalFrames; ++y) {
                 for (int x = 0; x < config.HorizontalFrames; ++x) {
-                    frames[x + (y * config.HorizontalFrames)] = new(0, config.FrameTime, SpriteSheetClip(frameSize, x, y));
+                    frames[x + (y * config.HorizontalFrames)] = new(0, TimeSpan.FromMilliseconds(config.FrameTime), SpriteSheetClip(frameSize, x, y));
                 }
             }
         }
@@ -86,7 +86,7 @@ public class AnimationLoader() : AssetLoaderStage() {
             GetAllTextures(assets, config.Textures),
             frames: [..config.Frames.Select(frame => new AnimationFrame(
                 texture: frame.Texture,
-                duration: frame.Duration,
+                duration: TimeSpan.FromMilliseconds(frame.Duration),
                 flipX: frame.FlipX,
                 flipY: frame.FlipY,
                 positionOffset: new(frame.PositionOffsetX, frame.PositionOffsetY),

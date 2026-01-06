@@ -8,7 +8,7 @@ namespace Jackdaw;
 /// <param name="game">The game instance.</param>
 /// <param name="rect">The rectangle to render.</param>
 /// <param name="color">The color to render the rectangle with.</param>
-public class RectComponent(Game game, Rect rect, Color color) : Component(game) {
+public class RectangleRenderComponent(Game game, Rect rect, Color color) : Component(game) {
     /// <summary>
     /// The rendering rectangle.
     /// </summary>

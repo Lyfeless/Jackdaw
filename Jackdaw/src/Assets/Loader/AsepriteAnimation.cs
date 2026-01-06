@@ -56,7 +56,7 @@ public class AsepriteAnimationLoader() : AssetLoaderStage() {
             textures[i] = assets.GetSubtexture(AsepriteLoader.GetFrameName(name, i));
             frames[i] = new AnimationFrame(
                 texture: i,
-                duration: aseprite.Frames[i].Duration,
+                duration: TimeSpan.FromMilliseconds(aseprite.Frames[i].Duration),
                 flipX: flipX,
                 flipY: flipY,
                 embeddedData: embeddedData

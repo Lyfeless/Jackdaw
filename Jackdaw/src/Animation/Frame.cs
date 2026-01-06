@@ -12,9 +12,9 @@ public readonly struct AnimationFrame {
     public readonly int Texture;
 
     /// <summary>
-    /// The length of the frame, in milliseconds.
+    /// The length of the frame.
     /// </summary>
-    public readonly float Duration = 1;
+    public readonly TimeSpan Duration = TimeSpan.FromMilliseconds(1);
 
     /// <summary>
     /// The region of the texture to use for the frame. Uses the full frame if the size is 0.
@@ -46,7 +46,7 @@ public readonly struct AnimationFrame {
     /// Create a frame for a sprite animation.
     /// </summary>
     /// <param name="texture">The texture index to use.</param>
-    /// <param name="duration">The length of the frame, in milliseconds.</param>
+    /// <param name="duration">The length of the frame.</param>
     /// <param name="clip">The region of the texture to use for the frame. Defaults to the full texture.</param>
     /// <param name="positionOffset">The amount to offset this frame's position from the rest of the animation.</param>
     /// <param name="flipX">If the frame texture should be mirrored horizontally.</param>
@@ -54,7 +54,7 @@ public readonly struct AnimationFrame {
     /// <param name="embeddedData">Metadata to include in the frame.</param>
     public AnimationFrame(
         int texture,
-        float duration,
+        TimeSpan duration,
         RectInt? clip = null,
         Point2? positionOffset = null,
         bool flipX = false,
