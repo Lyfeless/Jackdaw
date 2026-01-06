@@ -149,17 +149,17 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
 
         JsonObject floats = [];
         foreach ((string key, float value) in savedata.Floats) {
-            strings[key] = value;
+            floats[key] = value;
         }
 
         JsonObject ints = [];
         foreach ((string key, int value) in savedata.Ints) {
-            strings[key] = value;
+            ints[key] = value;
         }
 
         JsonObject bools = [];
         foreach ((string key, bool value) in savedata.Bools) {
-            strings[key] = value;
+            bools[key] = value;
         }
 
         node["strings"] = strings;

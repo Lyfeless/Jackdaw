@@ -118,12 +118,16 @@ internal static class SaveFileLoader {
     }
 
     internal static BinaryWriter CreateBinaryWriter(string savePath) {
-        return new(File.Open(savePath, FileMode.OpenOrCreate));
+        FileStream file = File.Open(savePath, FileMode.OpenOrCreate);
+        file.SetLength(0);
+        return new(file);
     }
 
 
     internal static void WriteJsonObject(JsonNode node, string path) {
         using FileStream file = new(path, FileMode.OpenOrCreate);
+        file.SetLength(0);
+
         using Utf8JsonWriter writer = new(file);
         node.WriteTo(writer);
     }
