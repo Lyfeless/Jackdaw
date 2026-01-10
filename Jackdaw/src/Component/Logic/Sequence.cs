@@ -32,13 +32,10 @@ public class SequenceComponent(Game game, Sequence sequence) : Component(game) {
 
     public void Run() {
         if (Running) { Cancel(); }
-        Console.WriteLine("RUN!");
         Runner = new SingleSequenceRunner(Game, sequence);
     }
 
     void Finish() {
-        Console.WriteLine("FINISH!");
-
         if (LoopOnFinish) {
             Run();
             return;
@@ -55,7 +52,6 @@ public class SequenceComponent(Game game, Sequence sequence) : Component(game) {
 
     public void Cancel() {
         if (!Running) { return; }
-        Console.WriteLine("CANCEL!");
         Runner!.Cancel();
         Runner = null;
         Done = false;

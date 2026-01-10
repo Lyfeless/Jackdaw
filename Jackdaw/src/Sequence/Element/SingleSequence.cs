@@ -10,7 +10,6 @@ public class SingleSequenceRunner : ISequenceElementRunner {
     public SingleSequenceRunner(Game game, Sequence sequence) {
         Game = game;
         Sequence = sequence;
-        Console.WriteLine(Sequence.SequenceDone(index));
         if (!Sequence.SequenceDone(index)) {
             Current = Sequence[index].GetRunner(Game);
         }
