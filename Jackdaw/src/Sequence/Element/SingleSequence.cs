@@ -1,6 +1,6 @@
 namespace Jackdaw;
 
-public class SingleSequenceRunner : ISequenceElementRunner {
+internal class SingleSequenceRunner : ISequenceElementRunner {
     readonly Game Game;
     readonly Sequence Sequence;
 

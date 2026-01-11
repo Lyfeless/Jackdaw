@@ -1,13 +1,24 @@
 namespace Jackdaw;
 
+/// <summary>
+/// A sequence element for running multiple sub-sequences.
+/// </summary>
+/// <param name="requiredFinishedSequences">The number of sequences that need to be completed before continuing.</param>
+/// <param name="sequences">The subsequences to run.</param>
 public class SequenceElementSubSequences(int requiredFinishedSequences, params Sequence[] sequences) : ISequenceElement {
     public ISequenceElementRunner GetRunner(Game game)
         => new SequenceElementSubSequencesRunner(game, requiredFinishedSequences, sequences);
 }
 
+/// <summary>
+/// A runner for handling <see cref="SequenceElementSubSequences"/> elements.
+/// </summary>
+/// <param name="game">The current game instance.</param>
+/// <param name="requiredFinishedSequences">The number of sequences that need to be completed before continuing.</param>
+/// <param name="sequences">The subsequences to run.</param>
 public class SequenceElementSubSequencesRunner(Game game, int requiredFinishedSequences, params Sequence[] sequences) : ISequenceElementRunner {
-    public int RequiredFinishedSequences = requiredFinishedSequences;
-    public SingleSequenceRunner[] Sequences = [.. sequences.Select(e => new SingleSequenceRunner(game, e))];
+    readonly int RequiredFinishedSequences = requiredFinishedSequences;
+    readonly SingleSequenceRunner[] Sequences = [.. sequences.Select(e => new SingleSequenceRunner(game, e))];
 
     public SequenceRunnerState IsDone() {
         bool isCancelled = false;
@@ -26,7 +37,6 @@ public class SequenceElementSubSequencesRunner(Game game, int requiredFinishedSe
         }
 
         if (isCancelled) {
-            //! FIXME (Alex): MAKE SURE CANCEL ACTION GETS RUN IF THIS HAPPENS
             return SequenceRunnerState.CANCEL;
         }
 
