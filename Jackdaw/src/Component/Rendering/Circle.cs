@@ -37,13 +37,12 @@ public class CircleRenderComponent(Game game, Circle circle, int steps, Color co
     /// <summary>
     /// The rectangular region the circle occupies.
     /// </summary>
-    public Rect Bounds { get; private set; } = GetBounds(circle);
+    public Rect Bounds { get; private set; } = circle.Bounds;
 
     protected override void Render(Batcher batcher) {
         if (!Game.Window.BoundsInPixels().Overlaps(Bounds.TransformAABB(Actor.Transform.GlobalDisplayMatrix))) { return; }
         batcher.Circle(Circle, Steps, Color);
     }
 
-    void SetBounds() { Bounds = GetBounds(circle); }
-    static Rect GetBounds(Circle circle) => Rect.Centered(circle.Position, circle.Radius * 2, circle.Radius * 2);
+    void SetBounds() { Bounds = circle.Bounds; }
 }

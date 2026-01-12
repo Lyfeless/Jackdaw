@@ -8,7 +8,8 @@ namespace Jackdaw;
 /// </summary>
 public class ShaderLoader() : AssetLoaderStage() {
     public override void Run(Assets assets) {
-        assets.SetFallback(new BatcherShader(assets.GraphicsDevice));
+        // With shader rework, a fallback really doesn't make sense. Crash if shaders are misconfigured.
+        // assets.SetFallback();
 
         string configPath = Path.Join(assets.Config.RootFolder, assets.Config.ShaderConfig);
         if (!Path.Exists(configPath)) { return; }
@@ -21,28 +22,18 @@ public class ShaderLoader() : AssetLoaderStage() {
         string shaderPath = Path.Join(assets.Config.RootFolder, assets.Config.ShaderFolder);
 
         foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
-            string vertexPath = Path.Join(shaderPath, $"{entry.Vertex.Path}.{shaderExtension}");
-            string fragmentPath = Path.Join(shaderPath, $"{entry.Fragment.Path}.{shaderExtension}");
-            if (!Path.Exists(vertexPath) || !Path.Exists(fragmentPath)) { continue; }
+            string path = Path.Join(shaderPath, $"{entry.Path}.{shaderExtension}");
+            if (!Path.Exists(path)) { continue; }
 
-            byte[] vertexBytes;
-            byte[] fragmentBytes;
-            vertexBytes = File.ReadAllBytes(vertexPath);
-            fragmentBytes = vertexPath == fragmentPath ? vertexBytes : File.ReadAllBytes(fragmentPath);
+            byte[] bytes;
+            bytes = File.ReadAllBytes(path);
 
             ShaderCreateInfo createInfo = new(
-                Vertex: new(
-                    Code: vertexBytes,
-                    SamplerCount: entry.Vertex.Samplers,
-                    UniformBufferCount: entry.Vertex.Uniforms,
-                    EntryPoint: entry.Vertex.EntryPoint
-                ),
-                Fragment: new(
-                    Code: fragmentBytes,
-                    SamplerCount: entry.Fragment.Samplers,
-                    UniformBufferCount: entry.Fragment.Uniforms,
-                    EntryPoint: entry.Fragment.EntryPoint
-                )
+                Code: bytes,
+                Stage: entry.Stage,
+                SamplerCount: entry.Samplers,
+                UniformBufferCount: entry.Uniforms,
+                StorageBufferCount: entry.StorageBuffers
             );
 
             assets.Add(entry.Name, new Shader(assets.GraphicsDevice, createInfo));
