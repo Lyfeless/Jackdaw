@@ -118,6 +118,24 @@ public class CollisionManager {
     /// Get all collisions between given collider and all registered collision components at a given location.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The actor position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public AllCollisionInfo GetAllCollisions(Collider collider, ActorPosition position)
+        => GetAllCollisions(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
+
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public AllCollisionInfo GetAllCollisions(Collider collider, Transform position)
+        => GetAllCollisions(collider, position.Matrix, position.MatrixInverse);
+
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
     public AllCollisionInfo GetAllCollisions(Collider collider, Matrix3x2 position) {
@@ -211,6 +229,26 @@ public class CollisionManager {
         ActiveComponent = null;
         return info;
     }
+
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The actor position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionInfo GetFirstCollision(Collider collider, ActorPosition position)
+        => GetFirstCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
+
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionInfo GetFirstCollision(Collider collider, Transform position)
+        => GetFirstCollision(collider, position.Matrix, position.MatrixInverse);
 
     /// <summary>
     /// Get the first object the given collider collides with at a given location.
