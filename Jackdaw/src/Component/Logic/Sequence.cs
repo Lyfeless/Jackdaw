@@ -42,6 +42,19 @@ public class SequenceComponent(Game game, Sequence sequence) : Component(game) {
     /// </summary>
     public bool RemoveOnFinish = false;
 
+    /// <summary>
+    /// If the component should automatically run the sequence when added to the node tree.
+    /// </summary>
+    public bool Autostart = false;
+
+    protected override void EnterTree() {
+        if (Autostart) { Run(); }
+    }
+
+    protected override void ExitTree() {
+        Cancel();
+    }
+
     protected override void Update() {
         if (!Running) { return; }
         switch (Runner!.IsDone()) {
