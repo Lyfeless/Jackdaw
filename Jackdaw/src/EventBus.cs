@@ -12,6 +12,7 @@ public class EventBus {
     bool subscriptionsLocked = false;
     readonly List<QueueAction> addQueue = [];
     readonly List<QueueAction> removeQueue = [];
+    readonly List<Action> dispatchQueue = [];
 
     /// <summary>
     /// Subscribe to an event with a callback.
@@ -77,7 +78,13 @@ public class EventBus {
     /// </summary>
     /// <typeparam name="T">The type of event to send.</typeparam>
     /// <param name="event">The event package.</param>
-    public void Dispatch<T>(T @event) where T : struct {
+    /// <param name="runImmediately">If the event should be dispatched immediately rather than queuing until the end of the tick.</param>
+    public void Dispatch<T>(T @event, bool runImmediately = false) where T : struct {
+        if (!runImmediately) {
+            dispatchQueue.Add(() => { Dispatch(@event, true); });
+            return;
+        }
+
         Type type = typeof(T);
         if (!Subsciptions.TryGetValue(type, out List<Subscription>? value)) { return; }
         subscriptionsLocked = true;
@@ -85,16 +92,27 @@ public class EventBus {
             ((Action<T>)subscription.Callback)(@event);
         }
         subscriptionsLocked = false;
-        ProcessQueue();
+        ProcessAddQueue();
     }
 
-    void ProcessQueue() {
-        foreach (QueueAction action in addQueue) { Subscribe(action.Type, action.Subscription); }
-        foreach (QueueAction action in removeQueue) {
-            if (Subsciptions.TryGetValue(action.Type, out List<Subscription>? value)) { value.Remove(action.Subscription); }
+    internal void ProcessDispatchQueue() {
+        if (dispatchQueue.Count == 0) { return; }
+        foreach (Action action in dispatchQueue) { action(); }
+        dispatchQueue.Clear();
+    }
+
+    void ProcessAddQueue() {
+        if (addQueue.Count > 0) {
+            foreach (QueueAction action in addQueue) { Subscribe(action.Type, action.Subscription); }
+            addQueue.Clear();
         }
 
-        addQueue.Clear();
-        removeQueue.Clear();
+        if (removeQueue.Count > 0) {
+            foreach (QueueAction action in removeQueue) {
+                if (Subsciptions.TryGetValue(action.Type, out List<Subscription>? value)) { value.Remove(action.Subscription); }
+            }
+            removeQueue.Clear();
+        }
+
     }
 }

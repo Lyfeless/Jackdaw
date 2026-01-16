@@ -137,6 +137,9 @@ public class Game : App {
             Root?.SetContainerQueuing(true);
         }
 
+        // Run before main tick to ensure events before setup are applied
+        Events.ProcessDispatchQueue();
+
         Controls.Update();
         Timers.Update();
 
