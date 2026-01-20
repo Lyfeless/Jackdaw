@@ -103,7 +103,11 @@ public sealed class Actor {
     /// </summary>
     public bool ComponentsVisible {
         get => componentsVisible;
-        set => componentsVisible = value;
+        set {
+            if (componentsVisible == value) { return; }
+            componentsVisible = value;
+            ComponentVisibilityChanged();
+        }
     }
 
     /// <summary>
@@ -116,7 +120,11 @@ public sealed class Actor {
     /// </summary>
     public bool ChildrenVisible {
         get => childrenVisible;
-        set => childrenVisible = value;
+        set {
+            if (childrenVisible == value) { return; }
+            childrenVisible = value;
+            ChildrenVisibilityChanged();
+        }
     }
 
     /// <summary>
@@ -152,6 +160,7 @@ public sealed class Actor {
     public bool ComponentsTicking {
         get => componentsTicking;
         set {
+            if (componentsTicking == value) { return; }
             componentsTicking = value;
             ComponentTickingChanged();
         }
@@ -168,6 +177,7 @@ public sealed class Actor {
     public bool ChildrenTicking {
         get => childrenTicking;
         set {
+            if (childrenTicking == value) { return; }
             childrenTicking = value;
             ChildrenTickingChanged();
         }
