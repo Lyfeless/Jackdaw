@@ -62,7 +62,7 @@ public class AnimationLoader() : AssetLoaderStage() {
             ))];
         }
         else {
-            frames = new AnimationFrame[config.HorizontalFrames * config.HorizontalFrames];
+            frames = new AnimationFrame[config.HorizontalFrames * config.VerticalFrames];
             for (int y = 0; y < config.VerticalFrames; ++y) {
                 for (int x = 0; x < config.HorizontalFrames; ++x) {
                     frames[x + (y * config.HorizontalFrames)] = new(0, TimeSpan.FromMilliseconds(config.FrameTime), SpriteSheetClip(frameSize, x, y));
