@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -8,9 +9,10 @@ namespace Jackdaw;
 /// <param name="texture">The texture to display.</param>
 public class SpriteSingle(Subtexture texture) : Sprite() {
     readonly Subtexture Texture = texture;
+    readonly RectInt textureBounds = new(texture.Size.RoundToPoint2());
+    readonly Point2 halfSize = (texture.Size / 2).RoundToPoint2();
 
-    public override Point2 Size => (Point2)Texture.Size;
-    public override RectInt Bounds => new(Point2.Zero, Size);
+    public override RectInt Bounds => textureBounds.Translate(Offset);
 
     /// <summary>
     /// A single-image sprite.
@@ -20,6 +22,6 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     public SpriteSingle(Assets assets, string texture) : this(assets.GetSubtexture(texture)) { }
 
     public override void Render(Batcher batcher) {
-        batcher.Image(Texture, Offset + (Bounds.Size / 2), Bounds.Center, FlipScale(), 0, Color);
+        batcher.Image(Texture, Bounds.Center, halfSize, FlipScale(), 0, Color);
     }
 }

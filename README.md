@@ -24,7 +24,8 @@ Actor rootActor = new(game);
 rootActor.Position = new(100, 50);
 
 // Add a component to the root
-rootActor.Components.Add(new SpriteComponent(game, "fallback-man"));
+SpriteSingle sprite = new(game.Assets.GetSubtexture("fallback-man"));
+rootActor.Components.Add(new DisplayObjectRenderComponent(game, sprite));
 
 // Assign the root actor to the game;
 game.Root = rootActor;

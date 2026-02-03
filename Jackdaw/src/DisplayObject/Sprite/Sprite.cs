@@ -3,17 +3,12 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A renderable sprite for use in the <seealso cref="SpriteRenderComponent" />.
+/// A renderable sprite for use in the <seealso cref="DisplayObjectRenderComponent" />.
 /// Can be recolored, offset, or flipped.
 /// </summary>
-public abstract class Sprite {
+public abstract class Sprite : DisplayObject {
     /// <summary>
-    /// The color to render the sprite at. Defaults to white.
-    /// </summary>
-    public Color Color = Color.White;
-
-    /// <summary>
-    /// The position offset from the sprite origin.
+    /// The sprite's local offset, stacks with the render component offset.
     /// </summary>
     public Point2 Offset = Point2.Zero;
 
@@ -26,22 +21,6 @@ public abstract class Sprite {
     /// If the sprite should be flipped vertically.
     /// </summary>
     public bool FlipY = false;
-
-    /// <summary>
-    /// The size of the sprite.
-    /// </summary>
-    public abstract Point2 Size { get; }
-
-    /// <summary>
-    /// The space the sprite covers including offsets.
-    /// </summary>
-    public abstract RectInt Bounds { get; }
-
-    /// <summary>
-    /// Render the sprite to the given batcher.
-    /// </summary>
-    /// <param name="batcher">The batcher to render to.</param>
-    public abstract void Render(Batcher batcher);
 
     /// <summary>
     /// Get the scale value required to render the flip the sprite by the current flipX and flipY values.

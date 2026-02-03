@@ -68,13 +68,7 @@ public class SpriteNineslice : Sprite {
     /// <summary>
     /// The Rectangle bounds of the nineslice.
     /// </summary>
-    public override RectInt Bounds => (RectInt)BoundsComponent.Rect;
-
-    /// <summary>
-    /// The dimensions of the nineslice.
-    /// </summary>
-    public override Point2 Size => (Point2)BoundsComponent.Size;
-
+    public override RectInt Bounds => BoundsComponent.Rect.Int().Translate(Offset);
 
     /// <summary>
     /// Create a new nineslice object.
@@ -133,15 +127,15 @@ public class SpriteNineslice : Sprite {
         : this(assets.GetSubtexture(texture), center, bounds, extend, constrain) { }
 
     public override void Render(Batcher batcher) {
-        batcher.PushMatrix((Point2)BoundsComponent.Position);
+        batcher.PushMatrix(BoundsComponent.Position.RoundToPoint2() + Offset);
 
-        Point2 boundsSize = (Point2)BoundsComponent.Size;
-        Point2 topLeftSize = (Point2)TopLeft.Size;
-        Point2 bottomRightSize = (Point2)BottomRight.Size;
+        Point2 boundsSize = BoundsComponent.Size.RoundToPoint2();
+        Point2 topLeftSize = TopLeft.Size.RoundToPoint2();
+        Point2 bottomRightSize = BottomRight.Size.RoundToPoint2();
 
         if (Constrain != ConstrainBehavior.NONE) {
             boundsSize = Constrain switch {
-                ConstrainBehavior.TEXTURE_SIZE => LimitSize(boundsSize, (Point2)Full.Size),
+                ConstrainBehavior.TEXTURE_SIZE => LimitSize(boundsSize, Full.Size.RoundToPoint2()),
                 ConstrainBehavior.BORDER_SIZE => LimitSize(boundsSize, topLeftSize + bottomRightSize),
                 _ => boundsSize
             };

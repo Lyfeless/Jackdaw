@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -9,9 +10,7 @@ namespace Jackdaw;
 public class SpriteStack(params Sprite[] sprites) : Sprite() {
     public readonly Sprite[] Sprites = sprites;
 
-    readonly RectInt bounds = (RectInt)new BoundsBuilder([.. sprites.Select(e => e.Bounds)]).Rect;
-    public override Point2 Size => bounds.Size;
-    public override RectInt Bounds => bounds.Translate(Offset);
+    public override RectInt Bounds => new BoundsBuilder([.. Sprites.Select(e => e.Bounds)]).Rect.Translate(Offset).Int();
 
     /// <summary>
     /// Create a stack of sprites.
@@ -35,11 +34,21 @@ public class SpriteStack(params Sprite[] sprites) : Sprite() {
     public SpriteStack(Assets assets, Color color, params string[] sprites) : this([.. sprites.Select(e => new SpriteSingle(assets, e) { Color = color })]) { }
 
     public override void Render(Batcher batcher) {
-        batcher.PushMatrix(Transform.CreateMatrix(Offset + (bounds.Size / 2), bounds.Center, FlipScale(), 0));
+        RectInt bounds = Bounds;
+        Point2 halfSize = bounds.Size / 2;
+        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(Offset, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Position, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center - Offset, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center + Offset, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(-Offset, bounds.Size / 2, FlipScale(), 0));
+        // batcher.PushMatrix(Transform.CreateMatrix(Offset + halfSize, halfSize, FlipScale(), 0));
+        batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Center, FlipScale(), 0));
 
         foreach (Sprite sprite in Sprites) {
             sprite.Render(batcher);
         }
+
         batcher.PopMatrix();
     }
 }

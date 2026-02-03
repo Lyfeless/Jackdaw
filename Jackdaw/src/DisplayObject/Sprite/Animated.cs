@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -20,8 +21,7 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
         Looping = animation.Looping
     };
 
-    readonly RectInt bounds = (RectInt)new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect;
-    public override Point2 Size => bounds.Size;
+    readonly RectInt bounds = new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect.Int();
     public override RectInt Bounds => bounds.Translate(Offset);
 
     public bool Done => Timer.Done;
@@ -42,6 +42,6 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
         AnimationFrame frame = Frame;
         bool flipX = frame.FlipX != FlipX;
         bool flipY = frame.FlipY != FlipY;
-        batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Offset + (bounds.Size / 2), bounds.Center - Animation.PositionOffset - frame.PositionOffset, FlipScale(flipX, flipY), 0, Color);
+        batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Bounds.Center, Bounds.Size / 2, FlipScale(flipX, flipY), 0, Color);
     }
 }
