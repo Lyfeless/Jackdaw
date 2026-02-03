@@ -61,7 +61,7 @@ public static class ISpatialGridHelper {
         /// <param name="element">The element to set the tile to.</param>
         /// <param name="localCoord">The local coordinate to add to.</param>
         public void SetTileLocal(TIn element, Vector2 localCoord)
-            => grid.SetTile(element, (Point2)grid.LocalToTileCoord(localCoord));
+            => grid.SetTile(element, grid.LocalToTileCoord(localCoord).RoundToPoint2());
 
         /// <summary>
         /// If applicable, add an additional element to stack on a tile, in local coordinates.
@@ -69,21 +69,21 @@ public static class ISpatialGridHelper {
         /// <param name="element">The element to set the tile to.</param>
         /// <param name="localCoord">The local coordinate to add to.</param>
         public void AddTileStackLocal(TIn element, Vector2 localCoord)
-            => grid.AddTileStack(element, (Point2)grid.LocalToTileCoord(localCoord));
+            => grid.AddTileStack(element, grid.LocalToTileCoord(localCoord).RoundToPoint2());
 
         /// <summary>
         /// If applicable, remove the top element from a tile's element stack, in local coordinates.
         /// </summary>
         /// <param name="localCoord">The local coordinate to add to.</param>
         public void RemoveTileStackLocal(Vector2 localCoord)
-            => grid.RemoveTileStack((Point2)grid.LocalToTileCoord(localCoord));
+            => grid.RemoveTileStack(grid.LocalToTileCoord(localCoord).RoundToPoint2());
 
         /// <summary>
         /// Clear all data from a tile, in local coordinates.
         /// </summary>
         /// <param name="localCoord">The local coordinate to add to.</param>
         public void ClearTileLocal(Vector2 localCoord)
-            => grid.ClearTile((Point2)grid.LocalToTileCoord(localCoord));
+            => grid.ClearTile(grid.LocalToTileCoord(localCoord).RoundToPoint2());
 
         /// <summary>
         /// Get the stored value at a tile position, in local coordinates.
@@ -91,7 +91,7 @@ public static class ISpatialGridHelper {
         /// <param name="localCoord">The local coordinate to add to.</param>
         /// <returns>The tile value at the given local position.</returns>
         public TOut? GetTileLocal(Vector2 localCoord)
-            => grid.GetTile((Point2)grid.LocalToTileCoord(localCoord));
+            => grid.GetTile(grid.LocalToTileCoord(localCoord).RoundToPoint2());
 
         /// <summary>
         /// Convert a position from a spatial position to a tile coordinate.

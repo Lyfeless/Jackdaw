@@ -20,7 +20,7 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     /// </summary>
     public Vector2 Position {
         get => position;
-        set => position = (Point2)value;
+        set => position = value.RoundToPoint2();
     }
 
     protected Point2 tileSize = tileSize;
@@ -30,7 +30,7 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     /// </summary>
     public Vector2 TileSize {
         get => tileSize;
-        set => tileSize = (Point2)value;
+        set => tileSize = value.RoundToPoint2();
     }
 
     /// <summary>

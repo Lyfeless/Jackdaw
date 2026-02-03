@@ -65,7 +65,7 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         List<Collider> overlaps = [];
         int tileCountX = (int)MathF.Ceiling(diff.X / TileSize.X) + 1;
         int tileCountY = (int)MathF.Ceiling(diff.Y / TileSize.Y) + 1;
-        Point2 startingCoord = (Point2)this.LocalToTileCoord(min);
+        Point2 startingCoord = this.LocalToTileCoord(min).RoundToPoint2();
         for (int x = 0; x < tileCountX; ++x) {
             for (int y = 0; y < tileCountY; ++y) {
                 Point2 coord = startingCoord + new Point2(x, y);
