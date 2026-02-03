@@ -36,13 +36,6 @@ public class SpriteStack(params Sprite[] sprites) : Sprite() {
     public override void Render(Batcher batcher) {
         RectInt bounds = Bounds;
         Point2 halfSize = bounds.Size / 2;
-        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(Offset, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Position, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center - Offset, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(bounds.Center + Offset, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(-Offset, bounds.Size / 2, FlipScale(), 0));
-        // batcher.PushMatrix(Transform.CreateMatrix(Offset + halfSize, halfSize, FlipScale(), 0));
         batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Center, FlipScale(), 0));
 
         foreach (Sprite sprite in Sprites) {
