@@ -2,9 +2,13 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+public interface IDisplayObjectLine {
+    public Line Line { get; set; }
+}
+
 public class DisplayLine(Line line, float lineWeight)
-    : DisplayObject, IDisplayObjectLines {
-    public Line Line = line;
+    : DisplayObject, IDisplayObjectLine, IDisplayObjectLines {
+    public Line Line { get; set; } = line;
     public float LineWeight { get; set; } = lineWeight;
 
     public override RectInt Bounds => Line.Bounds.Int();
@@ -15,8 +19,8 @@ public class DisplayLine(Line line, float lineWeight)
 }
 
 public class DisplayLineDashed(Line line, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectDashedLines {
-    public Line Line = line;
+    : DisplayObject, IDisplayObjectLine, IDisplayObjectDashedLines {
+    public Line Line { get; set; } = line;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
