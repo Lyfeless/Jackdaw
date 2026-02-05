@@ -18,7 +18,7 @@ public interface IDisplayObjectLine {
 /// <param name="line">The line to render.</param>
 /// <param name="lineWeight"></param>
 public class DisplayLine(Line line, float lineWeight)
-    : DisplayObject, IDisplayObjectLine, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectLine, IDisplayObjectOutline {
     public Line Line { get; set; } = line;
     public float LineWeight { get; set; } = lineWeight;
 
@@ -36,7 +36,7 @@ public class DisplayLine(Line line, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayLineDashed(Line line, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectLine, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectLine, IDisplayObjectDashedOutline {
     public Line Line { get; set; } = line;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;

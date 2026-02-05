@@ -3,7 +3,7 @@ namespace Jackdaw;
 /// <summary>
 /// Display configuration for rendering an outline object with lines.
 /// </summary>
-public interface IDisplayObjectLines {
+public interface IDisplayObjectOutline {
     /// <summary>
     /// The width of the rendered lines.
     /// </summary>
@@ -13,7 +13,7 @@ public interface IDisplayObjectLines {
 /// <summary>
 /// Display configuration for rendering an object with dashed lines.
 /// </summary>
-public interface IDisplayObjectDashedLines : IDisplayObjectLines {
+public interface IDisplayObjectDashedOutline : IDisplayObjectOutline {
     /// <summary>
     /// The length of every segment and gap pair along the line.
     /// </summary>

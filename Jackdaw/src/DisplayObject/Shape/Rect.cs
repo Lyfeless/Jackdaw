@@ -120,7 +120,7 @@ public class DisplayRectangle(RectInt rect)
 /// <param name="rect">The rect to render.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayRectangleLines(RectInt rect, float lineWeight)
-    : DisplayObject, IDisplayObjectRoundableRect, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectRoundableRect, IDisplayObjectOutline {
     public RectInt Rect { get; set; } = rect;
     public float LineWeight { get; set; } = lineWeight;
     public RectangleCornerRounding Corners { get; set; } = RectangleCornerRounding.None();
@@ -140,7 +140,7 @@ public class DisplayRectangleLines(RectInt rect, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayRectangleLinesDashed(RectInt rect, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectRect, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectRect, IDisplayObjectDashedOutline {
     public RectInt Rect { get; set; } = rect;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;

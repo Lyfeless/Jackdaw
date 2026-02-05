@@ -37,7 +37,7 @@ public class DisplayPolygon(Polygon polygon)
 /// <param name="polygon">The polygon to render.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayPolygonLines(Polygon polygon, float lineWeight)
-    : DisplayObject, IDisplayObjectPolygon, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectPolygon, IDisplayObjectOutline {
     public Polygon Polygon { get; set; } = polygon;
     public float LineWeight { get; set; } = lineWeight;
 
@@ -58,7 +58,7 @@ public class DisplayPolygonLines(Polygon polygon, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayPolygonLinesDashed(Polygon polygon, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectPolygon, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectPolygon, IDisplayObjectDashedOutline {
     public Polygon Polygon { get; set; } = polygon;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;

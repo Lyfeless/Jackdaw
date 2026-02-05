@@ -34,7 +34,7 @@ public class DisplayTriangle(Triangle triangle)
 /// <param name="triangle">The triangle to render.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayTriangleLines(Triangle triangle, float lineWeight)
-    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectOutline {
     public Triangle Triangle { get; set; } = triangle;
     public float LineWeight { get; set; } = lineWeight;
 
@@ -66,7 +66,7 @@ public class DisplayTriangleLines(Triangle triangle, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayTriangleLinesDashed(Triangle triangle, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectOutline, IDisplayObjectDashedOutline {
     public Triangle Triangle { get; set; } = triangle;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;

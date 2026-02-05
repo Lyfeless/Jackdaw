@@ -34,7 +34,7 @@ public class DisplayQuad(Quad quad)
 /// <param name="quad">The quad to render.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayQuadLines(Quad quad, float lineWeight)
-    : DisplayObject, IDisplayObjectQuad, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectQuad, IDisplayObjectOutline {
     public Quad Quad { get; set; } = quad;
     public float LineWeight { get; set; } = lineWeight;
 
@@ -53,7 +53,7 @@ public class DisplayQuadLines(Quad quad, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayQuadLinesDashed(Quad quad, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectQuad, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectQuad, IDisplayObjectDashedOutline {
     public Quad Quad { get; set; } = quad;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;

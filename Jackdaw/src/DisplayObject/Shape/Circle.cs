@@ -55,7 +55,7 @@ public class DisplayCircle(Circle circle)
 /// <param name="circle">The circle to render.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayCircleLines(Circle circle, float lineWeight)
-    : DisplayObject, IDisplayObjectCircle, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectCircle, IDisplayObjectOutline {
     public Circle Circle { get; set; } = circle;
     public int Resolution { get; set; } = 16;
     public float LineWeight { get; set; } = lineWeight;
@@ -74,7 +74,7 @@ public class DisplayCircleLines(Circle circle, float lineWeight)
 /// <param name="lineWeight">The width of the rendered lines.</param>
 /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayCircleLinesDashed(Circle circle, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectCircle, IDisplayObjectDashedLines {
+    : DisplayObject, IDisplayObjectCircle, IDisplayObjectDashedOutline {
     public Circle Circle { get; set; } = circle;
     public int Resolution { get; set; } = 16;
     public float LineWeight { get; set; } = lineWeight;
@@ -116,7 +116,7 @@ public class DisplaySemiCircle(Circle circle, float startRadians, float endRadia
 /// <param name="endRadians">The angle the semicircle should stop at, in radians.</param>
 /// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplaySemiCircleLines(Circle circle, float startRadians, float endRadians, float lineWeight)
-    : DisplayObject, IDisplayObjectSemiCircle, IDisplayObjectLines {
+    : DisplayObject, IDisplayObjectSemiCircle, IDisplayObjectOutline {
     public Circle Circle { get; set; } = circle;
     public int Resolution { get; set; } = 16;
     public float StartRadians { get; set; } = startRadians;
