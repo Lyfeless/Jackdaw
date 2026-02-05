@@ -35,7 +35,7 @@ public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite 
     }
 
     void Render(Batcher batcher, int offset, bool padLeft) {
-        Point2 textureSize = Texture.Size.RoundToPoint2();
+        Point2 textureSize = Texture.Size.FloorToPoint2();
 
         int count = Math.Abs(Width) / textureSize.X;
         int remainder = Math.Abs(Width) % textureSize.X;

@@ -48,7 +48,7 @@ public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     }
 
     void Render(Batcher batcher, Point2 offset, bool padLeft, bool padTop) {
-        Point2 textureSize = Texture.Size.RoundToPoint2();
+        Point2 textureSize = Texture.Size.FloorToPoint2();
 
         Point2 count = new(
             Math.Abs(Width) / textureSize.X,

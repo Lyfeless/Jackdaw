@@ -127,15 +127,15 @@ public class SpriteNineslice : Sprite {
         : this(assets.GetSubtexture(texture), center, bounds, extend, constrain) { }
 
     public override void Render(Batcher batcher) {
-        batcher.PushMatrix(BoundsComponent.Position.RoundToPoint2() + Offset);
+        batcher.PushMatrix(BoundsComponent.Position.FloorToPoint2() + Offset);
 
-        Point2 boundsSize = BoundsComponent.Size.RoundToPoint2();
-        Point2 topLeftSize = TopLeft.Size.RoundToPoint2();
-        Point2 bottomRightSize = BottomRight.Size.RoundToPoint2();
+        Point2 boundsSize = BoundsComponent.Size.FloorToPoint2();
+        Point2 topLeftSize = TopLeft.Size.FloorToPoint2();
+        Point2 bottomRightSize = BottomRight.Size.FloorToPoint2();
 
         if (Constrain != ConstrainBehavior.NONE) {
             boundsSize = Constrain switch {
-                ConstrainBehavior.TEXTURE_SIZE => LimitSize(boundsSize, Full.Size.RoundToPoint2()),
+                ConstrainBehavior.TEXTURE_SIZE => LimitSize(boundsSize, Full.Size.FloorToPoint2()),
                 ConstrainBehavior.BORDER_SIZE => LimitSize(boundsSize, topLeftSize + bottomRightSize),
                 _ => boundsSize
             };

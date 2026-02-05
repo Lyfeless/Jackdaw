@@ -35,7 +35,7 @@ public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
     }
 
     void Render(Batcher batcher, int offset, bool padTop) {
-        Point2 textureSize = Texture.Size.RoundToPoint2();
+        Point2 textureSize = Texture.Size.FloorToPoint2();
 
         int count = Math.Abs(Height) / textureSize.Y;
         int remainder = Math.Abs(Height) % textureSize.Y;

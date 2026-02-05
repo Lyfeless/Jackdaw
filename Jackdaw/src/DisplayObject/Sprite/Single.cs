@@ -8,8 +8,8 @@ namespace Jackdaw;
 /// <param name="texture">The texture to display.</param>
 public class SpriteSingle(Subtexture texture) : Sprite() {
     readonly Subtexture Texture = texture;
-    readonly RectInt textureBounds = new(texture.Size.RoundToPoint2());
-    readonly Point2 halfSize = (texture.Size / 2).RoundToPoint2();
+    readonly RectInt textureBounds = new(texture.Size.FloorToPoint2());
+    readonly Point2 halfSize = (texture.Size / 2).FloorToPoint2();
 
     public override RectInt Bounds => textureBounds.Translate(Offset);
 
