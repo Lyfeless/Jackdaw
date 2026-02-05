@@ -3,8 +3,13 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-public class DisplayTriangle(Triangle triangle) : DisplayObject {
-    public Triangle Triangle = triangle;
+public interface IDisplayObjectTriangle {
+    public Triangle Triangle { get; set; }
+}
+
+public class DisplayTriangle(Triangle triangle)
+    : DisplayObject, IDisplayObjectTriangle {
+    public Triangle Triangle { get; set; } = triangle;
 
     public override RectInt Bounds => Triangle.Bounds.Int();
 
@@ -14,8 +19,8 @@ public class DisplayTriangle(Triangle triangle) : DisplayObject {
 }
 
 public class DisplayTriangleLines(Triangle triangle, float lineWeight)
-    : DisplayObject, IDisplayObjectLines {
-    public Triangle Triangle = triangle;
+    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines {
+    public Triangle Triangle { get; set; } = triangle;
     public float LineWeight { get; set; } = lineWeight;
 
     public override RectInt Bounds => Triangle.Bounds.Int();
@@ -40,8 +45,8 @@ public class DisplayTriangleLines(Triangle triangle, float lineWeight)
 }
 
 public class DisplayTriangleLinesDashed(Triangle triangle, float lineWeight, float dashLength)
-    : DisplayObject, IDisplayObjectLines, IDisplayObjectDashedLines {
-    public Triangle Triangle = triangle;
+    : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines, IDisplayObjectDashedLines {
+    public Triangle Triangle { get; set; } = triangle;
     public float LineWeight { get; set; } = lineWeight;
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
