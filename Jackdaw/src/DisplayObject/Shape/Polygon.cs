@@ -3,10 +3,20 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Display configuration for rendering a polygon.
+/// </summary>
 public interface IDisplayObjectPolygon {
+    /// <summary>
+    /// The polygon to render.
+    /// </summary>
     public Polygon Polygon { get; set; }
 }
 
+/// <summary>
+/// A renderable filled polygon.
+/// </summary>
+/// <param name="polygon">The polygon to render.</param>
 public class DisplayPolygon(Polygon polygon)
     : DisplayObject, IDisplayObjectPolygon {
     public Polygon Polygon { get; set; } = polygon;
@@ -21,6 +31,11 @@ public class DisplayPolygon(Polygon polygon)
     }
 }
 
+/// <summary>
+/// A renderable polygon outline.
+/// </summary>
+/// <param name="polygon">The polygon to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayPolygonLines(Polygon polygon, float lineWeight)
     : DisplayObject, IDisplayObjectPolygon, IDisplayObjectLines {
     public Polygon Polygon { get; set; } = polygon;
@@ -36,6 +51,12 @@ public class DisplayPolygonLines(Polygon polygon, float lineWeight)
     }
 }
 
+/// <summary>
+/// A renderable dashed polygon outline.
+/// </summary>
+/// <param name="polygon">The polygon to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
+/// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayPolygonLinesDashed(Polygon polygon, float lineWeight, float dashLength)
     : DisplayObject, IDisplayObjectPolygon, IDisplayObjectDashedLines {
     public Polygon Polygon { get; set; } = polygon;

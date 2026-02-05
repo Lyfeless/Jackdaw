@@ -9,7 +9,6 @@ namespace Jackdaw;
 /// <param name="width">The sprite's resized width.</param>
 public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite {
     readonly Subtexture Texture = texture;
-
     readonly ScalingAxis width = new(width);
 
     /// <summary>

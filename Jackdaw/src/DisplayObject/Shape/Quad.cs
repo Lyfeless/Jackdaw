@@ -3,10 +3,20 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Display configuration for rendering polygon with 4 points.
+/// </summary>
 public interface IDisplayObjectQuad {
+    /// <summary>
+    /// The quad to render.
+    /// </summary>
     public Quad Quad { get; set; }
 }
 
+/// <summary>
+/// A renderable filled quad.
+/// </summary>
+/// <param name="quad">The quad to render.</param>
 public class DisplayQuad(Quad quad)
 : DisplayObject, IDisplayObjectQuad {
     public Quad Quad { get; set; } = quad;
@@ -18,6 +28,11 @@ public class DisplayQuad(Quad quad)
     }
 }
 
+/// <summary>
+/// A renderable quad outline.
+/// </summary>
+/// <param name="quad">The quad to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayQuadLines(Quad quad, float lineWeight)
     : DisplayObject, IDisplayObjectQuad, IDisplayObjectLines {
     public Quad Quad { get; set; } = quad;
@@ -31,6 +46,12 @@ public class DisplayQuadLines(Quad quad, float lineWeight)
     }
 }
 
+/// <summary>
+/// A renderable dashed quad outline.
+/// </summary>
+/// <param name="quad">The quad to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
+/// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayQuadLinesDashed(Quad quad, float lineWeight, float dashLength)
     : DisplayObject, IDisplayObjectQuad, IDisplayObjectDashedLines {
     public Quad Quad { get; set; } = quad;

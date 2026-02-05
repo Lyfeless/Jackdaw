@@ -3,10 +3,20 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Display configuration for rendering a triangle.
+/// </summary>
 public interface IDisplayObjectTriangle {
+    /// <summary>
+    /// The triangle to render.
+    /// </summary>
     public Triangle Triangle { get; set; }
 }
 
+/// <summary>
+/// A renderable filled triangle.
+/// </summary>
+/// <param name="triangle">The triangle to render.</param>
 public class DisplayTriangle(Triangle triangle)
     : DisplayObject, IDisplayObjectTriangle {
     public Triangle Triangle { get; set; } = triangle;
@@ -18,6 +28,11 @@ public class DisplayTriangle(Triangle triangle)
     }
 }
 
+/// <summary>
+/// A renderable triangle outline.
+/// </summary>
+/// <param name="triangle">The triangle to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
 public class DisplayTriangleLines(Triangle triangle, float lineWeight)
     : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines {
     public Triangle Triangle { get; set; } = triangle;
@@ -44,6 +59,12 @@ public class DisplayTriangleLines(Triangle triangle, float lineWeight)
     }
 }
 
+/// <summary>
+/// A renderable dashed triangle outline.
+/// </summary>
+/// <param name="triangle">The triangle to render.</param>
+/// <param name="lineWeight">The width of the rendered lines.</param>
+/// <param name="dashLength">The length of every segment and gap pair along the line.</param>
 public class DisplayTriangleLinesDashed(Triangle triangle, float lineWeight, float dashLength)
     : DisplayObject, IDisplayObjectTriangle, IDisplayObjectLines, IDisplayObjectDashedLines {
     public Triangle Triangle { get; set; } = triangle;

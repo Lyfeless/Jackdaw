@@ -9,7 +9,6 @@ namespace Jackdaw;
 /// <param name="height">The sprite's resized height.</param>
 public class SpriteTilingVertical(Subtexture texture, int height = 0) : Sprite {
     readonly Subtexture Texture = texture;
-
     readonly ScalingAxis height = new(height);
 
     /// <summary>

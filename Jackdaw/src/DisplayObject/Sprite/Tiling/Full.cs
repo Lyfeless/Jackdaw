@@ -9,7 +9,6 @@ namespace Jackdaw;
 /// <param name="size">The sprite's resized size.</param>
 public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     readonly Subtexture Texture = texture;
-
     readonly ScalingPoint2 size = new(size);
 
     public int Width { get => size.Width; set => size.Width = value; }

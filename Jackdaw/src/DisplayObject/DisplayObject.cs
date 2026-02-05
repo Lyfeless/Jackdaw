@@ -3,6 +3,10 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// An object that can be rendered to the screen. <br/>
+/// Use a <see cref="DisplayObjectRenderComponent" /> to render.
+/// </summary>
 public abstract class DisplayObject {
     /// <summary>
     /// The bounds the object should use to determine if it should render
@@ -24,11 +28,24 @@ public abstract class DisplayObject {
     /// </summary>
     public Color Color = Color.White;
 
+    /// <summary>
+    /// Check if the object is currently inside the window's view bounds.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="actor">The actor the object is rendered relative to.</param>
+    /// <param name="offset">The renderer component's relative offset.</param>
+    /// <returns>If the object is onscreen.</returns>
     public bool IsOnScreen(Game game, Actor actor, Point2 offset) {
         Rect globalBounds = GetGlobalRenderBounds(actor, offset);
         return game.Window.BoundsInPixels().Overlaps(globalBounds);
     }
 
+    /// <summary>
+    /// Get the global bounds of the object in window coordinates.
+    /// </summary>
+    /// <param name="actor">The actor the object is rendered relative to.</param>
+    /// <param name="offset">The renderer component's relative offset.</param>
+    /// <returns>The display object's bounds as an AABB.</returns>
     public Rect GetGlobalRenderBounds(Actor actor, Point2 offset)
         => Bounds
             .Translate(offset)
