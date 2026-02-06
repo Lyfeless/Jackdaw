@@ -16,6 +16,12 @@ public interface IAssetStorage {
     public void Add(string name, object asset);
 
     /// <summary>
+    /// Get the names of all assets currently stored in the container.
+    /// </summary>
+    /// <returns>A list of asset names.</returns>
+    public string[] GetAssetNames();
+
+    /// <summary>
     /// Get an asset from storage.
     /// </summary>
     /// <param name="name">The asset's name id.</param>
@@ -41,6 +47,8 @@ internal class AssetStorage(Type type) : IAssetStorage {
     object? Fallback = null;
 
     public void Add(string name, object asset) => Assets.Add(name, asset);
+
+    public string[] GetAssetNames() => [.. Assets.Keys];
 
     public object Get(string name) {
         if (Assets.TryGetValue(name, out object? output)) { return output; }

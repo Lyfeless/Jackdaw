@@ -189,6 +189,23 @@ public class Assets {
     public void SetFallback<T>(T asset) => GetStorage<T>(true).SetFallback(asset!);
 
     /// <summary>
+    /// Get the name ids of all loaded assets of a type.
+    /// </summary>
+    /// <typeparam name="T">The asset type to get the name ids of.</typeparam>
+    /// <returns>A list of name ids.</returns>
+    public string[] GetLoadedAssetNames<T>() => GetLoadedAssetNames(typeof(T));
+
+    /// <summary>
+    /// Get the name ids of all loaded assets of a type.
+    /// </summary>
+    /// <param name="type">The asset type to get the name ids of.</param>
+    /// <returns>A list of name ids.</returns>
+    public string[] GetLoadedAssetNames(Type type) {
+        if (!LoadedAssets.TryGetValue(type, out IAssetStorage? storage)) { return []; }
+        return storage.GetAssetNames();
+    }
+
+    /// <summary>
     /// Get a loaded asset from storage.
     /// </summary>
     /// <typeparam name="T">The type of asset to find.</typeparam>
