@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// Manager class used for storing and loading game assets including textures, sounds, fonts, etc
 /// </summary>
 public class Assets {
-    readonly Dictionary<Type, AssetStorage<object>> LoadedAssets = [];
+    readonly Dictionary<Type, IAssetStorage> LoadedAssets = [];
     readonly List<AssetLoaderStage> LoaderStages = [];
     bool Loaded = false;
 
@@ -72,6 +72,31 @@ public class Assets {
         AddTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
 
         if (!config.EnableCustomLoaders) { Load(); }
+    }
+
+    /// <summary>
+    /// Add a custom asset loader for a specific asset type. <br/>
+    /// Only needed for assets that require custom logic when accessed,
+    /// any asset that doesn't need additional logic after loading is will automatically use a default storage system.
+    /// </summary>
+    /// <typeparam name="T">The type to register the storage for.</typeparam>
+    /// <param name="storage">The asset storage object.</param>
+    public void RegisterCustomAssetStorage<T>(IAssetStorage storage)
+        => RegisterCustomAssetStorage(typeof(T), storage);
+
+    /// <summary>
+    /// Add a custom asset loader for a specific asset type. <br/>
+    /// Only needed for assets that require custom logic when accessed,
+    /// any asset that doesn't need additional logic after loading is will automatically use a default storage system.
+    /// </summary>
+    /// <param name="type">The type to register the storage for.</param>
+    /// <param name="storage">The asset storage object.</param>
+    public void RegisterCustomAssetStorage(Type type, IAssetStorage storage) {
+        if (LoadedAssets.ContainsKey(type)) {
+            Log.Warning($"Attempting to add a new storage object for type {type} when one already exists, skipping.");
+            return;
+        }
+        LoadedAssets.Add(type, storage);
     }
 
     /// <summary>
@@ -161,7 +186,7 @@ public class Assets {
     /// </summary>
     /// <typeparam name="T">The type of asset to set the fallback for.</typeparam>
     /// <param name="asset">The asset to set as fallback.</param>
-    public void SetFallback<T>(T asset) => GetStorage<T>(true).AddFallback(asset!);
+    public void SetFallback<T>(T asset) => GetStorage<T>(true).SetFallback(asset!);
 
     /// <summary>
     /// Get a loaded asset from storage.
@@ -169,7 +194,7 @@ public class Assets {
     /// <typeparam name="T">The type of asset to find.</typeparam>
     /// <param name="name">The name id of the asset to find.</param>
     /// <returns>The requested asset, or the asset type's fallback if the name id isn't present.</returns>
-    public T Get<T>(string name) => (T)GetStorage<T>().Get(name, typeof(T));
+    public T Get<T>(string name) => (T)GetStorage<T>().Get(name);
 
     /// <summary>
     /// Get the fallback asset for the given type.
@@ -177,7 +202,7 @@ public class Assets {
     /// </summary>
     /// <typeparam name="T">The asset type to get the fallback for.</typeparam>
     /// <returns>The asset type's fallback value.</returns>
-    public T GetFallback<T>() => (T)GetStorage<T>().Fallback;
+    public T GetFallback<T>() => (T)GetStorage<T>().GetFallback();
 
     /// <summary>
     /// Get a loaded texture asset from storage.
@@ -207,14 +232,17 @@ public class Assets {
     /// <returns>The requested animation asset, or the fallback animation if the name id isn't present.</returns>
     public AnimationData GetAnimationData(string name) => Get<AnimationData>(name);
 
-    AssetStorage<object> GetStorage<T>(bool create = false) {
-        Type type = typeof(T);
-        if (!LoadedAssets.TryGetValue(type, out AssetStorage<object>? value)) {
+    IAssetStorage GetStorage<T>(bool create = false)
+        => GetStorage(typeof(T), create);
+
+    IAssetStorage GetStorage(Type type, bool create = false) {
+        if (!LoadedAssets.TryGetValue(type, out IAssetStorage? value)) {
             if (create) {
-                value = new(); LoadedAssets.Add(type, value);
+                value = new AssetStorage(type);
+                LoadedAssets.Add(type, value);
             }
             else {
-                TypeWarnings.TryGetValue(typeof(T), out string? warning);
+                TypeWarnings.TryGetValue(type, out string? warning);
                 throw new Exception($"Assets: No assets initialized for type {type}, could not send fallback. {warning}");
             }
         }
