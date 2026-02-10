@@ -6,7 +6,11 @@ namespace Jackdaw;
 /// <summary>
 /// Asset loader for importing texture animations from configuration data.
 /// </summary>
-public class AnimationLoader() : AssetLoaderStage() {
+public class AnimationLoader : AssetLoaderStage {
+    public AnimationLoader() : base() {
+        SetAfter<PackerLoader>();
+    }
+
     public override void Run(Assets assets) {
         assets.SetFallback(new AnimationData(assets.GetFallback<Subtexture>(), [new(0, TimeSpan.Zero)], TimeSpan.Zero));
 

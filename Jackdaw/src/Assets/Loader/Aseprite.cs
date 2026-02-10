@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -6,9 +5,13 @@ namespace Jackdaw;
 /// <summary>
 /// Asset loader for importing textures and animations from aseprite files.
 /// </summary>
-public class AsepriteLoader() : AssetLoaderStage() {
+public class AsepriteLoader : AssetLoaderStage {
     readonly string[] AsepriteExtensions = [".aseprite", ".ase"];
 
+    public AsepriteLoader() : base() {
+        SetBefore<PackerLoader>();
+        SetBefore<AsepriteAnimationLoader>();
+    }
 
     public override void Run(Assets assets) {
         PackerLoader? packer = assets.FindLoaderStage<PackerLoader>();

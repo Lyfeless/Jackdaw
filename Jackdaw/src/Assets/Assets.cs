@@ -41,31 +41,14 @@ public class Assets {
         Assembly = Assembly.GetExecutingAssembly();
         AssemblyName = Assembly.GetName().Name ?? "";
 
-        TextureLoader textureLoader = new();
-        TextureFallbackLoader textureFallbackLoader = new();
-        AsepriteLoader asepriteLoader = new();
-        AsepriteAnimationLoader asepriteAnimationLoader = new();
-        PackerLoader packerLoader = new();
-        FontLoader fontLoader = new();
-        AnimationLoader animationLoader = new();
-        ShaderLoader shaderLoader = new();
-
-        textureLoader.SetBefore<PackerLoader>();
-        asepriteLoader.SetBefore<PackerLoader>();
-        asepriteLoader.SetBefore<AsepriteAnimationLoader>();
-
-        animationLoader.SetAfter<PackerLoader>();
-        asepriteAnimationLoader.SetAfter<PackerLoader>();
-        textureFallbackLoader.SetAfter<PackerLoader>();
-
-        RegisterLoaderStage(textureLoader);
-        RegisterLoaderStage(textureFallbackLoader);
-        RegisterLoaderStage(asepriteLoader);
-        RegisterLoaderStage(asepriteAnimationLoader);
-        RegisterLoaderStage(packerLoader);
-        RegisterLoaderStage(animationLoader);
-        RegisterLoaderStage(fontLoader);
-        RegisterLoaderStage(shaderLoader);
+        RegisterLoaderStage(new TextureLoader());
+        RegisterLoaderStage(new TextureFallbackLoader());
+        RegisterLoaderStage(new AsepriteLoader());
+        RegisterLoaderStage(new AsepriteAnimationLoader());
+        RegisterLoaderStage(new PackerLoader());
+        RegisterLoaderStage(new AnimationLoader());
+        RegisterLoaderStage(new FontLoader());
+        RegisterLoaderStage(new ShaderLoader());
 
         AddTypeWarning<Image>("Use Subtexture to access auto-loaded image data.");
         AddTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");

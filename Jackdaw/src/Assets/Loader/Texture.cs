@@ -6,11 +6,15 @@ namespace Jackdaw;
 /// <summary>
 /// Asset loader for importing textures from external files.
 /// </summary>
-public class TextureLoader() : AssetLoaderStage() {
+public class TextureLoader : AssetLoaderStage {
     readonly string[] TextureExtensions = [".png", ".jpg"];
 
     const string TextureFallbackName = "Fallback.texture.png";
     const string ManFallbackName = "Fallback.man.png";
+
+    public TextureLoader() : base() {
+        SetBefore<PackerLoader>();
+    }
 
     public override void Run(Assets assets) {
         PackerLoader? packer = assets.FindLoaderStage<PackerLoader>();

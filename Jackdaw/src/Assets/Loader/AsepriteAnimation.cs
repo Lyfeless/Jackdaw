@@ -6,9 +6,13 @@ namespace Jackdaw;
 /// <summary>
 /// Asset loader for creating animations from aseprite files, needs to bne run after <see cref="PackerLoader" /> runs so the textures exist.
 /// </summary>
-public class AsepriteAnimationLoader() : AssetLoaderStage() {
+public class AsepriteAnimationLoader : AssetLoaderStage {
     record struct Animation(string Name, Aseprite Data);
     readonly List<Animation> animations = [];
+
+    public AsepriteAnimationLoader() : base() {
+        SetAfter<PackerLoader>();
+    }
 
     public override void Run(Assets assets) {
         string texturePath = Path.Join(assets.Config.RootFolder, assets.Config.TextureFolder);
