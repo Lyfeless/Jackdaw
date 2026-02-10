@@ -98,8 +98,8 @@ public class EventBus {
     internal void ProcessDispatchQueue() {
         if (dispatchQueue.Count == 0) { return; }
         Action[] dispatchQueueTemp = [.. dispatchQueue];
-        foreach (Action action in dispatchQueueTemp) { action(); }
         dispatchQueue.Clear();
+        foreach (Action action in dispatchQueueTemp) { action(); }
     }
 
     void ProcessAddQueue() {
