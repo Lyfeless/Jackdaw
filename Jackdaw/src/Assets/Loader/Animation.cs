@@ -14,23 +14,21 @@ public class AnimationLoader : AssetLoaderStage {
     public override void Run(Assets assets) {
         assets.SetFallback(new AnimationData(assets.GetFallback<Subtexture>(), [new(0, TimeSpan.Zero)], TimeSpan.Zero));
 
-        string AnimationPath = Path.Join(assets.Config.RootFolder, assets.Config.AnimationFolder);
-        if (!Directory.Exists(AnimationPath)) { return; }
-
         // Load single animations
-        foreach (string file in Assets.GetEnumeratedFiles(AnimationPath, assets.Config.AnimationExtension)) {
-            AnimationConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationConfig);
+        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.AnimationGroup, assets.Config.AnimationExtension)) {
+            using Stream stream = assets.Provider.GetItemStream(item);
+            AnimationConfig? data = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationConfig);
             if (data == null) { continue; }
-            string name = Assets.GetAssetName(AnimationPath, file);
-            AddAnimation(assets, name, data);
+            AddAnimation(assets, item.Name, data);
         }
 
         // Load animation group files
-        foreach (string file in Assets.GetEnumeratedFiles(AnimationPath, assets.Config.AnimationGroupExtension)) {
-            AnimationGroupConfig? data = JsonSerializer.Deserialize(File.ReadAllText(file), SourceGenerationContext.Default.AnimationGroupConfig);
+        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.AnimationGroup, assets.Config.AnimationGroupExtension)) {
+            using Stream stream = assets.Provider.GetItemStream(item);
+            AnimationGroupConfig? data = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationGroupConfig);
             if (data == null) { continue; }
             foreach (AnimationConfigEntry entry in data.Entries) {
-                string name = $"{Assets.GetAssetName(AnimationPath, file)}/{entry.Name}";
+                string name = $"{item.Name}/{entry.Name}";
                 AddAnimation(assets, name, entry.Animation);
             }
         }

@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -10,20 +9,17 @@ public struct GameConfig() {
     /// <summary>
     /// The name of the application. Also used when saving data to the userpath.
     /// </summary>
-    [JsonPropertyName("applicationName")]
-    public string ApplicationName { get; set; } = "JackdawGame";
+    public string ApplicationName = "JackdawGame";
 
     /// <summary>
     /// Configuration data for the window.
     /// </summary>
-    [JsonPropertyName("window")]
-    public GameWindowConfig Window { get; set; } = new();
+    public GameWindowConfig Window = new();
 
     /// <summary>
     /// Configuration data for the asset loader.
     /// </summary>
-    [JsonPropertyName("content")]
-    public GameContentConfig Content { get; set; } = new();
+    public GameContentConfig Content = new();
 }
 
 /// <summary>
@@ -33,33 +29,23 @@ public struct GameWindowConfig() {
     /// <summary>
     /// The title to display on the window.
     /// </summary>
-    [JsonPropertyName("title")]
-    public string Title { get; set; } = "Jackdaw Game";
+    public string Title = "Jackdaw Game";
 
     /// <summary>
-    /// Initial width of the full window.
+    /// Initial size of the full window.
     /// </summary>
-    [JsonPropertyName("width")]
-    public int Width { get; set; } = 600;
-
-    /// <summary>
-    /// Initial height of the full window.
-    /// </summary>
-    [JsonPropertyName("height")]
-    public int Height { get; set; } = 600;
+    public Point2 Size = new(600, 600);
 
     /// <summary>
     /// Whether or not the window can be resized by the user.
     /// </summary>
-    [JsonPropertyName("resizable")]
-    public bool Resizable { get; set; } = true;
+    public bool Resizable = true;
 
     /// <summary>
     /// The background color of the window. <br/>
     /// Used as the letterbox color when using fixed viewport.
     /// </summary>
-    [JsonPropertyName("clearColor")]
-    public Color ClearColor { get; set; } = Color.Black;
+    public Color ClearColor = Color.Black;
 }
 
 /// <summary>
@@ -67,85 +53,70 @@ public struct GameWindowConfig() {
 /// </summary>
 public struct GameContentConfig() {
     /// <summary>
-    /// The root folder all asset data is stored in.<br/>
-    /// Defaults to "Content".
+    /// The source to load assets from. <br/>
+    /// Defaults to loading assets from folders in the root folder "Content".
     /// </summary>
-    [JsonPropertyName("rootFolder")]
-    public string RootFolder { get; set; } = "Content";
+    public IAssetProvider AssetProvider = new FileFolderAssetProvider("Content");
 
     /// <summary>
-    /// The folder to search for texture files. <br/>
+    /// Any custom content loaders to run when initializing assets. <br/>
+    /// If left empty only textures, animations, fonts and shaders will be loaded.
+    /// </summary>
+    public AssetLoaderStage[] CustomAssetLoaders = [];
+
+    /// <summary>
+    /// The provider group name to search for texture files. <br/>
     /// Defaults to "Textures".
-    /// Relative to root folder.
     /// </summary>
-    [JsonPropertyName("textureFolder")]
-    public string TextureFolder { get; set; } = "Textures";
+    public string TextureGroup = "Textures";
 
     /// <summary>
-    /// The folder to search for font files. <br/>
+    /// The provider group to search for font files. <br/>
     /// Defaults to "Fonts".
-    /// Relative to root folder.
     /// </summary>
-    [JsonPropertyName("fontFolder")]
-    public string FontFolder { get; set; } = "Fonts";
+    public string FontGroup = "Fonts";
 
     /// <summary>
-    /// The location of the font config data.
-    /// Defaults to "Fonts/config.json".
-    /// Relative to root folder.
+    /// The name of the font config data. <br/>
+    /// Must be stored inside the font group to be found. <br/>
+    /// Defaults to "config.json".
     /// </summary>
-    [JsonPropertyName("fontConfig")]
-    public string FontConfig { get; set; } = "Fonts/config.json";
+    public string FontConfig = "config.json";
 
     /// <summary>
-    /// The folder to search for shader files. <br/>
+    /// The provider group to search for shader files. <br/>
     /// Defaults to "Shaders".
-    /// Relative to root folder.
     /// </summary>
-    [JsonPropertyName("shaderFolder")]
-    public string ShaderFolder { get; set; } = "Shaders";
+    public string ShaderGroup = "Shaders";
 
     /// <summary>
-    /// The location of the shader config data.
-    /// Defaults to "Shaders/config.json".
-    /// Relative to root folder.
+    /// The name of the shader config data. <br/>
+    /// Must be stored inside the shader group to be found. <br/>
+    /// Defaults to "config.json".
     /// </summary>
-    [JsonPropertyName("shaderConfig")]
-    public string ShaderConfig { get; set; } = "Shaders/config.json";
+    public string ShaderConfig = "config.json";
 
     /// <summary>
-    /// The folder to search for animation files. <br/>
+    /// The provider group to search for animation files. <br/>
     /// Defaults to "Animations".
-    /// Relative to root folder.
     /// </summary>
-    [JsonPropertyName("animationFolder")]
-    public string AnimationFolder { get; set; } = "Animations";
+    public string AnimationGroup = "Animations";
 
     /// <summary>
     /// The file extension for single animations.
-    /// Defaults to ".llanim".
+    /// Defaults to ".jda".
     /// </summary>
-    [JsonPropertyName("animationExtension")]
-    public string AnimationExtension { get; set; } = ".jda";
+    public string AnimationExtension = ".jda";
 
     /// <summary>
     /// The file extension for groups of animations.
-    /// Defaults to ".llganim".
+    /// Defaults to ".jdga".
     /// </summary>
-    [JsonPropertyName("animationGroupExtension")]
-    public string AnimationGroupExtension { get; set; } = ".jdga";
+    public string AnimationGroupExtension = ".jdga";
 
     /// <summary>
     /// The file extension for aseprite sidecar files.
     /// Defaults to ".asedef".
     /// </summary>
-    [JsonPropertyName("asepriteConfigExtension")]
-    public string AsepriteConfigExtension { get; set; } = ".asedef";
-
-    /// <summary>
-    /// If the game is using custom content loaders. <br/>
-    /// If enabled, requires calling <see cref="Assets.Load"/>
-    /// </summary>
-    [JsonPropertyName("enableCustomLoaders")]
-    public bool EnableCustomLoaders { get; set; } = false;
+    public string AsepriteConfigExtension = ".asedef";
 }

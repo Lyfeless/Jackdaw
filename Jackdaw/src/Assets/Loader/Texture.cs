@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// Asset loader for importing textures from external files.
 /// </summary>
 public class TextureLoader : AssetLoaderStage {
-    readonly string[] TextureExtensions = [".png", ".jpg"];
+    readonly string[] TextureExtensions = ["png", "jpg", ".qoi"];
 
     const string TextureFallbackName = "Fallback.texture.png";
     const string ManFallbackName = "Fallback.man.png";
@@ -23,12 +23,9 @@ public class TextureLoader : AssetLoaderStage {
         packer.Add("fallback", FallbackTexture(assets.Assembly, assets.AssemblyName, TextureFallbackName));
         packer.Add("fallback-man", FallbackTexture(assets.Assembly, assets.AssemblyName, ManFallbackName));
 
-        string TexturePath = Path.Join(assets.Config.RootFolder, assets.Config.TextureFolder);
-        if (!Directory.Exists(TexturePath)) { return; }
-
-        foreach (string file in Assets.GetEnumeratedFiles(TexturePath, TextureExtensions)) {
-            string name = Assets.GetAssetName(TexturePath, file);
-            packer.Add(name, file);
+        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.TextureGroup, TextureExtensions)) {
+            using Stream imageStream = assets.Provider.GetItemStream(item);
+            packer.Add(item.Name, new Image(imageStream));
         }
     }
 

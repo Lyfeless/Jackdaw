@@ -10,14 +10,20 @@ public class AsepriteAnimationLoader : AssetLoaderStage {
     record struct Animation(string Name, Aseprite Data);
     readonly List<Animation> animations = [];
 
+    static readonly AsepriteConfig DefaultConfig = new() {
+        Looping = false,
+        PositionOffsetX = 0,
+        PositionOffsetY = 0,
+        FrameData = []
+    };
+
     public AsepriteAnimationLoader() : base() {
         SetAfter<PackerLoader>();
     }
 
     public override void Run(Assets assets) {
-        string texturePath = Path.Join(assets.Config.RootFolder, assets.Config.TextureFolder);
         foreach (Animation animation in animations) {
-            AnimationData? anim = GetAnimationData(assets, animation.Name, animation.Data, texturePath);
+            AnimationData? anim = GetAnimationData(assets, animation.Name, animation.Data, GetConfig(assets, animation.Name));
             if (anim != null) { assets.Add(animation.Name, anim); }
         }
     }
@@ -30,27 +36,14 @@ public class AsepriteAnimationLoader : AssetLoaderStage {
     public void AddAnimation(string name, Aseprite data)
         => animations.Add(new(name, data));
 
-    static AnimationData? GetAnimationData(Assets assets, string name, Aseprite aseprite, string texturePath) {
-        bool looping = true;
-        Point2 positionOffset = Point2.Zero;
-        AsepriteFrameConfig[] frameConfigs = [];
-        string path = Path.Join(texturePath, $"{name}{assets.Config.AsepriteConfigExtension}");
-        if (File.Exists(path)) {
-            AsepriteConfig? config = JsonSerializer.Deserialize(File.ReadAllText(path), SourceGenerationContext.Default.AsepriteConfig);
-            if (config != null) {
-                looping = config.Looping;
-                positionOffset = new(config.PositionOffsetX, config.PositionOffsetY);
-                frameConfigs = config.FrameData;
-            }
-        }
-
+    static AnimationData? GetAnimationData(Assets assets, string name, Aseprite aseprite, AsepriteConfig config) {
         Subtexture[] textures = new Subtexture[aseprite.Frames.Length];
         AnimationFrame[] frames = new AnimationFrame[aseprite.Frames.Length];
         for (int i = 0; i < aseprite.Frames.Length; ++i) {
             bool flipX = false;
             bool flipY = false;
             string embeddedData = string.Empty;
-            AsepriteFrameConfig? frameConfig = frameConfigs.FirstOrDefault(e => e.Frame == i);
+            AsepriteFrameConfig? frameConfig = config.FrameData.FirstOrDefault(e => e.Frame == i);
             if (frameConfig != null) {
                 flipX = frameConfig.FlipX;
                 flipY = frameConfig.FlipY;
@@ -70,8 +63,20 @@ public class AsepriteAnimationLoader : AssetLoaderStage {
         return new(
             textures: textures,
             frames: frames,
-            looping: looping,
-            positionOffset: positionOffset
+            looping: config.Looping,
+            positionOffset: new(config.PositionOffsetX, config.PositionOffsetY)
         );
+    }
+
+    static AsepriteConfig GetConfig(Assets assets, string name) {
+        AssetProviderItem item = new(assets.Config.TextureGroup, name, assets.Config.AsepriteConfigExtension);
+        if (!assets.Provider.HasItem(item)) { return DefaultConfig; }
+        try {
+            using Stream stream = assets.Provider.GetItemStream(item);
+            AsepriteConfig? data = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AsepriteConfig);
+            if (data == null) { return DefaultConfig; }
+            return data;
+        } catch { }
+        return DefaultConfig;
     }
 }

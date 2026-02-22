@@ -74,24 +74,17 @@ public class Game : App {
     bool containersLocked = false;
 
     /// <summary>
-    /// Create a new game instance using a configuration file.
-    /// </summary>
-    /// <param name="configPath">The path to the configuration file, relative to the application.</param>
-    public Game(string configPath)
-        : this(JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.GameConfig)) { }
-
-    /// <summary>
     /// Create a new game instance using manually defined configuration data.
     /// </summary>
     /// <param name="config">The game's configuration data.</param>
     public Game(GameConfig config) : base(new AppConfig() {
         ApplicationName = config.ApplicationName,
         WindowTitle = config.Window.Title,
-        Width = config.Window.Width,
-        Height = config.Window.Height,
+        Width = config.Window.Size.X,
+        Height = config.Window.Size.Y,
         Resizable = true
     }) {
-        Assets = new(GraphicsDevice, config.Content);
+        Assets = new(this, config.Content);
         Controls = new(Input);
         Timers = new(this);
         Collision = new();

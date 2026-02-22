@@ -13,19 +13,24 @@ public class FontLoader() : AssetLoaderStage() {
 
 
     public override void Run(Assets assets) {
-        using Stream stream = assets.Assembly.GetManifestResourceStream($"{assets.AssemblyName}.{FontFallbackName}")!;
-        assets.SetFallback(new SpriteFont(assets.GraphicsDevice, stream, 16));
+        using Stream fallbackStream = assets.Assembly.GetManifestResourceStream($"{assets.AssemblyName}.{FontFallbackName}")!;
+        assets.SetFallback(new SpriteFont(assets.GraphicsDevice, fallbackStream, 16));
 
-        string fontPath = Path.Join(assets.Config.RootFolder, assets.Config.FontFolder);
-        if (!Directory.Exists(fontPath)) { return; }
+        FontConfig? config = null;
+        string configName = Path.GetFileNameWithoutExtension(assets.Config.FontConfig);
+        string configExtension = Path.GetExtension(assets.Config.FontConfig);
+        AssetProviderItem configItem = new(assets.Config.FontGroup, configName, configExtension);
+        if (assets.Provider.HasItem(configItem)) {
+            try {
+                using Stream stream = assets.Provider.GetItemStream(configItem);
+                config = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.FontConfig);
+            } catch { }
+        }
 
-        string configPath = Path.Join(assets.Config.RootFolder, assets.Config.FontConfig);
-        FontConfig? fontConfig = Path.Exists(configPath) ? JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.FontConfig) : null;
-
-        foreach (string file in Assets.GetEnumeratedFiles(fontPath, FontExtensions)) {
-            string name = Assets.GetAssetName(fontPath, file);
-            FontConfigEntry? configEntry = fontConfig?.FontConfigs.FirstOrDefault(e => e.Name == name);
-            assets.Add(name, new SpriteFont(assets.GraphicsDevice, file, configEntry?.Size ?? FontConfig.DefaultFontSize));
+        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.FontGroup, FontExtensions)) {
+            FontConfigEntry? configEntry = config?.FontConfigs.FirstOrDefault(e => e.Name == item.Name);
+            using Stream stream = assets.Provider.GetItemStream(item);
+            assets.Add(item.Name, new SpriteFont(assets.GraphicsDevice, stream, configEntry?.Size ?? FontConfig.DefaultFontSize));
         }
     }
 }

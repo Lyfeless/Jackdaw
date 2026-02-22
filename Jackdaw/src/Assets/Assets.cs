@@ -14,18 +14,28 @@ public class Assets {
     readonly Dictionary<Type, string> TypeWarnings = [];
 
     /// <summary>
+    /// The game instance the assets are being used for.
+    /// </summary>
+    public readonly Game Game;
+
+    /// <summary>
+    /// The game's graphics device, used for creating assets.
+    /// </summary>
+    public GraphicsDevice GraphicsDevice => Game.GraphicsDevice;
+
+    /// <summary>
     /// Configuration data for how assets should be loaded.
     /// </summary>
     public readonly GameContentConfig Config;
 
     /// <summary>
-    /// The game's graphics device, used for creating assets
+    /// The source assets are loaded from.
     /// </summary>
-    public readonly GraphicsDevice GraphicsDevice;
+    public readonly IAssetProvider Provider;
 
     /// <summary>
     /// The library's file assembly. <br/>
-    /// Most default fallback data is stored inside the embedded assembly
+    /// Most default fallback data is stored inside the embedded assembly.
     /// </summary>
     public readonly Assembly Assembly;
 
@@ -34,9 +44,11 @@ public class Assets {
     /// </summary>
     public readonly string AssemblyName;
 
-    public Assets(GraphicsDevice graphicsDevice, GameContentConfig config) {
+    public Assets(Game game, GameContentConfig config) {
+        Game = game;
         Config = config;
-        GraphicsDevice = graphicsDevice;
+
+        Provider = config.AssetProvider;
 
         Assembly = Assembly.GetExecutingAssembly();
         AssemblyName = Assembly.GetName().Name ?? "";
@@ -54,7 +66,11 @@ public class Assets {
         AddTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");
         AddTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
 
-        if (!config.EnableCustomLoaders) { Load(); }
+        foreach (AssetLoaderStage stage in config.CustomAssetLoaders) {
+            RegisterLoaderStage(stage);
+        }
+
+        Load();
     }
 
     /// <summary>
@@ -83,19 +99,6 @@ public class Assets {
     }
 
     /// <summary>
-    /// Add an asset loader stage to the queue. Currently only one loader of each type is supported. <br/>
-    /// Adding custom loaders requires the game config option <see cref="GameContentConfig.EnableCustomLoaders" />.
-    /// </summary>
-    /// <param name="loader">The loader to add to the load queue.</param>
-    public void RegisterLoaderStage(AssetLoaderStage loader) {
-        if (LoaderStages.Any(e => e.GetType() == loader.GetType())) {
-            Log.Warning($"Trying to add a second loader of type {loader.GetType()}. Behavior is currently unsupported, skipping.");
-            return;
-        }
-        LoaderStages.Add(loader);
-    }
-
-    /// <summary>
     /// Find an asset loader stage in the queue by type. Currently only one loader of each type is supported.
     /// </summary>
     /// <typeparam name="T">The loader type to find.</typeparam>
@@ -118,12 +121,7 @@ public class Assets {
     /// <param name="warning">The warning to show in exceptions.</param>
     public void AddTypeWarning(Type type, string warning) => TypeWarnings.Add(type, warning);
 
-    /// <summary>
-    /// Load assets from all registered loader stages. <br/>
-    /// Runs automatically on game creation unless <see cref="GameContentConfig.EnableCustomLoaders" /> is enabled.
-    /// </summary>
-    /// <exception cref="Exception">If the registered loaders have conflicts in load order preventing them from executing.</exception>
-    public void Load() {
+    void Load() {
         if (Loaded) {
             Log.Warning("Assets: Attempting to run asset load after load has already run, skipping.");
             return;
@@ -136,6 +134,14 @@ public class Assets {
         }
 
         Loaded = true;
+    }
+
+    void RegisterLoaderStage(AssetLoaderStage loader) {
+        if (LoaderStages.Any(e => e.GetType() == loader.GetType())) {
+            Log.Warning($"Trying to add a second loader of type {loader.GetType()}. Behavior is currently unsupported, skipping.");
+            return;
+        }
+        LoaderStages.Add(loader);
     }
 
     AssetLoaderStage? NextLoaderStage() {
@@ -247,29 +253,5 @@ public class Assets {
             }
         }
         return value;
-    }
-
-    /// <summary>
-    /// Remove extra information from a file path to create a unique asset identifier
-    /// </summary>
-    /// <param name="relativePath">The path elements to remove from the start of the path</param>
-    /// <param name="assetPath">Full path to the asset</param>
-    /// <returns></returns>
-    public static string GetAssetName(string relativePath, string assetPath) {
-        string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
-        name = Path.GetRelativePath(relativePath, name);
-        name = name.Replace("\\", "/");
-        return name;
-    }
-
-    /// <summary>
-    /// Get all files from a directory and all subdirectories that match the given extensions.
-    /// </summary>
-    /// <param name="path">The directory to search.</param>
-    /// <param name="extensions">The file extensions to search for.</param>
-    /// <returns>All files in the directory with a matching extension.</returns>
-    public static IEnumerable<string> GetEnumeratedFiles(string path, params string[] extensions) {
-        if (!Directory.Exists(path)) { return []; }
-        return Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).Where(e => extensions.Any(e.EndsWith));
     }
 }

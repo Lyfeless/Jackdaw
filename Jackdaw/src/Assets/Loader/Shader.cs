@@ -8,25 +8,27 @@ namespace Jackdaw;
 /// </summary>
 public class ShaderLoader() : AssetLoaderStage() {
     public override void Run(Assets assets) {
-        // With shader rework, a fallback really doesn't make sense. Crash if shaders are misconfigured.
-        // assets.SetFallback();
+        string configName = Path.GetFileNameWithoutExtension(Path.GetRelativePath(assets.Config.ShaderGroup, assets.Config.ShaderConfig));
+        string configExtension = Path.GetExtension(assets.Config.ShaderConfig);
+        AssetProviderItem configItem = new(assets.Config.ShaderGroup, configName, configExtension);
+        if (!assets.Provider.HasItem(configItem)) { return; }
 
-        string configPath = Path.Join(assets.Config.RootFolder, assets.Config.ShaderConfig);
-        if (!Path.Exists(configPath)) { return; }
-
-        // Shaders are built from more data than just files, so read directly off the config
-        ShaderConfig? shaderConfig = JsonSerializer.Deserialize(File.ReadAllText(configPath), SourceGenerationContext.Default.ShaderConfig);
+        using Stream configStream = assets.Provider.GetItemStream(configItem);
+        ShaderConfig? shaderConfig;
+        try {
+            shaderConfig = JsonSerializer.Deserialize(configStream, SourceGenerationContext.Default.ShaderConfig);
+        } catch { return; }
         if (shaderConfig == null) { return; }
 
-        string shaderExtension = assets.GraphicsDevice.Driver.GetShaderExtension(); assets.GraphicsDevice.Driver.GetShaderExtension();
-        string shaderPath = Path.Join(assets.Config.RootFolder, assets.Config.ShaderFolder);
+        string shaderExtension = $".{assets.GraphicsDevice.Driver.GetShaderExtension()}";
 
         foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
-            string path = Path.Join(shaderPath, $"{entry.Path}.{shaderExtension}");
-            if (!Path.Exists(path)) { continue; }
+            AssetProviderItem item = new(assets.Config.ShaderGroup, entry.Name, shaderExtension);
+            if (!assets.Provider.HasItem(item)) { continue; }
 
-            byte[] bytes;
-            bytes = File.ReadAllBytes(path);
+            using Stream shaderStream = assets.Provider.GetItemStream(item);
+            byte[] bytes = new byte[shaderStream.Length];
+            shaderStream.ReadExactly(bytes);
 
             ShaderCreateInfo createInfo = new(
                 Code: bytes,

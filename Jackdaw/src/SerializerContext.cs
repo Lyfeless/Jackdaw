@@ -7,7 +7,6 @@ namespace Jackdaw;
     ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
     PropertyNameCaseInsensitive = true
 )]
-[JsonSerializable(typeof(GameConfig))]
 [JsonSerializable(typeof(FontConfig))]
 [JsonSerializable(typeof(ShaderConfig))]
 [JsonSerializable(typeof(AnimationConfig))]
