@@ -60,6 +60,17 @@ public abstract class Component {
         }
     }
 
+    /// <summary>
+    /// Should the component render and tick while attached to an actor.
+    /// </summary>
+    public bool Active {
+        get => Ticking && Visible;
+        set {
+            Ticking = value;
+            Visible = value;
+        }
+    }
+
     bool ticking = true;
     bool globalTicking = true;
 

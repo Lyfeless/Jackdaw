@@ -206,10 +206,52 @@ public sealed class Actor {
     public bool GlobalTicking => Ticking && ParentTicking;
 
     /// <summary>
-    /// If all parents above the actor are ticking their children
+    /// If all parents above the actor are ticking their children.
     /// </summary>
     public bool ParentTicking { get; internal set; } = true;
-    // public bool GlobalTicking => ChildrenTicking && (!ParentValid || Parent.GlobalTicking);
+
+    /// <summary>
+    /// If the actor's children are both visible and ticking.
+    /// </summary>
+    public bool ChildrenActive {
+        get => ChildrenTicking && ChildrenVisible;
+        set {
+            ChildrenTicking = value;
+            ChildrenVisible = value;
+        }
+    }
+
+    /// <summary>
+    /// If the actor's components are both visible and ticking.
+    /// </summary>
+    public bool ComponentsActive {
+        get => ComponentsTicking && ComponentsVisible;
+        set {
+            ComponentsTicking = value;
+            ComponentsVisible = value;
+        }
+    }
+
+    /// <summary>
+    /// If the actor's components and children are both visible and ticking.
+    /// </summary>
+    public bool Active {
+        get => Ticking && Visible;
+        set {
+            Ticking = value;
+            Visible = value;
+        }
+    }
+
+    /// <summary>
+    /// If the actor will tick and render due to local and parent visibility states.
+    /// </summary>
+    public bool GlobalActive => Active && ParentActive;
+
+    /// <summary>
+    /// If all parents above the actor are ticking and rendering their children.
+    /// </summary>
+    public bool ParentActive => ParentTicking && ParentVisible;
 
     /// <summary>
     /// If the actor is currently in the game's node tree.
