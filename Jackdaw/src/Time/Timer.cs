@@ -11,7 +11,7 @@ public class TicklessTimer {
     /// <summary>
     /// The length of the timer.
     /// </summary>
-    public readonly TimeSpan Duration;
+    public TimeSpan Duration;
 
     TimeSpan StartTime;
 
@@ -53,6 +53,16 @@ public class TicklessTimer {
     public TimeSpan ElapsedTimeClamped => new(Math.Clamp(ElapsedTime.Ticks, 0, Duration.Ticks));
 
     /// <summary>
+    /// The time left until the timer is done.
+    /// </summary>
+    public TimeSpan TimeRemaining => Duration - ElapsedTime;
+
+    /// <summary>
+    /// The time left until the timer is done, stopping once the time remaining reaches 0.
+    /// </summary>
+    public TimeSpan TimeRemainingClamped => Duration - ElapsedTimeClamped;
+
+    /// <summary>
     /// The percent of the total duration the timer has reached.
     /// </summary>
     public float Percent => (float)(ElapsedTime / Duration);
@@ -61,6 +71,16 @@ public class TicklessTimer {
     /// The percent of the total duration the timer has reached, stopping at 1.
     /// </summary>
     public float PercentClamped => Math.Clamp(Percent, 0, 1);
+
+    /// <summary>
+    /// The percent of the total duration the timer has left.
+    /// </summary>
+    public float PercentRemaining => 1 - Percent;
+
+    /// <summary>
+    /// The percent of the total duration the timer has left, starting at 1 and stopping at 0.
+    /// </summary>
+    public float PercentRemainingClamped => 1 - PercentClamped;
 
     /// <summary>
     /// If the timer has reached its duration. Will always be false when looping.
