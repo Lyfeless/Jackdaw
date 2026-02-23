@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// Asset loader for importing textures from external files.
 /// </summary>
 public class TextureLoader : AssetLoaderStage {
-    readonly string[] TextureExtensions = ["png", "jpg", ".qoi"];
+    readonly string[] TextureExtensions = [".png", ".jpg", ".qoi"];
 
     const string TextureFallbackName = "Fallback.texture.png";
     const string ManFallbackName = "Fallback.man.png";
@@ -20,8 +20,8 @@ public class TextureLoader : AssetLoaderStage {
         PackerLoader? packer = assets.FindLoaderStage<PackerLoader>();
         if (packer == null) { return; }
 
-        packer.Add("fallback", FallbackTexture(assets.Assembly, assets.AssemblyName, TextureFallbackName));
-        packer.Add("fallback-man", FallbackTexture(assets.Assembly, assets.AssemblyName, ManFallbackName));
+        packer.Add("fallback", FallbackTexture(assets, "texture", ".png"));
+        packer.Add("fallback-man", FallbackTexture(assets, "man", ".png"));
 
         foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.TextureGroup, TextureExtensions)) {
             using Stream imageStream = assets.Provider.GetItemStream(item);
@@ -29,8 +29,8 @@ public class TextureLoader : AssetLoaderStage {
         }
     }
 
-    static Image FallbackTexture(Assembly assembly, string assemblyName, string name) {
-        using Stream streamError = assembly.GetManifestResourceStream($"{assemblyName}.{name}")!;
-        return new Image(streamError);
+    static Image FallbackTexture(Assets assets, string name, string extension) {
+        using Stream stream = assets.FallbackProvider.GetItemStream(new("", name, extension)); ;
+        return new Image(stream);
     }
 }

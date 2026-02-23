@@ -9,11 +9,8 @@ namespace Jackdaw;
 public class FontLoader() : AssetLoaderStage() {
     readonly string[] FontExtensions = [".ttf", ".otf", ".fnt"];
 
-    const string FontFallbackName = "Fallback.font.ttf";
-
-
     public override void Run(Assets assets) {
-        using Stream fallbackStream = assets.Assembly.GetManifestResourceStream($"{assets.AssemblyName}.{FontFallbackName}")!;
+        using Stream fallbackStream = assets.FallbackProvider.GetItemStream(new("", "font", ".ttf"));
         assets.SetFallback(new SpriteFont(assets.GraphicsDevice, fallbackStream, 16));
 
         FontConfig? config = null;

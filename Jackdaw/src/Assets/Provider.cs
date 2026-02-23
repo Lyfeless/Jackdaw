@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Jackdaw;
 
 /// <summary>
@@ -88,4 +90,15 @@ public readonly struct AssetProviderItem(string group, string name, string exten
     public override string ToString() {
         return $"{Group} {Name}{Extension}";
     }
+
+    public override bool Equals([NotNullWhen(true)] object? obj) {
+        if (obj is not AssetProviderItem other) { return false; }
+        return Group == other.Group && Name == other.Name && Extension == other.Extension;
+    }
+
+    public static bool operator ==(AssetProviderItem left, AssetProviderItem right) => left.Equals(right);
+
+    public static bool operator !=(AssetProviderItem left, AssetProviderItem right) => !(left == right);
+
+    public override int GetHashCode() => HashCode.Combine(Group, Name, Extension);
 }

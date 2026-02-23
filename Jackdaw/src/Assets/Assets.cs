@@ -34,24 +34,15 @@ public class Assets {
     public readonly IAssetProvider Provider;
 
     /// <summary>
-    /// The library's file assembly. <br/>
-    /// Most default fallback data is stored inside the embedded assembly.
+    /// The provider for accessing fallback files
     /// </summary>
-    public readonly Assembly Assembly;
-
-    /// <summary>
-    /// The name of the library's executing assembly.
-    /// </summary>
-    public readonly string AssemblyName;
+    public readonly EmbeddedResourceAssetProvider FallbackProvider = new("Fallback");
 
     public Assets(Game game, GameContentConfig config) {
         Game = game;
         Config = config;
 
         Provider = config.AssetProvider;
-
-        Assembly = Assembly.GetExecutingAssembly();
-        AssemblyName = Assembly.GetName().Name ?? "";
 
         RegisterLoaderStage(new TextureLoader());
         RegisterLoaderStage(new TextureFallbackLoader());
