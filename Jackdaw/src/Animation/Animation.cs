@@ -94,7 +94,7 @@ public class AnimationData(
     /// Get a frame from the animation.
     /// </summary>
     /// <param name="time">The elapsed duration of the animation.</param>
-    /// <returns></returns>
+    /// <returns>The frame to display at the given time.</returns>
     public AnimationFrame GetFrame(TimeSpan time) {
         TimeSpan count = TimeSpan.Zero;
         for (int i = 0; i < Frames.Length; ++i) {

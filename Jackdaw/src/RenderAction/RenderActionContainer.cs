@@ -48,7 +48,7 @@ public class RenderActionContainer(Actor owner) : SearchableChildContainer<Actor
     /// Add a batcher to the stack.
     /// The last batcher pushed will be sent to all components and children.
     /// </summary>
-    /// <param name="batcher"></param>
+    /// <param name="batcher">The batcher to add to the stack.</param>
     public void PushBatcher(Batcher batcher) {
         batcherStack.Push(batcher);
     }

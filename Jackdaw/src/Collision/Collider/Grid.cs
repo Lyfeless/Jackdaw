@@ -90,10 +90,8 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// </summary>
     /// <param name="collider">The collider to set.</param>
     /// <param name="position">The position on the grid in local space.</param>
-    /// <returns></returns>
-    public GridCollider Set(Collider? collider, Point2 position) {
+    public void Set(Collider? collider, Point2 position) {
         Grid.Set(collider, position);
-        return this;
     }
 
     /// <summary>
@@ -101,7 +99,6 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// </summary>
     /// <param name="collider">The collider to set.</param>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void SetTile(Collider? collider, Point2 gridCoord) {
         Grid.Set(collider, gridCoord);
     }
@@ -111,7 +108,6 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// </summary>
     /// <param name="collider">The collider to add.</param>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void AddTileStack(Collider? collider, Point2 gridCoord) {
         if (collider == null) { return; }
         Collider? current = Grid.Get(gridCoord);
@@ -124,7 +120,6 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// Remove the most recent collider from a tile's stack.
     /// </summary>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void RemoveTileStack(Point2 gridCoord) {
         Collider? current = Grid.Get(gridCoord);
         if (current == null) { return; }

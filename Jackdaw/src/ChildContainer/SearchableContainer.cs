@@ -11,8 +11,8 @@ public abstract class SearchableChildContainer<Telement, Towner>(Towner owner) :
     /// <summary>
     /// Get the identifier object used for comparing children.
     /// </summary>
-    /// <param name="element"></param>
-    /// <returns></returns>
+    /// <param name="element">The element to match.</param>
+    /// <returns>The element's identifier object.</returns>
     protected abstract ObjectIdentifier<Telement> Match(Telement element);
     #endregion
 

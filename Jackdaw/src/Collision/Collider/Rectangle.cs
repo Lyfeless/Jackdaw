@@ -6,7 +6,7 @@ namespace Jackdaw;
 /// <summary>
 /// A rectangle-shaped collider.
 /// </summary>
-/// <param name="rect"></param>
+/// <param name="rect">The collision rectangle.</param>
 public class RectangleCollider(Rect rect) : Collider {
     /// <summary>
     /// The collider rectangle.

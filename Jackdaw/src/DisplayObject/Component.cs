@@ -3,7 +3,7 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A component that renders a <seealso cref="Jackdaw.DisplayObject" />.
+/// A component that renders a <see cref="Jackdaw.DisplayObject" />.
 /// </summary>
 /// <param name="game">The current game instance.</param>
 /// <param name="displayObject">The object to render.</param>

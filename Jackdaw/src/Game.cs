@@ -5,7 +5,7 @@ namespace Jackdaw;
 
 /// <summary>
 /// The main entry point for a game and storage for all management utilies.
-/// Created using a <seealso cref="GameConfig" />, either defined locally or with an external config file. <br/>
+/// Created using a <see cref="GameConfig" />, either defined locally or with an external config file. <br/>
 /// Start the game with <see cref="Start" /> to automatically handle crashlog creation when running in release.
 /// </summary>
 public class Game : App {
@@ -25,7 +25,7 @@ public class Game : App {
     public TimeManager Timers;
 
     /// <summary>
-    /// Collision system for any <seealso cref="CollisionComponent" /> objects. <br/>
+    /// Collision system for any <see cref="CollisionComponent" /> objects. <br/>
     /// Currently has no broadphase support, all collisions need to be handled with the supplied manual check functions.
     /// </summary>
     public CollisionManager Collision;

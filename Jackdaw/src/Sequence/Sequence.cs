@@ -71,7 +71,7 @@ public class Sequence() {
     /// <summary>
     /// Adds an action to cancel the sequence and all parent sequences.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current sequence.</returns>
     public Sequence Cancel()
         => Element(new SequenceElementCancel());
 

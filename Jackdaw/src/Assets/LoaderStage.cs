@@ -12,7 +12,7 @@ public abstract class AssetLoaderStage() {
     /// <summary>
     /// The code to be run when the loader's stage is executed.
     /// </summary>
-    /// <param name="assets"></param>
+    /// <param name="assets">The game instance's asset controller.</param>
     public abstract void Run(Assets assets);
 
 

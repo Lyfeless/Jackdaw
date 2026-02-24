@@ -95,7 +95,7 @@ public abstract class Component {
     /// Display function, called once per tree render when attached to an actor in the node tree.
     /// Doesn't run if <see cref="Visible" /> is false.
     /// </summary>
-    /// <param name="batcher"></param>
+    /// <param name="batcher">The batcher to render with.</param>
     protected virtual void Render(Batcher batcher) { }
 
     /// <summary>

@@ -7,7 +7,7 @@ public interface IStateMachineElement {
     /// <summary>
     /// Set the enabled state of the element.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The state to set the element to.</param>
     public void SetState(bool value);
 
     /// <summary>

@@ -15,8 +15,8 @@ public class ComponentClaimer() {
     /// <summary>
     /// Check if a component is holding the claim.
     /// </summary>
-    /// <param name="component"></param>
-    /// <returns></returns>
+    /// <param name="component">The component to check.</param>
+    /// <returns>If the given component is claiming this component.</returns>
     public bool ClaimedBy(Component component) => storeClaim == component || tickClaim == component;
 
     /// <summary>

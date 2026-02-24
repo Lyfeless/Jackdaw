@@ -6,8 +6,8 @@ namespace Jackdaw;
 /// <summary>
 /// Basic component for storing a size.
 /// </summary>
-/// <param name="game"></param>
-/// <param name="bounds"></param>
+/// <param name="game">The current game instance.</param>
+/// <param name="bounds">The rectangle region the bounds cover.</param>
 public class BoundsComponent(Game game, Rect bounds) : Component(game) {
     public Rect Rect = bounds;
 

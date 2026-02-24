@@ -66,7 +66,7 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     /// <summary>
     /// Get printable string for an element.
     /// </summary>
-    /// <param name="child"></param>
+    /// <param name="child">The child to be printed.</param>
     /// <returns>a string identifier for the element.</returns>
     public abstract string Printable(Telement child);
 

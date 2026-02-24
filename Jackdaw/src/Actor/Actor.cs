@@ -459,7 +459,7 @@ public sealed class Actor {
     /// Create a new actor from a single child.
     /// </summary>
     /// <param name="child">The child to add to the actor.</param>
-    /// <returns></returns>
+    /// <returns>The actor with the given child added to it.</returns>
     public static Actor From(Actor child) {
         Actor actor = new(child.Game);
         actor.Children.Add(child);
@@ -470,7 +470,7 @@ public sealed class Actor {
     /// Create a new actor from a single component.
     /// </summary>
     /// <param name="component">The component to add to the actor.</param>
-    /// <returns></returns>
+    /// <returns>The actor with the given component added to it.</returns>
     public static Actor From(Component component) {
         Actor actor = new(component.Game);
         actor.Components.Add(component);

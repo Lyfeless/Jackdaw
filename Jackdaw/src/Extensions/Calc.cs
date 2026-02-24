@@ -11,7 +11,7 @@ public static class CalcExtensions {
         /// <param name="a">The first vector.</param>
         /// <param name="b">The second vector.</param>
         /// <param name="c">The third vector.</param>
-        /// <returns></returns>
+        /// <returns>The triple product of the given vectors.</returns>
         public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) {
             Vector3 a3 = new(a.X, a.Y, 0);
             Vector3 b3 = new(b.X, b.Y, 0);

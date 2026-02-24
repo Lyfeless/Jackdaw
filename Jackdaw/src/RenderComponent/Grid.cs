@@ -74,7 +74,6 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     /// </summary>
     /// <param name="sprite">The sprite to set.</param>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void SetTile(Sprite? sprite, Point2 gridCoord) {
         Grid.Set(sprite, gridCoord);
     }
@@ -84,7 +83,6 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     /// </summary>
     /// <param name="sprite">The collider to add.</param>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void AddTileStack(Sprite? sprite, Point2 gridCoord) {
         if (sprite == null) { return; }
         Sprite? current = Grid.Get(gridCoord);
@@ -97,7 +95,6 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     /// Remove the most recent sprite from a tile's stack.
     /// </summary>
     /// <param name="gridCoord">The tile location.</param>
-    /// <returns></returns>
     public void RemoveTileStack(Point2 gridCoord) {
         Sprite? current = Grid.Get(gridCoord);
         if (current == null) { return; }

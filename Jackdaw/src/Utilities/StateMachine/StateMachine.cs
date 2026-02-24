@@ -163,7 +163,7 @@ public class StateMachine<T>(T initialState) where T : Enum {
     /// </summary>
     /// <param name="state">The state that should render that components.</param>
     /// <param name="components">The components to render.</param>
-    /// <returns></returns>
+    /// <returns>The statemachine instance.</returns>
     public StateMachine<T> AddVisible(T state, params Component[] components) {
         foreach (Component component in components) {
             AddVisible(state, component);
@@ -178,7 +178,7 @@ public class StateMachine<T>(T initialState) where T : Enum {
     /// </summary>
     /// <param name="element">The element to enable when the given states are active.</param>
     /// <param name="states">The states that should enable the element.</param>
-    /// <returns></returns>
+    /// <returns>The statemachine instance.</returns>
     public StateMachine<T> Add(IStateMachineElement element, params T[] states) {
         foreach (T state in states) {
             Add(state, element);
@@ -192,7 +192,7 @@ public class StateMachine<T>(T initialState) where T : Enum {
     /// </summary>
     /// <param name="state">The state that should enable the elements.</param>
     /// <param name="elements">The elements to enable when the given state is active.</param>
-    /// <returns></returns>
+    /// <returns>The statemachine instance.</returns>
     public StateMachine<T> Add(T state, params IStateMachineElement[] elements) {
         State stateValue = GetOrAddState(state);
 
@@ -208,7 +208,7 @@ public class StateMachine<T>(T initialState) where T : Enum {
     /// </summary>
     /// <param name="state">The state that should enable the element.</param>
     /// <param name="element">The element to enable when the given state is active.</param>
-    /// <returns></returns>
+    /// <returns>The statemachine instance.</returns>
     public StateMachine<T> Add(T state, IStateMachineElement element) {
         Add(GetOrAddState(state), element);
         return this;
