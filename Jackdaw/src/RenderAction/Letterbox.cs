@@ -4,7 +4,9 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A render action that scales a view into a bound while maintaining an aspect ratio.
+/// A render action that scales a view into a bound while maintaining an aspect ratio. <br/>
+/// Pushes a new batcher to the actor's stack.
+/// Any other render actions that affect the batcher should be added after this in the execution order.
 /// </summary>
 /// <param name="device">The game window's graphics device.</param>
 /// <param name="fillBounds">The bounds that the letterboxed viewport should fill, relative to the actor position.</param>
