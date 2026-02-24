@@ -23,6 +23,20 @@ public class DisplayPolygon(Polygon polygon)
 
     public override RectInt Bounds => Polygon.Bounds.Int();
 
+    /// <summary>
+    /// A renderable filled polygon.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    public DisplayPolygon(Vector2[] points)
+        : this(new Polygon(points)) { }
+
+    /// <summary>
+    /// A renderable filled polygon.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    public DisplayPolygon(Point2[] points)
+        : this(new Polygon([.. points.Select(e => (Vector2)e)])) { }
+
     public override void Render(Batcher batcher) {
         TriangulationEnumerator triangleEnumeration = Polygon.Triangles.GetEnumerator();
         while (triangleEnumeration.MoveNext()) {
@@ -42,6 +56,22 @@ public class DisplayPolygonLines(Polygon polygon, float lineWeight)
     public float LineWeight { get; set; } = lineWeight;
 
     public override RectInt Bounds => Polygon.Bounds.Int();
+
+    /// <summary>
+    /// A renderable polygon outline.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayPolygonLines(Vector2[] points, float lineWeight)
+        : this(new Polygon(points), lineWeight) { }
+
+    /// <summary>
+    /// A renderable polygon outline.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayPolygonLines(Point2[] points, float lineWeight)
+        : this(new Polygon([.. points.Select(e => (Vector2)e)]), lineWeight) { }
 
     public override void Render(Batcher batcher) {
         Polygon.LineEnumerator lineEnumeration = Polygon.Edges.GetEnumerator();
@@ -65,6 +95,24 @@ public class DisplayPolygonLinesDashed(Polygon polygon, float lineWeight, float 
     public float OffsetPercent { get; set; } = 0;
 
     public override RectInt Bounds => Polygon.Bounds.Int();
+
+    /// <summary>
+    /// A renderable dashed polygon outline.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayPolygonLinesDashed(Vector2[] points, float lineWeight, float dashLength)
+        : this(new Polygon(points), lineWeight, dashLength) { }
+
+    /// <summary>
+    /// A renderable dashed polygon outline.
+    /// </summary>
+    /// <param name="points">The points making up the polygon.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayPolygonLinesDashed(Point2[] points, float lineWeight, float dashLength)
+        : this(new Polygon([.. points.Select(e => (Vector2)e)]), lineWeight, dashLength) { }
 
     public override void Render(Batcher batcher) {
         if (Polygon.Count < 2) { return; }

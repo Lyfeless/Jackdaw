@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -76,7 +77,7 @@ public readonly struct RectangleCornerRounding(float topLeft, float topRight, fl
     /// <summary>
     /// Set all corners to the same value.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The rounding radius of all corners.</param>
     /// <returns>A rectangle corner configuration.</returns>
     public static RectangleCornerRounding All(float value) => new(value, value, value, value);
 
@@ -108,6 +109,47 @@ public class DisplayRectangle(RectInt rect)
 
     public override RectInt Bounds => Rect;
 
+    /// <summary>
+    /// A renderable filled rectangle.
+    /// </summary>
+    /// <param name="rect">The rect to render.</param>
+    public DisplayRectangle(Rect rect)
+        : this(rect.Int()) { }
+
+    /// <summary>
+    /// A renderable filled rectangle.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    public DisplayRectangle(Vector2 position, Vector2 size)
+        : this(new Rect(position, size)) { }
+
+    /// <summary>
+    /// A renderable filled rectangle.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    public DisplayRectangle(Point2 position, Point2 size)
+        : this(new RectInt(position, size)) { }
+
+    /// <summary>
+    /// A renderable filled rectangle.
+    /// </summary>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    public DisplayRectangle(float width, float height)
+        : this(new Rect(width, height)) { }
+
+    /// <summary>
+    /// A renderable filled rectangle.
+    /// </summary>
+    /// <param name="x">The x position of the left side of the rectangle.</param>
+    /// <param name="y">The y position of the top of the rectangle.</param>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    public DisplayRectangle(float x, float y, float width, float height)
+        : this(new Rect(x, y, width, height)) { }
+
     public override void Render(Batcher batcher) {
         if (Corners.Unrounded) { batcher.Rect(Rect, Color); }
         else { batcher.RectRounded(Rect, Corners.TopLeft, Corners.TopRight, Corners.BottomRight, Corners.BottomLeft, Color); }
@@ -126,6 +168,52 @@ public class DisplayRectangleLines(RectInt rect, float lineWeight)
     public RectangleCornerRounding Corners { get; set; } = RectangleCornerRounding.None();
 
     public override RectInt Bounds => Rect;
+
+    /// <summary>
+    /// A renderable rectangle outline.
+    /// </summary>
+    /// <param name="rect">The rect to render.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayRectangleLines(Rect rect, float lineWeight)
+        : this(rect.Int(), lineWeight) { }
+
+    /// <summary>
+    /// A renderable rectangle outline.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayRectangleLines(Vector2 position, Vector2 size, float lineWeight)
+        : this(new Rect(position, size), lineWeight) { }
+
+    /// <summary>
+    /// A renderable rectangle outline.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayRectangleLines(Point2 position, Point2 size, float lineWeight)
+        : this(new RectInt(position, size), lineWeight) { }
+
+    /// <summary>
+    /// A renderable rectangle outline.
+    /// </summary>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayRectangleLines(float width, float height, float lineWeight)
+        : this(new Rect(width, height), lineWeight) { }
+
+    /// <summary>
+    /// A renderable rectangle outline.
+    /// </summary>
+    /// <param name="x">The x position of the left side of the rectangle.</param>
+    /// <param name="y">The y position of the top of the rectangle.</param>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    public DisplayRectangleLines(float x, float y, float width, float height, float lineWeight)
+        : this(new Rect(x, y, width, height), lineWeight) { }
 
     public override void Render(Batcher batcher) {
         if (Corners.Unrounded) { batcher.RectLine(Rect, LineWeight, Color); }
@@ -148,6 +236,57 @@ public class DisplayRectangleLinesDashed(RectInt rect, float lineWeight, float d
     // Dashed Rectangle doesn't support rounded corners
 
     public override RectInt Bounds => Rect;
+
+    /// <summary>
+    /// A renderable dashed rectangle outline.
+    /// </summary>
+    /// <param name="rect">The rect to render.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayRectangleLinesDashed(Rect rect, float lineWeight, float dashLength)
+        : this(rect.Int(), lineWeight, dashLength) { }
+
+    /// <summary>
+    /// A renderable dashed rectangle outline.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayRectangleLinesDashed(Vector2 position, Vector2 size, float lineWeight, float dashLength)
+        : this(new Rect(position, size), lineWeight, dashLength) { }
+
+    /// <summary>
+    /// A renderable dashed rectangle outline.
+    /// </summary>
+    /// <param name="position">The position of the top left corner of the rectangle.</param>
+    /// <param name="size">The size of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayRectangleLinesDashed(Point2 position, Point2 size, float lineWeight, float dashLength)
+        : this(new RectInt(position, size), lineWeight, dashLength) { }
+
+    /// <summary>
+    /// A renderable dashed rectangle outline.
+    /// </summary>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayRectangleLinesDashed(float width, float height, float lineWeight, float dashLength)
+        : this(new Rect(width, height), lineWeight, dashLength) { }
+
+    /// <summary>
+    /// A renderable dashed rectangle outline.
+    /// </summary>
+    /// <param name="x">The x position of the left side of the rectangle.</param>
+    /// <param name="y">The y position of the top of the rectangle.</param>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    /// <param name="lineWeight">The width of the rendered lines.</param>
+    /// <param name="dashLength">The length of every segment and gap pair along the line.</param>
+    public DisplayRectangleLinesDashed(float x, float y, float width, float height, float lineWeight, float dashLength)
+        : this(new Rect(x, y, width, height), lineWeight, dashLength) { }
 
     public override void Render(Batcher batcher) {
         batcher.RectDashed(Rect, LineWeight, Color, DashLength, OffsetPercent);
