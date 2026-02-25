@@ -27,7 +27,7 @@ public class ActorContainer(Actor actor) : RecursiveSearchableChildContainer<Act
 
     public override void HandleAdd(Actor child) => child.ParentAdded(Owner);
 
-    public override void HandleRemove(Actor child) => child.ParentRemoved();
+    public override void HandleRemove(Actor child) => child.ParentRemoved(Owner);
 
     protected override ObjectIdentifier<Actor> Match(Actor element) => element.Match;
 

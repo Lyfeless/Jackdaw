@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// <typeparam name="Towner">The type of owner.</typeparam>
 /// <param name="owner">The owning object.</param>
 public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telement : class {
-    protected readonly Towner Owner = owner;
+    public readonly Towner Owner = owner;
 
     /// <summary>
     /// All the elements currently being stored.

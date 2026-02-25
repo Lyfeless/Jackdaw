@@ -229,15 +229,11 @@ public class ActorPosition {
         localRounded.Position = localRounded.Position.RoundToPoint2();
 
         Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * localRounded.Matrix;
-        if (LocalDisplayMatrix != localDisplay) {
-            localDisplayMatrix.Matrix = localDisplay;
-        }
+        localDisplayMatrix.Matrix = localDisplay;
 
         if (Actor.ParentValid) {
             Matrix3x2 globalDisplay = localDisplay * Actor.Parent.Transform.GlobalDisplayMatrix;
-            if (GlobalDisplayMatrix != globalDisplay) {
-                globalDisplayMatrix.Matrix = globalDisplay;
-            }
+            globalDisplayMatrix.Matrix = globalDisplay;
         }
         else {
             globalDisplayMatrix.Matrix = LocalDisplayMatrix;

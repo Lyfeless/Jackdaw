@@ -334,7 +334,11 @@ public sealed class Actor {
     }
 
     internal void ParentAdded(Actor parent) {
-        if (ParentValid) { Parent.Children.Remove(this); }
+        if (ParentValid) {
+            // Run remove manually to be sure it runs before the new add
+            ParentRemoved(Parent);
+            Parent.Children.Remove(this);
+        }
 
         Parent = parent;
         if (Parent.InTree) { EnterTree(); }
@@ -345,7 +349,10 @@ public sealed class Actor {
         Transform.MakeDirty();
     }
 
-    internal void ParentRemoved() {
+    internal void ParentRemoved(Actor parent) {
+        // Accounting for edge cases resulting from multiple parent changes in one tick.
+        if (parent != Parent) { return; }
+
         if (Parent.InTree) { ExitTree(); }
 
         Parent = Invalid;

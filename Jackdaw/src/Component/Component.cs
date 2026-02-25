@@ -226,6 +226,33 @@ public abstract class Component {
         VisibilityChanged();
     }
 
+    internal void ActorAdded(Actor owner) {
+        if (ActorValid) {
+            // Run remove manually to be sure it runs before the new add
+            ActorRemoved(Actor);
+            Actor.Components.Remove(this);
+        }
+
+        Actor = owner;
+
+        OnAdded();
+
+        if (owner.InTree) {
+            OnEnterTree();
+        }
+    }
+
+    internal void ActorRemoved(Actor owner) {
+        // Accounting for edge cases resulting from multiple owner changes in one tick.
+        if (Actor != owner) { return; }
+
+        OnRemoved();
+        if (owner.InTree) {
+            OnExitTree();
+        }
+        Actor = Actor.Invalid;
+    }
+
     /// <summary>
     /// Mark the component for cleanup at the end of the tick.
     /// </summary>
