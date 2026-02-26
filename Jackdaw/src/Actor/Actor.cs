@@ -258,6 +258,16 @@ public sealed class Actor {
     /// </summary>
     public bool InTree { get; internal set; } = false;
 
+    /// <summary>
+    /// If the actor should adjust their position when changing parents to stay in the same global location.
+    /// </summary>
+    public bool KeepGlobalPosition = false;
+
+    /// <summary>
+    /// If the actor should adjust their rotation when changing parents to stay at the same global angle.
+    /// </summary>
+    public bool KeepGlobalRotation = false;
+
     internal bool containerQueuing = false;
 
     bool componentsVisible = true;
@@ -340,6 +350,10 @@ public sealed class Actor {
             Parent.Children.Remove(this);
         }
 
+        // Actor position can be assumed as global because if it has a parent already it will have just been converted.
+        if (KeepGlobalPosition) { Position = Game.Convert.GlobalToLocal(Position, parent); }
+        if (KeepGlobalRotation) { Rotation = Calc.AngleWrap(Rotation - parent.GlobalRotation); }
+
         Parent = parent;
         if (Parent.InTree) { EnterTree(); }
 
@@ -354,6 +368,9 @@ public sealed class Actor {
         if (parent != Parent) { return; }
 
         if (Parent.InTree) { ExitTree(); }
+
+        if (KeepGlobalPosition) { Position = GlobalPosition; }
+        if (KeepGlobalRotation) { Rotation = GlobalRotation; }
 
         Parent = Invalid;
 
