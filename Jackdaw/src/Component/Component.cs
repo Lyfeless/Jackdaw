@@ -228,9 +228,9 @@ public abstract class Component {
 
     internal void ActorAdded(Actor owner) {
         if (ActorValid) {
+            Actor.Components.Remove(this);
             // Run remove manually to be sure it runs before the new add
             ActorRemoved(Actor);
-            Actor.Components.Remove(this);
         }
 
         Actor = owner;

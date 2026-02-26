@@ -345,9 +345,9 @@ public sealed class Actor {
 
     internal void ParentAdded(Actor parent) {
         if (ParentValid) {
+            Parent.Children.Remove(this);
             // Run remove manually to be sure it runs before the new add
             ParentRemoved(Parent);
-            Parent.Children.Remove(this);
         }
 
         // Actor position can be assumed as global because if it has a parent already it will have just been converted.
