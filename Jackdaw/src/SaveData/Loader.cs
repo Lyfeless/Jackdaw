@@ -10,16 +10,35 @@ internal static class SaveFileLoader {
     record struct DecomposedPath(string Directory, string Name, string Extension);
     record struct FileBackupEntry(string FullPath, string Name, string FullName, string Extension, long Timestamp);
 
-    public static SaveData Load(string savePath, bool usesBackup) {
-        if (!usesBackup) { return LoadSaveData(savePath); }
+    public static SaveData Load(string savePath, int backup) {
+        bool singleExists = File.Exists(savePath);
+        if (backup == -1 && singleExists) { return LoadSaveData(savePath); }
 
-        FileBackupEntry[] backupFiles = GetBackupFileInfo(savePath);
+        FileBackupEntry[] backupFiles = GetBackupFileEntries(savePath);
 
-        SaveData data = LoadSaveData(backupFiles.Length == 0 ? savePath : backupFiles[^1].FullPath);
+        if (backupFiles.Length == 0) {
+            if (singleExists) { return LoadSaveData(savePath); }
+            Log.Info($"Save file {savePath} has no primary or backup files, creating new.");
+            return new(savePath);
+        }
+
+        if (backup < 0 || backup >= backupFiles.Length) {
+            int newBackup = Calc.Clamp(backup, 0, backupFiles.Length - 1);
+            Log.Info($"SaveData: Backup index {backup} for {savePath} does not exist, loading backup {newBackup} instead. Use Savedata.GetFileInfo to check how many backups exist.");
+            backup = newBackup;
+        }
+
+        SaveData data = LoadSaveData(backupFiles[backup].FullPath);
         data.SavePath = savePath;
         data.UseBackups = true;
+        data.BackupCount = backupFiles.Length;
         return data;
     }
+
+    public static SaveFileInfo GetFileInfo(string savePath) => new(
+        File.Exists(savePath),
+        GetBackupFileEntries(savePath).Length
+    );
 
     static SaveData LoadSaveData(string savePath) {
         if (!File.Exists(savePath)) { return new(savePath); }
@@ -37,11 +56,11 @@ internal static class SaveFileLoader {
             savePath = Path.Join(pathInfo.Directory, $"{pathInfo.Name}-{timestamp}{pathInfo.Extension}");
 
             // Remove old paths
-            FileBackupEntry[] backupFiles = GetBackupFileInfo(saveData.SavePath);
-            int diff = backupFiles.Length - saveData.BackupCount;
+            FileBackupEntry[] backupFiles = GetBackupFileEntries(saveData.SavePath);
+            int diff = backupFiles.Length - saveData.BackupCount + 1;
             if (diff > 0) {
                 for (int i = 0; i < diff; ++i) {
-                    File.Delete(backupFiles[i].FullPath);
+                    File.Delete(backupFiles[^(1 + i)].FullPath);
                 }
             }
         }
@@ -138,12 +157,12 @@ internal static class SaveFileLoader {
         Path.GetExtension(path)
     );
 
-    static FileBackupEntry[] GetBackupFileInfo(string savePath) {
+    static FileBackupEntry[] GetBackupFileEntries(string savePath) {
         DecomposedPath path = DecomposePath(savePath);
-        return GetBackupFileInfo(path);
+        return GetBackupFileEntries(path);
     }
 
-    static FileBackupEntry[] GetBackupFileInfo(DecomposedPath path) {
+    static FileBackupEntry[] GetBackupFileEntries(DecomposedPath path) {
         List<FileBackupEntry> entries = [];
         foreach (string file in Directory.EnumerateFiles(path.Directory, $"*{path.Extension}", SearchOption.TopDirectoryOnly)) {
             string name = Path.GetFileNameWithoutExtension(file);
@@ -161,6 +180,6 @@ internal static class SaveFileLoader {
             ));
         }
 
-        return [.. entries.OrderBy(e => e.Timestamp)];
+        return [.. entries.OrderByDescending(e => e.Timestamp)];
     }
 }

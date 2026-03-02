@@ -21,9 +21,12 @@ public class SaveData {
     public bool UseBackups = false;
 
     /// <summary>
-    /// How many backup files to keep alongside the main file. Only used when <see cref="UseBackups" /> is enabled.
+    /// How many backup files to keep, including the main file. Only used when <see cref="UseBackups" /> is enabled. <br/>
+    /// Automatically assigned to the current number of backup files,
+    /// but should still be set to desired value even after loading from file in the case not all backup slots are used. <br/>
+    /// Setting to a lower value will automatically clear extra backups on next save.
     /// </summary>
-    public int BackupCount = 2;
+    public int BackupCount = 3;
 
     /// <summary>
     /// The path to save the file to.
@@ -91,9 +94,20 @@ public class SaveData {
     /// Automatically populates with data if any exists. Use <see cref="CreateEmpty"/> to ignore existing data.
     /// </summary>
     /// <param name="savePath">The path to using when saving or loading data.</param>
-    /// <param name="usesBackups">The save data is stored using backup files.</param>
+    /// <param name="backup">
+    ///     What backup file to use. <br/>
+    ///     Leaving at 0 will use the most recent version. Setting to -1 will ignore backups if a matching file exists. <br/>
+    ///     To get more info on a save file's options, use <see cref="GetFileInfo"/>.
+    /// </param>
     /// <returns>The new save data storage.</returns>
-    public static SaveData Load(string savePath, bool usesBackups = false) => SaveFileLoader.Load(savePath, usesBackups);
+    public static SaveData Load(string savePath, int backup = 0) => SaveFileLoader.Load(savePath, backup);
+
+    /// <summary>
+    /// Get information on what options a save file has for loading.
+    /// </summary>
+    /// <param name="savePath">The path to check.</param>
+    /// <returns>Data about what save options exist for the given path.</returns>
+    public static SaveFileInfo GetFileInfo(string savePath) => SaveFileLoader.GetFileInfo(savePath);
 
     /// <summary>
     /// Create a new save data storage, ignoring any data currently stored at the save path.
