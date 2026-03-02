@@ -9,7 +9,7 @@ namespace Jackdaw;
 /// <param name="position">The position of the grid.</param>
 /// <param name="grid">The grid object.</param>
 /// <param name="tileSize">The size of each tile.</param>
-public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSize) : Collider, ISpatialGrid<Collider?, Collider?> {
+public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSize) : Collider, IStackableGrid<Collider?>, ISpatialGrid {
     readonly Grid<Collider?> Grid = grid;
 
     Vector2 position = position;
@@ -56,6 +56,10 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     public override Vector2 Center => Bounds.Center;
 
     public override bool Multi => true;
+
+    // Support function will never be called by collision functions because it has subcolliders
+    public override Vector2 Support(Vector2 direction) => throw new NotImplementedException();
+
     public override Collider[] GetSubColliders(Rect bounds) {
         Vector2 min = Vector2.Max(bounds.TopLeft, Bounds.TopLeft);
         Vector2 max = Vector2.Min(bounds.BottomRight, Bounds.BottomRight);
@@ -76,71 +80,63 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         return [.. overlaps];
     }
 
-    public override Vector2 Support(Vector2 direction) {
-        throw new NotImplementedException();
-    }
 
     /// <summary>
     /// Get a new rectangle collider that fills the entire space of a single tile.
     /// </summary>
     public RectangleCollider FullCollider => new(tileSize);
 
-    /// <summary>
-    /// Set the collider for a tile.
-    /// </summary>
-    /// <param name="collider">The collider to set.</param>
-    /// <param name="position">The position on the grid in local space.</param>
-    public void Set(Collider? collider, Point2 position) {
-        Grid.Set(collider, position);
-    }
+    public IGrid<Collider?> Set(Collider? value, int tileX, int tileY) { Grid.Set(value, tileX, tileY); return this; }
+    public IGrid<Collider?> Set(Collider? value, Point2 tile) { Grid.Set(value, tile); return this; }
+    public Collider? Get(int tileX, int tileY) => Grid.Get(tileX, tileY);
+    public Collider? Get(Point2 tile) => Grid.Get(tile);
+    public bool Contains(int tileX, int tileY) => Grid.Contains(tileX, tileY);
+    public bool Contains(Point2 tile) => Grid.Contains(tile);
 
-    /// <summary>
-    /// Set the collider for a tile.
-    /// </summary>
-    /// <param name="collider">The collider to set.</param>
-    /// <param name="gridCoord">The tile location.</param>
-    public void SetTile(Collider? collider, Point2 gridCoord) {
-        Grid.Set(collider, gridCoord);
-    }
+    public IStackableGrid<Collider?> AddTileStackStart(Collider? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, 0);
+    public IStackableGrid<Collider?> AddTileStackEnd(Collider? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, -1);
+    public IStackableGrid<Collider?> AddTileStackAt(Collider? element, Point2 gridCoord, int index) {
+        if (element == null) { return this; }
 
-    /// <summary>
-    /// Add a collider onto a tile, combining it with other existing colliders.
-    /// </summary>
-    /// <param name="collider">The collider to add.</param>
-    /// <param name="gridCoord">The tile location.</param>
-    public void AddTileStack(Collider? collider, Point2 gridCoord) {
-        if (collider == null) { return; }
         Collider? current = Grid.Get(gridCoord);
-        if (current == null) { Grid.Set(collider, gridCoord); return; }
-        if (current is MultiCollider currentMulti) { Grid.Set(new MultiCollider([.. currentMulti.Colliders, collider]), gridCoord); return; }
-        Grid.Set(new MultiCollider([current, collider]), gridCoord);
+        if (current == null) {
+            Grid.Set(element, gridCoord);
+            return this;
+        }
+
+        List<Collider> colliders = current is MultiCollider currentMulti ? [.. currentMulti.Colliders] : [current];
+
+        if (index == -1) { index = colliders.Count; }
+        else { index = Calc.Clamp(index, 0, colliders.Count); }
+
+        colliders.Insert(index, element);
+
+        Grid.Set(new MultiCollider([.. colliders]), gridCoord);
+
+        return this;
     }
 
-    /// <summary>
-    /// Remove the most recent collider from a tile's stack.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    public void RemoveTileStack(Point2 gridCoord) {
+    public IStackableGrid<Collider?> RemoveTileStackStart(Point2 gridCoord) => RemoveTileStackAt(gridCoord, 0);
+    public IStackableGrid<Collider?> RemoveTileStackEnd(Point2 gridCoord) => RemoveTileStackAt(gridCoord, -1);
+    public IStackableGrid<Collider?> RemoveTileStackAt(Point2 gridCoord, int index) {
         Collider? current = Grid.Get(gridCoord);
-        if (current == null) { return; }
-        if (current is not MultiCollider currentMulti) { Grid.Set(null, gridCoord); return; }
-        Grid.Set(new MultiCollider(currentMulti.Colliders[..^1]), gridCoord);
-    }
+        if (current == null) { return this; }
 
-    /// <summary>
-    /// Remove all colliders from a tile.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    public void ClearTile(Point2 gridCoord) {
-        Grid.Set(null, gridCoord);
-    }
+        if (current is not MultiCollider currentMulti) {
+            if (index == 0 || index == -1) { Grid.Set(null, gridCoord); }
+            return this;
+        }
 
-    /// <summary>
-    /// Get the collider at a grid coordinate.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    /// <returns>The tile at the given location, null if the coord is out of bounds or the tile doesn't exist.</returns>
-    public Collider? GetTile(Point2 gridCoord) {
-        return Grid.Get(gridCoord);
+        if (index == -1) { index = currentMulti.Colliders.Length - 1; }
+        if (index < 0 || index <= currentMulti.Colliders.Length) { return this; }
+
+        List<Collider> colliders = [.. currentMulti.Colliders];
+        colliders.RemoveAt(index);
+
+        if (colliders.Count == 0) { Grid.Set(null, gridCoord); }
+        else if (colliders.Count == 1) { Grid.Set(colliders[0], gridCoord); }
+        else { Grid.Set(new MultiCollider([.. colliders]), gridCoord); }
+
+        return this;
     }
 }

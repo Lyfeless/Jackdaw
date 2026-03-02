@@ -10,7 +10,7 @@ namespace Jackdaw;
 /// <param name="position">The grid position.</param>
 /// <param name="grid">The grid instance.</param>
 /// <param name="tileSize">The size of each tile.</param>
-public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), ISpatialGrid<Sprite?, Sprite?> {
+public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), IStackableGrid<Sprite?>, ISpatialGrid {
     protected readonly Grid<Sprite> Grid = grid;
 
     protected Point2 position = position;
@@ -32,6 +32,8 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         get => tileSize;
         set => tileSize = value.FloorToPoint2();
     }
+
+    public Rect Bounds => throw new NotImplementedException();
 
     /// <summary>
     /// A renderable grid of sprites.
@@ -69,53 +71,53 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         }
     }
 
-    /// <summary>
-    /// Set the sprite for a tile.
-    /// </summary>
-    /// <param name="sprite">The sprite to set.</param>
-    /// <param name="gridCoord">The tile location.</param>
-    public void SetTile(Sprite? sprite, Point2 gridCoord) {
-        Grid.Set(sprite, gridCoord);
-    }
+    public IGrid<Sprite?> Set(Sprite? value, Point2 tile) { Grid.Set(value, tile); return this; }
+    public IGrid<Sprite?> Set(Sprite? value, int tileX, int tileY) { Grid.Set(value, tileX, tileY); return this; }
+    public Sprite? Get(int tileX, int tileY) => Grid.Get(tileX, tileY);
+    public Sprite? Get(Point2 tile) => Grid.Get(tile);
+    public bool Contains(int tileX, int tileY) => Grid.Contains(tileX, tileY);
+    public bool Contains(Point2 tile) => Grid.Contains(tile);
 
-    /// <summary>
-    /// Add a sprite onto a tile, combining it with other existing colliders.
-    /// </summary>
-    /// <param name="sprite">The collider to add.</param>
-    /// <param name="gridCoord">The tile location.</param>
-    public void AddTileStack(Sprite? sprite, Point2 gridCoord) {
-        if (sprite == null) { return; }
+    public IStackableGrid<Sprite?> AddTileStackStart(Sprite? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, 0);
+    public IStackableGrid<Sprite?> AddTileStackEnd(Sprite? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, -1);
+    public IStackableGrid<Sprite?> AddTileStackAt(Sprite? element, Point2 gridCoord, int index) {
+        if (element == null) { return this; }
+
         Sprite? current = Grid.Get(gridCoord);
-        if (current == null) { Grid.Set(sprite, gridCoord); return; }
-        if (current is SpriteStack currentStack) { Grid.Set(new SpriteStack([.. currentStack.Sprites, sprite]), gridCoord); return; }
-        Grid.Set(new SpriteStack(current, sprite), gridCoord);
+        if (current == null) { Grid.Set(element, gridCoord); return this; }
+
+        List<Sprite> sprites = current is SpriteStack currentStack ? [.. currentStack.Sprites] : [current];
+
+        if (index == -1) { index = sprites.Count; }
+        else { index = Calc.Clamp(index, 0, sprites.Count); }
+
+        sprites.Insert(index, element);
+        Grid.Set(new SpriteStack([.. sprites]), gridCoord);
+
+        return this;
     }
 
-    /// <summary>
-    /// Remove the most recent sprite from a tile's stack.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    public void RemoveTileStack(Point2 gridCoord) {
+    public IStackableGrid<Sprite?> RemoveTileStackStart(Point2 gridCoord) => RemoveTileStackAt(gridCoord, 0);
+    public IStackableGrid<Sprite?> RemoveTileStackEnd(Point2 gridCoord) => RemoveTileStackAt(gridCoord, -1);
+    public IStackableGrid<Sprite?> RemoveTileStackAt(Point2 gridCoord, int index) {
         Sprite? current = Grid.Get(gridCoord);
-        if (current == null) { return; }
-        if (current is not SpriteStack currentStack) { Grid.Set(null, gridCoord); return; }
-        Grid.Set(new SpriteStack(currentStack.Sprites[..^1]), gridCoord);
-    }
+        if (current == null) { return this; }
 
-    /// <summary>
-    /// Remove all sprites from a tile.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    public void ClearTile(Point2 gridCoord) {
-        Grid.Set(null, gridCoord);
-    }
+        if (current is not SpriteStack currentStack) {
+            if (index == 0 || index == -1) { Grid.Set(null, gridCoord); }
+            return this;
+        }
 
-    /// <summary>
-    /// Get the sprite at a grid coordinate.
-    /// </summary>
-    /// <param name="gridCoord">The tile location.</param>
-    /// <returns>The sprite at the given location, null if the coord is out of bounds or the tile doesn't exist.</returns>
-    public Sprite? GetTile(Point2 gridCoord) {
-        return Grid.Get(gridCoord);
+        if (index == -1) { index = currentStack.Sprites.Length - 1; }
+        if (index < 0 || index <= currentStack.Sprites.Length) { return this; }
+
+        List<Sprite> sprites = [.. currentStack.Sprites];
+        sprites.RemoveAt(index);
+
+        if (sprites.Count == 0) { Grid.Set(null, gridCoord); }
+        else if (sprites.Count == 1) { Grid.Set(sprites[0], gridCoord); }
+        else { Grid.Set(new SpriteStack([.. sprites]), gridCoord); }
+
+        return this;
     }
 }

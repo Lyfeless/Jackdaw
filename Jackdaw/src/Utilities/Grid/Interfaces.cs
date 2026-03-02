@@ -3,6 +3,14 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+
+
+
+
+
+
+/*
+
 /// <summary>
 /// A grid mean to exist in world space, with a position and tile size.
 /// </summary>
@@ -144,3 +152,5 @@ public static class ISpatialGridHelper {
             => Transform.CreateMatrix(-grid.Position, Vector2.Zero, Vector2.One / grid.TileSize, 0);
     }
 }
+
+*/
