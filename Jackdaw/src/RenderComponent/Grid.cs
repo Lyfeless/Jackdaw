@@ -33,7 +33,7 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         set => tileSize = value.FloorToPoint2();
     }
 
-    public Rect Bounds => throw new NotImplementedException();
+    public Rect Bounds => new(Position, Grid.Size * TileSize);
 
     /// <summary>
     /// A renderable grid of sprites.

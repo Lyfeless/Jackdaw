@@ -102,73 +102,73 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     public Towner RemoveAll(params Telement[] children) { foreach (Telement child in children) { Remove(child); } return Owner; }
 
     /// <summary>
-    /// Add a child to the top of the elements array.
+    /// Add a child to the start of the elements array.
     /// </summary>
     /// <param name="child">The child to add.</param>
     /// <returns>The container owner.</returns>
-    public Towner AddTop(Telement child) => Action(new ChildContainerModifyActionAddTop<Telement, Towner>(this, child));
+    public Towner AddFirst(Telement child) => Action(new ChildContainerModifyActionAddTop<Telement, Towner>(this, child));
 
     /// <summary>
-    /// Add a child above another in the elements array.
+    /// Add a child directly before another in the elements array.
     /// </summary>
     /// <param name="child">The child to add.</param>
     /// <param name="relative">The child currently in the container.</param>
     /// <returns>The container owner.</returns>
-    public Towner AddAbove(Telement child, Telement relative) => AddRelative(child, relative, 0);
+    public Towner AddBefore(Telement child, Telement relative) => AddRelative(child, relative, 0);
 
     /// <summary>
-    /// Add a child below another in the elements array.
+    /// Add a child directly after another in the elements array.
     /// </summary>
     /// <param name="child">The child to add.</param>
     /// <param name="relative">The child currently in the container.</param>
     /// <returns>The container owner.</returns>
-    public Towner AddBelow(Telement child, Telement relative) => AddRelative(child, relative, 1);
+    public Towner AddAfter(Telement child, Telement relative) => AddRelative(child, relative, 1);
 
     Towner AddRelative(Telement child, Telement relative, int offset) => Action(new ChildContainerModifyActionAddRelative<Telement, Towner>(this, child, relative, offset));
 
     /// <summary>
-    /// Move a child 1 element closer to the bottom of the elements array.
+    /// Move a child 1 element closer to the end of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveDown(Telement child) => Move(child, 1);
+    public Towner MoveForward(Telement child) => Move(child, 1);
 
     /// <summary>
-    /// Move a child closer to the bottom of the elements array.
+    /// Move a child closer to the end of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <param name="amount">The amount to move the child.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveDown(Telement child, int amount) => Move(child, amount);
+    public Towner MoveForward(Telement child, int amount) => Move(child, amount);
 
     /// <summary>
-    /// Move a child 1 element closer to the top of the elements array.
+    /// Move a child 1 element closer to the start of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveUp(Telement child) => Move(child, -1);
+    public Towner MoveBack(Telement child) => Move(child, -1);
 
     /// <summary>
-    /// Move a child closer to the top of the elements array.
+    /// Move a child closer to the start of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <param name="amount">The amount to move the child.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveUp(Telement child, int amount) => Move(child, -amount);
+    public Towner MoveBack(Telement child, int amount) => Move(child, -amount);
 
     /// <summary>
-    /// Move a child to the top of the elements array.
+    /// Move a child to the start of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveTop(Telement child) => Move(child, -Elements.Count);
+    public Towner MoveStart(Telement child) => Move(child, -Elements.Count);
 
     /// <summary>
-    /// Move a child to the bottom of the elements array.
+    /// Move a child to the end of the elements array.
     /// </summary>
     /// <param name="child">The child to move.</param>
     /// <returns>The container owner.</returns>
-    public Towner MoveBottom(Telement child) => Move(child, Elements.Count);
+    public Towner MoveEnd(Telement child) => Move(child, Elements.Count);
 
     Towner Move(Telement child, int amount) => Action(new ChildContainerModifyActionMove<Telement, Towner>(this, child, amount));
 
