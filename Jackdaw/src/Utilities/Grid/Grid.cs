@@ -10,30 +10,25 @@ namespace Jackdaw;
 public class Grid<T>(Point2 gridSize) : IGrid<T> {
     readonly T?[,] Tiles = new T?[gridSize.X, gridSize.Y];
 
-    /// <summary>
-    /// The tile count of the grid.
-    /// </summary>
-    public readonly Point2 Size = gridSize;
+    readonly Point2 size = gridSize;
+    public Point2 TileCount => size;
 
     public Grid(int width, int height) : this(new(width, height)) { }
 
     public T? Get(int tileX, int tileY) => Get(new(tileX, tileY));
-
     public T? Get(Point2 tile) {
         if (Contains(tile)) { return Tiles[tile.X, tile.Y]; }
         return default;
     }
 
     public IGrid<T> Set(T? value, int tileX, int tileY) => Set(value, new(tileX, tileY));
-
     public IGrid<T> Set(T? value, Point2 tile) {
         if (Contains(tile)) { Tiles[tile.X, tile.Y] = value; }
         return this;
     }
 
     public bool Contains(int tileX, int tileY) => Contains(new(tileX, tileY));
-
     public bool Contains(Point2 tile) {
-        return tile.X >= 0 && tile.Y >= 0 && tile.X < Size.X && tile.Y < Size.Y;
+        return tile.X >= 0 && tile.Y >= 0 && tile.X < TileCount.X && tile.Y < TileCount.Y;
     }
 }

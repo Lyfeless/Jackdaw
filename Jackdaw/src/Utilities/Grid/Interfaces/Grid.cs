@@ -8,6 +8,11 @@ namespace Jackdaw;
 /// <typeparam name="T">The type of object tiles are stored as.</typeparam>
 public interface IGrid<T> {
     /// <summary>
+    /// The number of tiles in each axis of the grid.
+    /// </summary>
+    public Point2 TileCount { get; }
+
+    /// <summary>
     /// Get a tile at the given location.
     /// </summary>
     /// <param name="tileX">The tile x coordinate.</param>
@@ -25,19 +30,19 @@ public interface IGrid<T> {
     /// <summary>
     /// Set a tile at the given location.
     /// </summary>
-    /// <param name="value">The tile data to set.</param>
+    /// <param name="element">The tile data to set.</param>
     /// <param name="tileX">The tile x coordinate.</param>
     /// <param name="tileY">The tile y coordinate.</param>
     /// <returns>The containing grid.</returns>
-    public IGrid<T> Set(T? value, int tileX, int tileY);
+    public IGrid<T> Set(T? element, int tileX, int tileY);
 
     /// <summary>
     /// Set a tile at the given location.
     /// </summary>
-    /// <param name="value">The tile data to set.</param>
+    /// <param name="element">The tile data to set.</param>
     /// <param name="tile">The tile coordinate.</param>
     /// <returns>The containing grid.</returns>
-    public IGrid<T> Set(T? value, Point2 tile);
+    public IGrid<T> Set(T? element, Point2 tile);
 
     /// <summary>
     /// Check if a tile coordinate is in the bounds of the grid.
@@ -62,6 +67,11 @@ public interface IGrid<T> {
 /// <typeparam name="TOut">The type of object the tiles are stored as.</typeparam>
 public interface IGrid<TIn, TOut> {
     /// <summary>
+    /// The number of tiles in each axis of the grid.
+    /// </summary>
+    public Point2 TileCount { get; }
+
+    /// <summary>
     /// Get a tile at the given location.
     /// </summary>
     /// <param name="tileX">The tile x coordinate.</param>
@@ -79,19 +89,19 @@ public interface IGrid<TIn, TOut> {
     /// <summary>
     /// Set a tile at the given location.
     /// </summary>
-    /// <param name="value">The tile data to set.</param>
+    /// <param name="element">The tile data to set.</param>
     /// <param name="tileX">The tile x coordinate.</param>
     /// <param name="tileY">The tile y coordinate.</param>
     /// <returns>The containing grid.</returns>
-    public IGrid<TIn, TOut> Set(TIn? value, int tileX, int tileY) => Set(value, new(tileX, tileY));
+    public IGrid<TIn, TOut> Set(TIn? element, int tileX, int tileY);
 
     /// <summary>
     /// Set a tile at the given location.
     /// </summary>
-    /// <param name="value">The tile data to set.</param>
+    /// <param name="element">The tile data to set.</param>
     /// <param name="tile">The tile coordinate.</param>
     /// <returns>The containing grid.</returns>
-    public IGrid<TIn, TOut> Set(TIn? value, Point2 tile);
+    public IGrid<TIn, TOut> Set(TIn? element, Point2 tile);
 
     /// <summary>
     /// Check if a tile coordinate is in the bounds of the grid.

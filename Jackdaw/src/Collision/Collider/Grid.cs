@@ -20,10 +20,7 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     }
 
     readonly Vector2 tileSize = tileSize;
-    public Vector2 TileSize {
-        get => tileSize;
-        set { }
-    }
+    public Vector2 TileSize => tileSize;
 
     /// <summary>
     /// A grid of colliders, designed to reduce total collision checks for tilemaps.
@@ -47,12 +44,9 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// <param name="tileSize">The size of each tile.</param>
     public GridCollider(Grid<Collider?> grid, Vector2 tileSize) : this(Vector2.Zero, grid, tileSize) { }
 
-    /// <summary>
-    /// The grid tile dimensions.
-    /// </summary>
-    public Point2 GridSize = grid.Size;
+    public Point2 TileCount => Grid.TileCount;
 
-    public override Rect Bounds => new(Position, Grid.Size * TileSize);
+    public override Rect Bounds => new(Position, Grid.TileCount * TileSize);
     public override Vector2 Center => Bounds.Center;
 
     public override bool Multi => true;
@@ -86,15 +80,18 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     /// </summary>
     public RectangleCollider FullCollider => new(tileSize);
 
-    public IGrid<Collider?> Set(Collider? value, int tileX, int tileY) { Grid.Set(value, tileX, tileY); return this; }
-    public IGrid<Collider?> Set(Collider? value, Point2 tile) { Grid.Set(value, tile); return this; }
-    public Collider? Get(int tileX, int tileY) => Grid.Get(tileX, tileY);
+    public IGrid<Collider?> Set(Collider? element, int tileX, int tileY) => Set(element, new(tileX, tileY));
+    public IGrid<Collider?> Set(Collider? element, Point2 tile) { Grid.Set(element, tile); return this; }
+    public Collider? Get(int tileX, int tileY) => Grid.Get(new(tileX, tileY));
     public Collider? Get(Point2 tile) => Grid.Get(tile);
-    public bool Contains(int tileX, int tileY) => Grid.Contains(tileX, tileY);
+    public bool Contains(int tileX, int tileY) => Grid.Contains(new(tileX, tileY));
     public bool Contains(Point2 tile) => Grid.Contains(tile);
 
+    public IStackableGrid<Collider?> AddTileStackStart(Collider? element, int tileX, int tileY) => AddTileStackStart(element, new(tileX, tileY));
     public IStackableGrid<Collider?> AddTileStackStart(Collider? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, 0);
+    public IStackableGrid<Collider?> AddTileStackEnd(Collider? element, int tileX, int tileY) => AddTileStackEnd(element, new(tileX, tileY));
     public IStackableGrid<Collider?> AddTileStackEnd(Collider? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, -1);
+    public IStackableGrid<Collider?> AddTileStackAt(Collider? element, int tileX, int tileY, int index) => AddTileStackAt(element, new(tileX, tileY), index);
     public IStackableGrid<Collider?> AddTileStackAt(Collider? element, Point2 gridCoord, int index) {
         if (element == null) { return this; }
 
@@ -116,8 +113,11 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
         return this;
     }
 
+    public IStackableGrid<Collider?> RemoveTileStackStart(int tileX, int tileY) => RemoveTileStackStart(new(tileX, tileY));
     public IStackableGrid<Collider?> RemoveTileStackStart(Point2 gridCoord) => RemoveTileStackAt(gridCoord, 0);
+    public IStackableGrid<Collider?> RemoveTileStackEnd(int tileX, int tileY) => RemoveTileStackEnd(new(tileX, tileY));
     public IStackableGrid<Collider?> RemoveTileStackEnd(Point2 gridCoord) => RemoveTileStackAt(gridCoord, -1);
+    public IStackableGrid<Collider?> RemoveTileStackAt(int tileX, int tileY, int index) => RemoveTileStackAt(new(tileX, tileY), index);
     public IStackableGrid<Collider?> RemoveTileStackAt(Point2 gridCoord, int index) {
         Collider? current = Grid.Get(gridCoord);
         if (current == null) { return this; }

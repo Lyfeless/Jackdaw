@@ -15,7 +15,7 @@ public interface ISpatialGrid {
     /// <summary>
     /// The width and height of an individual tile.
     /// </summary>
-    public Vector2 TileSize { get; protected set; }
+    public Vector2 TileSize { get; }
 
     /// <summary>
     /// The bounding box for the entire grid.

@@ -14,6 +14,7 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     protected readonly Grid<Sprite> Grid = grid;
 
     protected Point2 position = position;
+    protected Point2 tileSize = tileSize;
 
     /// <summary>
     /// The grid position.
@@ -23,8 +24,6 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         set => position = value.FloorToPoint2();
     }
 
-    protected Point2 tileSize = tileSize;
-
     /// <summary>
     /// The size of each tile.
     /// </summary>
@@ -33,7 +32,9 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         set => tileSize = value.FloorToPoint2();
     }
 
-    public Rect Bounds => new(Position, Grid.Size * TileSize);
+    public Point2 TileCount => Grid.TileCount;
+
+    public Rect Bounds => new(Position, Grid.TileCount * TileSize);
 
     /// <summary>
     /// A renderable grid of sprites.
@@ -52,12 +53,12 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         Vector2 bottomRight = Game.Convert.LocalToTile(bounds.BottomRight, this);
 
         Point2 start = new(
-            (int)Math.Clamp(topLeft.X, 0, Grid.Size.X - 1),
-            (int)Math.Clamp(topLeft.Y, 0, Grid.Size.Y - 1)
+            (int)Math.Clamp(topLeft.X, 0, Grid.TileCount.X - 1),
+            (int)Math.Clamp(topLeft.Y, 0, Grid.TileCount.Y - 1)
         );
         Point2 end = new(
-            (int)Math.Clamp(bottomRight.X, 0, Grid.Size.X - 1),
-            (int)Math.Clamp(bottomRight.Y, 0, Grid.Size.Y - 1)
+            (int)Math.Clamp(bottomRight.X, 0, Grid.TileCount.X - 1),
+            (int)Math.Clamp(bottomRight.Y, 0, Grid.TileCount.Y - 1)
         );
 
         for (int x = start.X; x <= end.X; ++x) {
@@ -71,15 +72,18 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         }
     }
 
-    public IGrid<Sprite?> Set(Sprite? value, Point2 tile) { Grid.Set(value, tile); return this; }
-    public IGrid<Sprite?> Set(Sprite? value, int tileX, int tileY) { Grid.Set(value, tileX, tileY); return this; }
-    public Sprite? Get(int tileX, int tileY) => Grid.Get(tileX, tileY);
+    public IGrid<Sprite?> Set(Sprite? element, int tileX, int tileY) => Set(element, new(tileX, tileY));
+    public IGrid<Sprite?> Set(Sprite? element, Point2 tile) { Grid.Set(element, tile); return this; }
+    public Sprite? Get(int tileX, int tileY) => Get(new(tileX, tileY));
     public Sprite? Get(Point2 tile) => Grid.Get(tile);
-    public bool Contains(int tileX, int tileY) => Grid.Contains(tileX, tileY);
+    public bool Contains(int tileX, int tileY) => Contains(new(tileX, tileY));
     public bool Contains(Point2 tile) => Grid.Contains(tile);
 
+    public IStackableGrid<Sprite?> AddTileStackStart(Sprite? element, int tileX, int tileY) => AddTileStackStart(element, new(tileX, tileY));
     public IStackableGrid<Sprite?> AddTileStackStart(Sprite? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, 0);
+    public IStackableGrid<Sprite?> AddTileStackEnd(Sprite? element, int tileX, int tileY) => AddTileStackEnd(element, new(tileX, tileY));
     public IStackableGrid<Sprite?> AddTileStackEnd(Sprite? element, Point2 gridCoord) => AddTileStackAt(element, gridCoord, -1);
+    public IStackableGrid<Sprite?> AddTileStackAt(Sprite? element, int tileX, int tileY, int index) => AddTileStackAt(element, new(tileX, tileY), index);
     public IStackableGrid<Sprite?> AddTileStackAt(Sprite? element, Point2 gridCoord, int index) {
         if (element == null) { return this; }
 
@@ -97,8 +101,11 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
         return this;
     }
 
+    public IStackableGrid<Sprite?> RemoveTileStackStart(int tileX, int tileY) => RemoveTileStackStart(new(tileX, tileY));
     public IStackableGrid<Sprite?> RemoveTileStackStart(Point2 gridCoord) => RemoveTileStackAt(gridCoord, 0);
+    public IStackableGrid<Sprite?> RemoveTileStackEnd(int tileX, int tileY) => RemoveTileStackEnd(new(tileX, tileY));
     public IStackableGrid<Sprite?> RemoveTileStackEnd(Point2 gridCoord) => RemoveTileStackAt(gridCoord, -1);
+    public IStackableGrid<Sprite?> RemoveTileStackAt(int tileX, int tileY, int index) => RemoveTileStackAt(new(tileX, tileY), index);
     public IStackableGrid<Sprite?> RemoveTileStackAt(Point2 gridCoord, int index) {
         Sprite? current = Grid.Get(gridCoord);
         if (current == null) { return this; }
