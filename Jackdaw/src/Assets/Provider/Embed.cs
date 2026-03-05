@@ -23,7 +23,23 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
         Assembly entry = Assembly.GetEntryAssembly()!;
         AssemblyName[] referenced = entry.GetReferencedAssemblies();
         Assemblies = [entry, .. referenced.Select(Assembly.Load)];
+        LoadAllAssemblies(root);
+    }
 
+    /// <summary>
+    /// An asset provider for loading data from embedded files inside the project's assemblies.
+    /// </summary>
+    /// <param name="root">
+    ///     The group name to load asset from. This will be the first element in the resource's name <br/>
+    ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
+    /// </param>
+    /// <param name="assemblies">The assemblies to load embedded files from.</param>
+    public EmbeddedResourceAssetProvider(string root, params Assembly[] assemblies) {
+        Assemblies = assemblies;
+        LoadAllAssemblies(root);
+    }
+
+    void LoadAllAssemblies(string root) {
         for (int i = 0; i < Assemblies.Length; ++i) {
             LoadAssemblyData(i, root);
         }
