@@ -36,7 +36,7 @@ public class LineCollider(Vector2 point1, Vector2 point2) : Collider {
 
     Rect bounds = GetBounds(point1, point2);
     public override Rect Bounds => bounds;
-    public override Vector2 Center => new Line(Point1, Point2).Midpoint;
+    public override Vector2 Center => new Line(Point1, Point2).Center;
 
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];

@@ -6,12 +6,6 @@ namespace Jackdaw;
 public static class LineExtensions {
     extension(Line line) {
         /// <summary>
-        /// Get the middle position between the line's two points.
-        /// </summary>
-        /// <returns>The midpoint of the line.</returns>
-        public Vector2 Midpoint => ((line.From - line.To) / 2) + line.To;
-
-        /// <summary>
         /// Get the point the line intersects with another line, treating both as line segments.
         /// </summary>
         /// <param name="other">The line to collide with.</param>
