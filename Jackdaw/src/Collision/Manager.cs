@@ -12,17 +12,6 @@ public class CollisionManager {
     const float PUSHOUT_TOLERANCE = 0.0001f;
     const float SWEEP_TOLERANCE = 0.0001f;
 
-    record struct ColliderContext(
-        Collider ColliderA,
-        Matrix3x2 PositionA,
-        Matrix3x2 PositionAInv,
-        Vector2 VelocityA,
-        Collider ColliderB,
-        Matrix3x2 PositionB,
-        Matrix3x2 PositionBInv,
-        Vector2 VelocityB
-    );
-
     record struct Edge(int Index, Vector2 Normal, float Distance);
     record struct CollisionSimplexInfo(Vector2 A, Vector2 B, Vector2 C, bool Collided);
     record struct CollisionPushoutInfo(Vector2 Pushout, bool Collided);
@@ -95,10 +84,8 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public AllCollisionInfo GetAllCollisions(CollisionComponent collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetAllCollisions(collider, position, positionInv);
-    }
+    public AllCollisionInfo GetAllCollisions(CollisionComponent collider, Matrix3x2 position)
+        => GetAllCollisions(collider, position, position.Invert());
 
     /// <summary>
     /// Get all collisions between given collider component and all registered collision components at a given location.
@@ -138,10 +125,8 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public AllCollisionInfo GetAllCollisions(Collider collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetAllCollisions(collider, position, positionInv);
-    }
+    public AllCollisionInfo GetAllCollisions(Collider collider, Matrix3x2 position)
+        => GetAllCollisions(collider, position, position.Invert());
 
     /// <summary>
     /// Get all collisions between given collider and all registered collision components at a given location.
@@ -155,14 +140,8 @@ public class CollisionManager {
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
             SimplexColliderPair[] pairs = ColliderOverlapCheck(new(
-                collider,
-                position,
-                positionInv,
-                Vector2.Zero,
-                other.Collider,
-                other.Actor.Transform.GlobalMatrix,
-                other.Actor.Transform.GlobalMatrixInverse,
-                Vector2.Zero
+                new(collider, position, positionInv),
+                new(other.Collider, other.Actor.Transform.GlobalMatrix, other.Actor.Transform.GlobalMatrixInverse)
             ));
             if (pairs.Length == 0) { continue; }
             collisions.Add(new(other, [.. pairs.Select(e => e.B)]));
@@ -210,10 +189,8 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public SingleCollisionInfo GetFirstCollision(CollisionComponent collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetFirstCollision(collider, position, positionInv);
-    }
+    public SingleCollisionInfo GetFirstCollision(CollisionComponent collider, Matrix3x2 position)
+        => GetFirstCollision(collider, position, position.Invert());
 
     /// <summary>
     /// Get the first object the given collider component collides with at a given location.
@@ -257,10 +234,8 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public SingleCollisionInfo GetFirstCollision(Collider collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetFirstCollision(collider, position, positionInv);
-    }
+    public SingleCollisionInfo GetFirstCollision(Collider collider, Matrix3x2 position)
+        => GetFirstCollision(collider, position, position.Invert());
 
     /// <summary>
     /// Get the first object the given collider collides with at a given location.
@@ -274,14 +249,8 @@ public class CollisionManager {
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
             SimplexColliderPair[] pairs = ColliderOverlapCheck(new(
-                collider,
-                position,
-                positionInv,
-                Vector2.Zero,
-                other.Collider,
-                other.Actor.Transform.GlobalMatrix,
-                other.Actor.Transform.GlobalMatrixInverse,
-                Vector2.Zero
+                new(collider, position, positionInv),
+                new(other.Collider, other.Actor.Transform.GlobalMatrix, other.Actor.Transform.GlobalMatrixInverse)
             ));
             if (pairs.Length > 0) {
                 return new(true, new(other, [.. pairs.Select(e => e.B)]));
@@ -385,10 +354,8 @@ public class CollisionManager {
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetSweptCollision(collider, position, positionInv, velocity);
-    }
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity)
+        => GetSweptCollision(collider, position, position.Invert(), velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -432,10 +399,8 @@ public class CollisionManager {
     /// <param name="position">The position offset for the collider by.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
-    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetSweptCollision(collider, position, positionInv, velocity);
-    }
+    public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity)
+        => GetSweptCollision(collider, position, position.Invert(), velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -456,14 +421,8 @@ public class CollisionManager {
             if (ShouldSkipCollider(other)) { continue; }
 
             SweptCollisionComponentInfo result = GetSweptComponentInfo(new(
-                collider,
-                position,
-                positionInv,
-                velocity,
-                other.Collider,
-                other.Actor.Transform.GlobalMatrix,
-                other.Actor.Transform.GlobalMatrixInverse,
-                Vector2.Zero
+                new(collider, position, positionInv, velocity),
+                new(other.Collider, other.Actor.Transform.GlobalMatrix, other.Actor.Transform.GlobalMatrixInverse)
             ), other);
 
             if (result.Colliders.Length == 0) { continue; }
@@ -499,7 +458,7 @@ public class CollisionManager {
         );
     }
 
-    SweptCollisionComponentInfo GetSweptComponentInfo(ColliderContext ctx, CollisionComponent component) {
+    SweptCollisionComponentInfo GetSweptComponentInfo(ColliderContextPair ctx, CollisionComponent component) {
         SweepColliderPair[] collisionPairs = ColliderIntersectionFraction(ctx);
 
         if (collisionPairs.Length == 0) { return new(component, Vector2.One, Vector2.One, 0, []); }
@@ -511,8 +470,8 @@ public class CollisionManager {
 
             Vector2 fraction = pair.Fraction;
             // Apply small pushback to stop objects getting stuck inside one another
-            if (ctx.VelocityA.X != 0) { fraction.X -= SWEEP_TOLERANCE + float.Epsilon; }
-            if (ctx.VelocityA.Y != 0) { fraction.Y -= SWEEP_TOLERANCE + float.Epsilon; }
+            if (ctx.A.Velocity.X != 0) { fraction.X -= SWEEP_TOLERANCE + float.Epsilon; }
+            if (ctx.A.Velocity.Y != 0) { fraction.Y -= SWEEP_TOLERANCE + float.Epsilon; }
             Vector2 fractionClamped = FractionNegative(fraction) ? Vector2.Zero : fraction;
 
             SweptColliderInfo info = new(pair.B, fraction, fractionClamped, pair.Normal);
@@ -588,10 +547,8 @@ public class CollisionManager {
     /// <param name="collider">The collision component to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetCollisionPushout(collider, position, positionInv);
-    }
+    public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Matrix3x2 position)
+        => GetCollisionPushout(collider, position, position.Invert());
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry.
@@ -619,10 +576,8 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The position offset for the collider by.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public PushoutCollisionInfo GetCollisionPushout(Collider collider, Matrix3x2 position) {
-        Matrix3x2.Invert(position, out Matrix3x2 positionInv);
-        return GetCollisionPushout(collider, position, positionInv);
-    }
+    public PushoutCollisionInfo GetCollisionPushout(Collider collider, Matrix3x2 position)
+        => GetCollisionPushout(collider, position, position.Invert());
 
     /// <summary>
     /// Get the distance required to push the collider out of geometry.
@@ -641,16 +596,15 @@ public class CollisionManager {
         List<PushoutCollisionComponentInfo> componentInfo = [];
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
-            PushoutCollisionComponentInfo? result = GetPushoutCollisionComponentInfo(collider, position, positionInv, other);
-            if (result == null) { continue; }
-            PushoutCollisionComponentInfo resultCast = (PushoutCollisionComponentInfo)result;
+            PushoutCollisionComponentInfo result = GetPushoutCollisionComponentInfo(collider, position, positionInv, other);
+            if (result.Colliders.Length == 0) { continue; }
 
-            float compareLength = resultCast.Colliders[resultCast.LargestPushout].Pushout.LengthSquared();
+            float compareLength = result.Colliders[result.LargestPushout].Pushout.LengthSquared();
             if (compareLength < smallestLength) {
-                smallestPushout = resultCast.Colliders[resultCast.LargestPushout].Pushout;
+                smallestPushout = result.Colliders[result.LargestPushout].Pushout;
                 smallestLength = compareLength;
             }
-            componentInfo.Add(resultCast);
+            componentInfo.Add(result);
         }
 
         return new(componentInfo.Count > 0, smallestPushout, [.. componentInfo.OrderByDescending(e => e.Colliders[e.LargestPushout].Pushout.LengthSquared())]);
@@ -724,23 +678,17 @@ public class CollisionManager {
         return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction), direction);
     }
 
-    static PushoutCollisionComponentInfo? GetPushoutCollisionComponentInfo(
+    static PushoutCollisionComponentInfo GetPushoutCollisionComponentInfo(
         Collider collider,
         Matrix3x2 position,
         Matrix3x2 positionInv,
         CollisionComponent other
     ) {
         PushoutColliderPair[] collisionPairs = ColliderPushout(new(
-            collider,
-            position,
-            positionInv,
-            Vector2.Zero,
-            other.Collider,
-            other.Actor.Transform.GlobalMatrix,
-            other.Actor.Transform.GlobalMatrixInverse,
-            Vector2.Zero
+            new(collider, position, positionInv),
+            new(other.Collider, other.Actor.Transform.GlobalMatrix, other.Actor.Transform.GlobalMatrixInverse)
         ));
-        if (collisionPairs.Length == 0) { return null; }
+        if (collisionPairs.Length == 0) { return new(other, 0, []); }
 
         PushoutColliderInfo[] colliders = new PushoutColliderInfo[collisionPairs.Length];
         int closest = 0;
@@ -766,139 +714,89 @@ public class CollisionManager {
     #endregion
 
     #region 2 Collider Middleman Functions
-    static SimplexColliderPair[] ColliderOverlapCheck(ColliderContext ctx, bool reversed = false) {
-        if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
+    static SimplexColliderPair[] ColliderOverlapCheck(ColliderContextPair ctx, bool reversed = false) {
+        if (!ctx.TagMatch(reversed)) { return []; }
 
-        Rect boundsAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
-        Rect boundsBOffset = ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB);
+        Rect boundsAOffset = ctx.A.Collider.Bounds.TransformAABB(ctx.A.Position);
+        Rect boundsBOffset = ctx.B.Collider.Bounds.TransformAABB(ctx.B.Position);
         if (!boundsAOffset.Overlaps(boundsBOffset)) {
             return [];
         }
 
-        if (ctx.ColliderA.Multi) {
-            Collider[] subs = ctx.ColliderA.GetSubColliders(ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB * ctx.PositionAInv));
+        if (ctx.A.Collider.Multi) {
+            Collider[] subs = ctx.A.Collider.GetSubColliders(ctx.B.Collider.Bounds.TransformAABB(ctx.B.Position * ctx.A.PositionInv));
             List<SimplexColliderPair> pairs = [];
             foreach (Collider collider in subs) {
-                SimplexColliderPair[] subCollisions = ColliderOverlapCheck(ctx with { ColliderA = collider }, reversed);
+                SimplexColliderPair[] subCollisions = ColliderOverlapCheck(ctx.WithA(collider), reversed);
                 if (subCollisions.Length > 0) { pairs.AddRange(subCollisions); }
             }
             return [.. pairs];
         }
 
-        if (ctx.ColliderB.Multi) { return ColliderOverlapCheck(FlipContext(ctx), !reversed); }
+        if (ctx.B.Collider.Multi) { return ColliderOverlapCheck(ctx.Flip(), !reversed); }
 
-        if (GetCollisionSimplex(ctx).Collided) {
-            return [reversed ? new(ctx.ColliderB, ctx.ColliderA) : new(ctx.ColliderA, ctx.ColliderB)];
+        if (new GJKSimplex(ctx).Collided) {
+            return [reversed ? new(ctx.B.Collider, ctx.A.Collider) : new(ctx.A.Collider, ctx.B.Collider)];
         }
         return [];
     }
 
-    static PushoutColliderPair[] ColliderPushout(ColliderContext ctx, bool reversed = false) {
-        if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
+    static PushoutColliderPair[] ColliderPushout(ColliderContextPair ctx, bool reversed = false) {
+        if (!ctx.TagMatch(reversed)) { return []; }
 
-        Rect boundsAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
-        Rect boundsBOffset = ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB);
-        if (!boundsAOffset.Overlaps(boundsBOffset)) {
-            return [];
-        }
+        Rect boundsAOffset = ctx.A.Collider.Bounds.TransformAABB(ctx.A.Position);
+        Rect boundsBOffset = ctx.B.Collider.Bounds.TransformAABB(ctx.B.Position);
+        if (!boundsAOffset.Overlaps(boundsBOffset)) { return []; }
 
-        if (ctx.ColliderA.Multi) {
-            Collider[] subs = ctx.ColliderA.GetSubColliders(ctx.ColliderB.Bounds.TransformAABB(ctx.PositionB * ctx.PositionAInv));
+        if (ctx.A.Collider.Multi) {
+            Collider[] subs = ctx.A.Collider.GetSubColliders(ctx.B.Collider.Bounds.TransformAABB(ctx.B.Position * ctx.A.PositionInv));
             List<PushoutColliderPair> pairs = [];
             foreach (Collider collider in subs) {
-                PushoutColliderPair[] subCollisions = ColliderPushout(ctx with { ColliderA = collider }, reversed);
+                PushoutColliderPair[] subCollisions = ColliderPushout(ctx.WithA(collider), reversed);
                 if (subCollisions.Length > 0) { pairs.AddRange(subCollisions); }
             }
             return [.. pairs];
         }
 
-        if (ctx.ColliderB.Multi) { return ColliderPushout(FlipContext(ctx), !reversed); }
+        if (ctx.B.Collider.Multi) { return ColliderPushout(ctx.Flip(), !reversed); }
 
-        CollisionSimplexInfo simplex = GetCollisionSimplex(ctx);
+        GJKSimplex simplex = new(ctx);
         if (!simplex.Collided) { return []; }
 
         CollisionPushoutInfo info = GetPushout(ctx, simplex);
         if (!info.Collided) { return []; }
-        return [reversed ? new(ctx.ColliderB, ctx.ColliderA, -info.Pushout) : new(ctx.ColliderA, ctx.ColliderB, info.Pushout)];
+        return [reversed ? new(ctx.B.Collider, ctx.A.Collider, -info.Pushout) : new(ctx.A.Collider, ctx.B.Collider, info.Pushout)];
     }
 
-    static SweepColliderPair[] ColliderIntersectionFraction(ColliderContext ctx, bool reversed = false) {
-        if (!TagMatch(ctx.ColliderA, ctx.ColliderB, reversed)) { return []; }
+    static SweepColliderPair[] ColliderIntersectionFraction(ColliderContextPair ctx, bool reversed = false) {
+        if (!ctx.TagMatch(reversed)) { return []; }
 
-        Rect boundAOffset = ctx.ColliderA.Bounds.TransformAABB(ctx.PositionA);
-        Rect sweptBoundsB = SweptBounds(ctx.ColliderB, ctx.VelocityB);
-        Rect sweptBoundsBCombined = SweptBounds(sweptBoundsB, -ctx.VelocityA);
-        Rect sweptBoundsBCombinedOffset = sweptBoundsBCombined.TransformAABB(ctx.PositionB);
-        if (!sweptBoundsBCombinedOffset.Overlaps(boundAOffset)) {
-            return [];
-        }
+        Rect boundAOffset = ctx.A.Collider.Bounds.TransformAABB(ctx.A.Position);
+        Rect sweptBoundsB = SweptBounds(ctx.B.Collider, ctx.B.Velocity);
+        Rect sweptBoundsBCombined = SweptBounds(sweptBoundsB, -ctx.A.Velocity);
+        Rect sweptBoundsBCombinedOffset = sweptBoundsBCombined.TransformAABB(ctx.B.Position);
+        if (!sweptBoundsBCombinedOffset.Overlaps(boundAOffset)) { return []; }
 
-        if (ctx.ColliderA.Multi) {
+        if (ctx.A.Collider.Multi) {
             List<SweepColliderPair> pairs = [];
-            foreach (Collider collider in ctx.ColliderA.GetSubColliders(sweptBoundsB.TransformAABB(ctx.PositionB * ctx.PositionAInv))) {
-                SweepColliderPair[] subCollisions = ColliderIntersectionFraction(ctx with { ColliderA = collider }, reversed);
+            foreach (Collider collider in ctx.A.Collider.GetSubColliders(sweptBoundsB.TransformAABB(ctx.B.Position * ctx.A.PositionInv))) {
+                SweepColliderPair[] subCollisions = ColliderIntersectionFraction(ctx.WithA(collider), reversed);
                 if (subCollisions.Length > 0) { pairs.AddRange(subCollisions); }
             }
             return [.. pairs];
         }
 
-        if (ctx.ColliderB.Multi) { return ColliderIntersectionFraction(FlipContext(ctx), !reversed); }
+        if (ctx.B.Collider.Multi) { return ColliderIntersectionFraction(ctx.Flip(), !reversed); }
 
         CollisionSweepInfo collision = GetRayIntersectionFraction(ctx);
         // Sweep calculation sometimes gives results for colliders that aren't initially colliding
         if (!collision.Collided || (FractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0)) { return []; }
-        return [reversed ? new(ctx.ColliderB, ctx.ColliderA, collision.Fraction, collision.Normal) : new(ctx.ColliderA, ctx.ColliderB, collision.Fraction, collision.Normal)];
+        return [reversed ? new(ctx.B.Collider, ctx.A.Collider, collision.Fraction, collision.Normal) : new(ctx.A.Collider, ctx.B.Collider, collision.Fraction, collision.Normal)];
     }
     #endregion
 
     #region Primary Collision Functions
-    static CollisionSimplexInfo GetCollisionSimplex(ColliderContext ctx) {
-        // Point A
-        Vector2 direction = Vector2.Transform(ctx.ColliderB.Center, ctx.PositionB) - Vector2.Transform(ctx.ColliderA.Center, ctx.PositionA);
-        Vector2 pointA = Support(ctx, direction);
-        if (!PointCrossesOrigin(pointA, direction)) { return new(pointA, Vector2.Zero, Vector2.Zero, false); }
-
-        // Point B
-        direction = -direction;
-        Vector2 pointB = Support(ctx, direction);
-        if (!PointCrossesOrigin(pointB, direction)) { return new(pointA, pointB, Vector2.Zero, false); }
-
-        // Point C
-        Vector2 AInv = -pointA;
-        Vector2 AB = pointB + AInv;
-        direction = Calc.TripleProduct(AB, AInv, AB);
-        Vector2 pointC = Support(ctx, direction);
-        if (!PointCrossesOrigin(pointC, direction)) { return new(pointA, pointB, pointC, false); }
-
-        // Adjust points until they cover the origin
-        while (true) {
-            Vector2 CInv = -pointC;
-            Vector2 CB = pointB + CInv;
-            Vector2 CA = pointA + CInv;
-            Vector2 perpCB = Calc.TripleProduct(CA, CB, CB);
-            Vector2 perpCA = Calc.TripleProduct(CB, CA, CA);
-            if (Vector2.Dot(perpCB, CInv) > 0) {
-                pointA = pointB;
-                pointB = pointC;
-
-                direction = perpCB;
-                pointC = Support(ctx, direction);
-                if (!PointCrossesOrigin(pointC, direction)) { return new(pointA, pointB, pointC, false); }
-            }
-            else if (Vector2.Dot(perpCA, CInv) > 0) {
-                pointB = pointC;
-
-                direction = perpCA;
-                pointC = Support(ctx, direction);
-                if (!PointCrossesOrigin(pointC, direction)) { return new(pointA, pointB, pointC, false); }
-            }
-            else {
-                return new(pointA, pointB, pointC, true);
-            }
-        }
-    }
-
-    static CollisionPushoutInfo GetPushout(ColliderContext ctx, CollisionSimplexInfo simplex) {
+    static CollisionPushoutInfo GetPushout(ColliderContextPair ctx, GJKSimplex simplex) {
         if (!simplex.Collided) { return new(Vector2.Zero, false); }
 
         List<Vector2> points = [
@@ -931,7 +829,7 @@ public class CollisionManager {
 
             // Find new support in direction of closest edge
             Vector2 direction = closestEdge.Normal;
-            Vector2 newSupport = Support(ctx, direction);
+            Vector2 newSupport = ctx.Support(direction);
             float supportDistance = Vector2.Dot(newSupport, direction);
 
             // Determine new pushout approximation
@@ -948,9 +846,9 @@ public class CollisionManager {
         return new(pushout, true);
     }
 
-    static CollisionSweepInfo GetRayIntersectionFraction(ColliderContext ctx) {
+    static CollisionSweepInfo GetRayIntersectionFraction(ColliderContextPair ctx) {
         // Get velocity difference
-        Vector2 velocityDifference = ctx.VelocityB - ctx.VelocityA;
+        Vector2 velocityDifference = ctx.B.Velocity - ctx.A.Velocity;
 
         // Cancel if objects are moving the same direction or stationary
         if (velocityDifference == Vector2.Zero) { return new(Vector2.One, Vector2.UnitY, false); }
@@ -959,11 +857,11 @@ public class CollisionManager {
 
         // Point A
         Vector2 direction = -velocityDifference;
-        Vector2 pointA = Support(ctx, direction);
+        Vector2 pointA = ctx.Support(direction);
 
         // Point B
         direction = Calc.TripleProduct(direction, -pointA, direction);
-        Vector2 pointB = Support(ctx, direction);
+        Vector2 pointB = ctx.Support(direction);
 
         float crossA = Calc.Cross(velocityDifference, pointA);
         float crossB = Calc.Cross(velocityDifference, pointB);
@@ -985,7 +883,7 @@ public class CollisionManager {
             if (direction.LengthSquared() < float.Epsilon) {
                 return SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
             }
-            Vector2 pointC = Support(ctx, direction);
+            Vector2 pointC = ctx.Support(direction);
 
             // New support point is the same as one of the current points
             if (Vector2.DistanceSquared(pointC, pointA) < SWEEP_TOLERANCE || Vector2.DistanceSquared(pointC, pointB) < SWEEP_TOLERANCE) {
@@ -1015,14 +913,6 @@ public class CollisionManager {
 
     #region Utilities
     static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
-
-    static Vector2 Support(ColliderContext ctx, Vector2 direction) {
-        Vector2 directionAdjustedA = direction.TransformDirection(ctx.PositionAInv);
-        Vector2 directionAdjustedB = -direction.TransformDirection(ctx.PositionBInv);
-        Vector2 supportA = Vector2.Transform(ctx.ColliderA.Support(directionAdjustedA), ctx.PositionA);
-        Vector2 supportB = Vector2.Transform(ctx.ColliderB.Support(directionAdjustedB), ctx.PositionB);
-        return supportA - supportB;
-    }
 
     static bool IsClockwiseWinding(Vector2 a, Vector2 b, Vector2 c) {
         float wind0 = (b.X - a.X) * (b.Y + a.Y);
@@ -1106,11 +996,6 @@ public class CollisionManager {
         return new(min, max - min);
     }
 
-    static bool TagMatch(Collider a, Collider b, bool reversed = false) {
-        if (reversed) { return TagMatch(b, a); }
-        return a.Mask.Empty || b.Tags.Empty || a.Mask.Any(b.Tags);
-    }
-
     bool ShouldSkipCollider(CollisionComponent component) {
         return
             (ActiveComponent != null && ComponentMatch(component, ActiveComponent)) ||
@@ -1125,8 +1010,5 @@ public class CollisionManager {
         return a.ActorValid && b.ActorValid && a.Actor == b.Actor;
     }
 
-    static ColliderContext FlipContext(ColliderContext ctx) {
-        return new(ctx.ColliderB, ctx.PositionB, ctx.PositionBInv, ctx.VelocityB, ctx.ColliderA, ctx.PositionA, ctx.PositionAInv, ctx.VelocityA);
-    }
     #endregion
 }
