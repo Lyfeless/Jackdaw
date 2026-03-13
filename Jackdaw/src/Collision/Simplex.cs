@@ -4,7 +4,7 @@ using Foster.Framework;
 namespace Jackdaw;
 
 internal struct GJKSimplex {
-    readonly ColliderContextPair Ctx;
+    public readonly ColliderContextPair Ctx;
 
     public readonly Vector2[] Points = new Vector2[3];
     int addIndex = 0;

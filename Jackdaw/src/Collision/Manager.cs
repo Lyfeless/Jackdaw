@@ -9,12 +9,8 @@ namespace Jackdaw;
 public class CollisionManager {
     #region Definitions
     const int ITERATION_LIMIT = 32;
-    const float PUSHOUT_TOLERANCE = 0.0001f;
     const float SWEEP_TOLERANCE = 0.0001f;
 
-    record struct Edge(int Index, Vector2 Normal, float Distance);
-    record struct CollisionSimplexInfo(Vector2 A, Vector2 B, Vector2 C, bool Collided);
-    record struct CollisionPushoutInfo(Vector2 Pushout, bool Collided);
     record struct CollisionSweepInfo(Vector2 Fraction, Vector2 Normal, bool Collided);
 
     record struct SimplexColliderPair(Collider A, Collider B);
@@ -84,6 +80,15 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
+    public AllCollisionInfo GetAllCollisions(CollisionComponent collider, Vector2 position)
+        => GetAllCollisions(collider, Matrix3x2.CreateTranslation(position));
+
+    /// <summary>
+    /// Get all collisions between given collider component and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
     public AllCollisionInfo GetAllCollisions(CollisionComponent collider, Matrix3x2 position)
         => GetAllCollisions(collider, position, position.Invert());
 
@@ -118,6 +123,15 @@ public class CollisionManager {
     /// <returns>Information about collision check results.</returns>
     public AllCollisionInfo GetAllCollisions(Collider collider, Transform position)
         => GetAllCollisions(collider, position.Matrix, position.MatrixInverse);
+
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public AllCollisionInfo GetAllCollisions(Collider collider, Vector2 position)
+        => GetAllCollisions(collider, Matrix3x2.CreateTranslation(position));
 
     /// <summary>
     /// Get all collisions between given collider and all registered collision components at a given location.
@@ -189,6 +203,16 @@ public class CollisionManager {
     /// <param name="collider">The collider component to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
+    public SingleCollisionInfo GetFirstCollision(CollisionComponent collider, Vector2 position)
+        => GetFirstCollision(collider, Matrix3x2.CreateTranslation(position));
+
+    /// <summary>
+    /// Get the first object the given collider component collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
     public SingleCollisionInfo GetFirstCollision(CollisionComponent collider, Matrix3x2 position)
         => GetFirstCollision(collider, position, position.Invert());
 
@@ -226,6 +250,16 @@ public class CollisionManager {
     /// <returns>Information about collision check results.</returns>
     public SingleCollisionInfo GetFirstCollision(Collider collider, Transform position)
         => GetFirstCollision(collider, position.Matrix, position.MatrixInverse);
+
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SingleCollisionInfo GetFirstCollision(Collider collider, Vector2 position)
+        => GetFirstCollision(collider, Matrix3x2.CreateTranslation(position));
 
     /// <summary>
     /// Get the first object the given collider collides with at a given location.
@@ -274,7 +308,7 @@ public class CollisionManager {
     /// Get all collision data from a ray.
     /// </summary>
     /// <param name="component">The raycast component to check against.</param>
-    /// <param name="position">The position to offset the raycast by.</param>
+    /// <param name="position">The transform to apply to the ray.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetRayCollision(RaycastComponent component, ActorPosition position)
         => GetRayCollision(component, position.LocalPosition);
@@ -283,7 +317,7 @@ public class CollisionManager {
     /// Get all collision data from a ray.
     /// </summary>
     /// <param name="component">The raycast component to check against.</param>
-    /// <param name="position">The position to offset the raycast by.</param>
+    /// <param name="position">The transform to apply to the ray.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetRayCollision(RaycastComponent component, Transform position)
         => GetRayCollision(component, position.Position);
@@ -292,7 +326,7 @@ public class CollisionManager {
     /// Get all collision data from a ray.
     /// </summary>
     /// <param name="component">The raycast component to check against.</param>
-    /// <param name="position">The position to offset the raycast by.</param>
+    /// <param name="position">The transform to apply to the ray.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetRayCollision(RaycastComponent component, Vector2 position)
         => GetRayCollision(component.Ray.Position + position, component.Ray.Direction, component.Mask);
@@ -331,7 +365,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, ActorPosition position, Vector2 velocity)
@@ -341,7 +375,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Transform position, Vector2 velocity)
@@ -351,7 +385,17 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="velocity">The collider's velocity.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Vector2 position, Vector2 velocity)
+        => GetSweptCollision(collider, Matrix3x2.CreateTranslation(position), velocity);
+
+    /// <summary>
+    /// Get collision results for a shapecast.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity)
@@ -361,7 +405,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
@@ -376,7 +420,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, ActorPosition position, Vector2 velocity)
@@ -386,7 +430,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, Transform position, Vector2 velocity)
@@ -396,7 +440,17 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="velocity">The collider's velocity.</param>
+    /// <returns>Information about collision check results.</returns>
+    public SweptCollisionInfo GetSweptCollision(Collider collider, Vector2 position, Vector2 velocity)
+        => GetSweptCollision(collider, Matrix3x2.CreateTranslation(position), velocity);
+
+    /// <summary>
+    /// Get collision results for a shapecast.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public SweptCollisionInfo GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity)
@@ -406,7 +460,7 @@ public class CollisionManager {
     /// Get collision results for a shapecast.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
@@ -472,7 +526,7 @@ public class CollisionManager {
             // Apply small pushback to stop objects getting stuck inside one another
             if (ctx.A.Velocity.X != 0) { fraction.X -= SWEEP_TOLERANCE + float.Epsilon; }
             if (ctx.A.Velocity.Y != 0) { fraction.Y -= SWEEP_TOLERANCE + float.Epsilon; }
-            Vector2 fractionClamped = FractionNegative(fraction) ? Vector2.Zero : fraction;
+            Vector2 fractionClamped = IsFractionNegative(fraction) ? Vector2.Zero : fraction;
 
             SweptColliderInfo info = new(pair.B, fraction, fractionClamped, pair.Normal);
             if (IsRayFractionSmaller(info.Fraction, collisionPairs[closest].Fraction)) {
@@ -521,7 +575,7 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, ActorPosition position)
         => GetCollisionPushout(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
@@ -533,7 +587,7 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Transform position)
         => GetCollisionPushout(collider, position.Matrix, position.MatrixInverse);
@@ -545,7 +599,19 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Vector2 position)
+        => GetCollisionPushout(collider, Matrix3x2.CreateTranslation(position));
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Matrix3x2 position)
         => GetCollisionPushout(collider, position, position.Invert());
@@ -557,7 +623,7 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv) {
@@ -574,7 +640,43 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushout(Collider collider, ActorPosition position)
+        => GetCollisionPushout(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
+
+    /// <summary>
+    /// Get the distance required to push the collider out of geometry.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushout(Collider collider, Transform position)
+        => GetCollisionPushout(collider, position.Matrix, position.MatrixInverse);
+
+    /// <summary>
+    /// Get the distance required to push the collider out of geometry.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushout(Collider collider, Vector2 position)
+        => GetCollisionPushout(collider, Matrix3x2.CreateTranslation(position));
+
+    /// <summary>
+    /// Get the distance required to push the collider out of geometry.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(Collider collider, Matrix3x2 position)
         => GetCollisionPushout(collider, position, position.Invert());
@@ -586,7 +688,7 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushout(Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {
@@ -629,11 +731,11 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, ActorPosition position, Vector2 direction)
-        => GetCollisionPushoutInDirection(collider, position.GlobalMatrix, direction);
+        => GetCollisionPushoutInDirection(collider, position.GlobalMatrix, position.GlobalMatrixInverse, direction);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry in a given direction.
@@ -642,11 +744,11 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
     public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Transform position, Vector2 direction)
-        => GetCollisionPushoutInDirection(collider, position.Matrix, direction);
+        => GetCollisionPushoutInDirection(collider, position.Matrix, position.MatrixInverse, direction);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry in a given direction.
@@ -655,12 +757,39 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Matrix3x2 position, Vector2 direction) {
-        if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
-        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction), direction);
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Vector2 position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, Matrix3x2.CreateTranslation(position), direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Matrix3x2 position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, position, position.Invert(), direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 direction) {
+        if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position, positionInv); }
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, positionInv, -direction), direction);
     }
 
     /// <summary>
@@ -670,12 +799,65 @@ public class CollisionManager {
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
-    /// <param name="position">The position offset for the collider by.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Matrix3x2 position, Vector2 direction) {
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, ActorPosition position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, position.GlobalMatrix, position.GlobalMatrixInverse, direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Transform position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, position.Matrix, position.MatrixInverse, direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Vector2 position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, Matrix3x2.CreateTranslation(position), direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Matrix3x2 position, Vector2 direction)
+        => GetCollisionPushoutInDirection(collider, position, position.Invert(), direction);
+
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry in a given direction.
+    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider.
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
+    /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
+    /// <returns>Information about collision pushout results.</returns>
+    public PushoutCollisionInfo GetCollisionPushoutInDirection(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 direction) {
         if (direction == Vector2.Zero) { return GetCollisionPushout(collider, position); }
-        return SweptToPushoutInfo(GetSweptCollision(collider, position, -direction), direction);
+        return SweptToPushoutInfo(GetSweptCollision(collider, position, positionInv, -direction), direction);
     }
 
     static PushoutCollisionComponentInfo GetPushoutCollisionComponentInfo(
@@ -760,10 +942,7 @@ public class CollisionManager {
 
         if (ctx.B.Collider.Multi) { return ColliderPushout(ctx.Flip(), !reversed); }
 
-        GJKSimplex simplex = new(ctx);
-        if (!simplex.Collided) { return []; }
-
-        CollisionPushoutInfo info = GetPushout(ctx, simplex);
+        EPAPushout info = new(ctx);
         if (!info.Collided) { return []; }
         return [reversed ? new(ctx.B.Collider, ctx.A.Collider, -info.Pushout) : new(ctx.A.Collider, ctx.B.Collider, info.Pushout)];
     }
@@ -790,61 +969,12 @@ public class CollisionManager {
 
         CollisionSweepInfo collision = GetRayIntersectionFraction(ctx);
         // Sweep calculation sometimes gives results for colliders that aren't initially colliding
-        if (!collision.Collided || (FractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0)) { return []; }
+        if (!collision.Collided || (IsFractionNegative(collision.Fraction) && ColliderOverlapCheck(ctx).Length == 0)) { return []; }
         return [reversed ? new(ctx.B.Collider, ctx.A.Collider, collision.Fraction, collision.Normal) : new(ctx.A.Collider, ctx.B.Collider, collision.Fraction, collision.Normal)];
     }
     #endregion
 
     #region Primary Collision Functions
-    static CollisionPushoutInfo GetPushout(ColliderContextPair ctx, GJKSimplex simplex) {
-        if (!simplex.Collided) { return new(Vector2.Zero, false); }
-
-        List<Vector2> points = [
-            simplex.A,
-            simplex.B,
-            simplex.C
-        ];
-
-        bool clockwiseWinding = IsClockwiseWinding(simplex.A, simplex.B, simplex.C);
-        Vector2 pushout = Vector2.Zero;
-
-        for (int i = 0; i < ITERATION_LIMIT; ++i) {
-            Edge closestEdge = new(0, Vector2.Zero, float.PositiveInfinity);
-
-            // Find edge closest to the origin
-            for (int indexA = 0; indexA < points.Count; ++indexA) {
-                int indexB = (indexA + 1) % points.Count;
-
-                Vector2 pointA = points[indexA];
-                Vector2 pointB = points[indexB];
-                Vector2 line = pointB - pointA;
-                Vector2 normal = clockwiseWinding ? new Vector2(line.Y, -line.X) : new Vector2(-line.Y, line.X);
-                normal = normal.Normalized();
-
-                float compareDistance = Vector2.Dot(normal, pointA);
-                if (compareDistance < closestEdge.Distance) {
-                    closestEdge = new(indexB, normal, compareDistance);
-                }
-            }
-
-            // Find new support in direction of closest edge
-            Vector2 direction = closestEdge.Normal;
-            Vector2 newSupport = ctx.Support(direction);
-            float supportDistance = Vector2.Dot(newSupport, direction);
-
-            // Determine new pushout approximation
-            pushout = supportDistance * direction;
-
-            // Return immediately if pushout is as close as possible
-            supportDistance = MathF.Abs(supportDistance - closestEdge.Distance);
-            if (supportDistance <= PUSHOUT_TOLERANCE) { return new(pushout, true); }
-
-            points.Insert(closestEdge.Index, newSupport);
-        }
-
-        // Return closest approximate pushout if nothing better can be found in time
-        return new(pushout, true);
-    }
 
     static CollisionSweepInfo GetRayIntersectionFraction(ColliderContextPair ctx) {
         // Get velocity difference
@@ -912,15 +1042,6 @@ public class CollisionManager {
     #endregion
 
     #region Utilities
-    static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
-
-    static bool IsClockwiseWinding(Vector2 a, Vector2 b, Vector2 c) {
-        float wind0 = (b.X - a.X) * (b.Y + a.Y);
-        float wind1 = (c.X - b.X) * (c.Y + b.Y);
-        float wind2 = (a.X - c.X) * (a.Y + c.Y);
-        return wind0 + wind1 + wind2 <= 0;
-    }
-
     static bool IsRayFractionSmaller(Vector2 newFraction, Vector2 originalFraction) {
         // We can assume both axes will be smaller because the ray will always be along the original line
         return newFraction.X <= originalFraction.X && newFraction.Y <= originalFraction.Y;
@@ -933,7 +1054,7 @@ public class CollisionManager {
         );
     }
 
-    static bool FractionNegative(Vector2 fraction) {
+    static bool IsFractionNegative(Vector2 fraction) {
         return MathF.Min(fraction.X, fraction.Y) < 0;
     }
 
@@ -996,19 +1117,16 @@ public class CollisionManager {
         return new(min, max - min);
     }
 
-    bool ShouldSkipCollider(CollisionComponent component) {
-        return
-            (ActiveComponent != null && ComponentMatch(component, ActiveComponent)) ||
-            !component.Actor.GlobalComponentsTicking ||
-            !component.Ticking;
-    }
+    bool ShouldSkipCollider(CollisionComponent component) =>
+        !component.Ticking ||
+        !component.Actor.GlobalComponentsTicking ||
+        (ActiveComponent != null && ComponentMatch(component, ActiveComponent));
 
     static bool ComponentMatch(CollisionComponent a, CollisionComponent b)
         => a == b || ActorMatch(a, b);
 
-    static bool ActorMatch(CollisionComponent a, CollisionComponent b) {
-        return a.ActorValid && b.ActorValid && a.Actor == b.Actor;
-    }
+    static bool ActorMatch(CollisionComponent a, CollisionComponent b)
+        => a.ActorValid && b.ActorValid && a.Actor == b.Actor;
 
     #endregion
 }

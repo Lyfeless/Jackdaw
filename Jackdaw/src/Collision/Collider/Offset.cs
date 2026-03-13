@@ -8,8 +8,8 @@ namespace Jackdaw;
 /// Mostly used for internal systems.
 /// </summary>
 public class OffsetCollider : Collider {
-    readonly Collider Collider;
-    readonly Vector2 Offset;
+    public readonly Collider Collider;
+    public readonly Vector2 Offset;
 
     /// <summary>
     /// Create an offset collider from an existing collider.
