@@ -87,9 +87,11 @@ internal struct JDASweep {
         SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
     }
 
-    static float VelocityFraction(Vector2 value, Vector2 max) {
-        return (max.X == 0) ? 0 : (value.X / max.X);
-    }
+    public static float VelocityFraction(Vector2 value, Vector2 max)
+        // Fraction should be the same on either axis so just use the one that will give more precision
+        => Math.Abs(max.X) > Math.Abs(max.Y) ? FloatFraction(value.X, max.X) : FloatFraction(value.Y, max.Y);
+
+    static float FloatFraction(float value, float max) => (max == 0) ? 0 : (value / max);
 
     // Returns squared length for optimization
     // Expects direction to be normalized

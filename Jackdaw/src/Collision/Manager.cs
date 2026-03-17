@@ -155,13 +155,16 @@ public class CollisionManager {
                 new(other)
             );
 
-            components.Add(new(
-                other,
-                [.. ctx.GetOverlappingPairs()
-                    .Where(e => new GJKSimplex(e).Collided)
-                    .Select(e => new CollisionResult.ColliderResult())
-                ]
-            ));
+            List<ColliderContextPair> pairs = ctx.GetOverlappingPairs();
+            if (pairs.Count == 0) { continue; }
+
+            CollisionResult.ColliderResult[] results = [..pairs
+                .Where(e => new GJKSimplex(e).Collided)
+                .Select(e => new CollisionResult.ColliderResult(e.B))];
+
+            if (results.Length == 0) { continue; }
+
+            components.Add(new(other, results));
         }
 
         return new([.. components]);
@@ -296,7 +299,7 @@ public class CollisionManager {
 
             CollisionResult.ColliderResult[] results = [.. pairs
                 .Where(e => new GJKSimplex(e).Collided)
-                .Select(e => new CollisionResult.ColliderResult(e.A))
+                .Select(e => new CollisionResult.ColliderResult(e.B))
             ];
             if (results.Length == 0) { continue; }
 
@@ -498,7 +501,7 @@ public class CollisionManager {
             foreach (ColliderContextPair pair in pairs) {
                 JDASweep sweep = new(pair);
                 if (!sweep.Collided) { continue; }
-                colliders.Add(new(pair.A, sweep));
+                colliders.Add(new(pair.B, sweep));
             }
 
             if (colliders.Count == 0) { continue; }
@@ -665,7 +668,7 @@ public class CollisionManager {
             foreach (ColliderContextPair pair in pairs) {
                 EPAPushout pushout = new(pair);
                 if (!pushout.Collided) { continue; }
-                colliders.Add(new(pair.A, pushout));
+                colliders.Add(new(pair.B, pushout));
             }
 
             if (Colliders.Count == 0) { continue; }

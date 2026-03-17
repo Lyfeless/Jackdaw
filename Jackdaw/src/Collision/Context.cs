@@ -57,7 +57,7 @@ internal readonly struct ColliderContextPair(ColliderContext a, ColliderContext 
     static Rect SweptBounds(Rect rect, Vector2 velocity) {
         Vector2 min = Vector2.Min(rect.TopLeft, rect.TopLeft + velocity);
         Vector2 max = Vector2.Max(rect.BottomRight, rect.BottomRight + velocity);
-        return new(min, max - min);
+        return Rect.Between(min, max);
     }
 
     public List<ColliderContextPair> GetOverlappingPairs() {
@@ -121,9 +121,9 @@ internal readonly struct ColliderContext {
     public ColliderContext(CollisionComponent component, Matrix3x2 position, Vector2 velocity)
         : this(component, position, position.Invert(), velocity) { }
     public ColliderContext(CollisionComponent component, Vector2 velocity)
-        : this(component, component.Actor.Transform.GlobalDisplayMatrix, component.Actor.Transform.GlobalDisplayMatrixInverse, velocity) { }
+        : this(component, component.Actor.Transform.GlobalMatrix, component.Actor.Transform.GlobalMatrixInverse, velocity) { }
     public ColliderContext(CollisionComponent component)
-        : this(component, component.Actor.Transform.GlobalDisplayMatrix, component.Actor.Transform.GlobalDisplayMatrixInverse, Vector2.Zero) { }
+        : this(component, component.Actor.Transform.GlobalMatrix, component.Actor.Transform.GlobalMatrixInverse, Vector2.Zero) { }
 
     public ColliderContext WithCollider(Collider collider) => new(
         collider,

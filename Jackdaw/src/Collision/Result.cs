@@ -84,7 +84,7 @@ public readonly struct CollisionResult {
             // Apply a small amount of additional pushout to stop objects getting stuck
             if (Collided) {
                 AdjustedVelocity -= AdjustedVelocity.Normalized() * SEPERATION_AMOUNT;
-                Fraction = AdjustedVelocity.X / OriginalVelocity.X;
+                Fraction = JDASweep.VelocityFraction(AdjustedVelocity, OriginalVelocity);
             }
 
             FractionClamped = Calc.Clamp(Fraction);
