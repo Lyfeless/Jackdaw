@@ -20,7 +20,7 @@ public class RaycastComponent(Game game, Vector2 position, Vector2 direction) : 
     /// <summary>
     /// Collision result for the tick.
     /// </summary>
-    public SweptCollisionInfo Collisions;
+    public CollisionResult Collisions;
 
     protected override void Update() {
         Collisions = Game.Collision.GetRayCollision(this);
