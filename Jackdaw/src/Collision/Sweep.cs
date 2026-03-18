@@ -20,59 +20,43 @@ internal struct JDASweep {
 
         // Get velocity difference
         Vector2 velocityDifference = ctx.B.Velocity - ctx.A.Velocity;
+        Vector2 velocityNormal = velocityDifference.Normalized();
 
         // Cancel if objects are moving the same direction or stationary
         if (velocityDifference == Vector2.Zero) { return; }
-
-        float velocityLength = velocityDifference.LengthSquared();
 
         // Point A
         Vector2 direction = -velocityDifference;
         Vector2 pointA = ctx.Support(direction);
 
         // Point B
-        direction = Calc.TripleProduct(direction, -pointA, direction);
+        direction = ClosestUnclamped(pointA, velocityDifference);
         Vector2 pointB = ctx.Support(direction);
 
-        float crossA = Calc.Cross(velocityDifference, pointA);
-        float crossB = Calc.Cross(velocityDifference, pointB);
-        if (MathF.Sign(crossA) == MathF.Sign(crossB)) {
-            // First line lies exactly on velocity vector
-            if (MathF.Abs(crossA) < float.Epsilon && MathF.Abs(crossB) < float.Epsilon) {
-                if (SweepInfiniteCollisionResolve(pointA, pointB, velocityLength, out Vector2 intersection)) {
-                    Fraction = VelocityFraction(intersection, velocityDifference);
-                    Normal = -velocityDifference.Normalized();
-                    Collided = true;
-                }
-            }
+        float crossA = Calc.Cross(velocityNormal, pointA.Normalized());
+        float crossB = Calc.Cross(velocityNormal, pointB.Normalized());
 
-            return;
-        }
+        if (!CrossesVelocity(crossA, crossB)) { return; }
 
         for (int i = 0; i < ITERATION_LIMIT; ++i) {
-            // Get new point C
-            direction = PerpDirection(pointA, pointB, -velocityDifference);
-            // Exit immediately if the direction has no magnitude (lies exactly on the line AB)
-            if (direction.LengthSquared() < float.Epsilon) {
-                SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
+            // Points lie exactly on the line
+            if (ApproxZero(crossA, crossB)) {
+                Set(CloserToZero(pointA, pointB), -velocityNormal, velocityDifference);
                 return;
             }
+
+            // Get new point C
+            direction = PerpDirection(pointA, pointB, -velocityDifference);
+
             Vector2 pointC = ctx.Support(direction);
 
             // New support point is the same as one of the current points
-            if (Vector2.DistanceSquared(pointC, pointA) < TOLERANCE || Vector2.DistanceSquared(pointC, pointB) < TOLERANCE) {
-                SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
+            if (ApproxEither(pointA, pointB, pointC)) {
+                Set(pointA, pointB, direction.Normalized(), velocityDifference);
                 return;
             }
 
-            float crossC = Calc.Cross(velocityDifference, pointC);
-
-            // pointC lies exactly on the line
-            if (MathF.Abs(crossC) < float.Epsilon) {
-                Fraction = VelocityFraction(pointC, velocityDifference);
-                Normal = PerpDirection(pointA, pointB, -velocityDifference);
-                Collided = true;
-            }
+            float crossC = Calc.Cross(velocityNormal, pointC.Normalized());
 
             if (MathF.Sign(crossC) == MathF.Sign(crossA)) {
                 pointA = pointC;
@@ -84,7 +68,29 @@ internal struct JDASweep {
             }
         }
 
-        SweepLineIntersection(pointA, pointB, velocityDifference, velocityLength);
+        Set(pointA, pointB, direction.Normalized(), velocityDifference);
+    }
+
+    public void Set(Vector2 a, Vector2 b, Vector2 normal, Vector2 velocity)
+        => Set(Intersection(a, b, velocity), normal, velocity);
+
+    public void Set(Vector2 intersection, Vector2 normal, Vector2 velocity) {
+        float frac = VelocityFraction(intersection, velocity);
+
+        // Cancel if sweep is trying to push backwards when objects didn't initally collide
+        if (frac < 0 && !new GJKSimplex(Ctx).Collided) {
+            return;
+        }
+
+        Fraction = Math.Min(frac, 1);
+        Collided = frac <= 1;
+        Normal = normal;
+    }
+
+    static bool CrossesVelocity(float crossA, float crossB) {
+        int signA = Math.Sign(crossA);
+        int signB = Math.Sign(crossB);
+        return Math.Max(signA, signB) >= 0 && Math.Min(signA, signB) < 0;
     }
 
     public static float VelocityFraction(Vector2 value, Vector2 max)
@@ -93,55 +99,34 @@ internal struct JDASweep {
 
     static float FloatFraction(float value, float max) => (max == 0) ? 0 : (value / max);
 
-    // Returns squared length for optimization
-    // Expects direction to be normalized
-    static float SweepIntersectionLength(Vector2 intersection, Vector2 direction) {
-        float distance = intersection.LengthSquared();
-        return Vector2.Dot(intersection.Normalized(), direction) > 0 ? distance : -distance;
+    static Vector2 Intersection(Vector2 a, Vector2 b, Vector2 velocity) {
+        float denominator = ((a.X - b.X) * velocity.Y) - ((a.Y - b.Y) * velocity.X);
+        if (denominator == 0) { Console.WriteLine("denom 0"); return CloserToZero(a, b); }
+        return new(((a.X * b.Y) - (a.Y * b.X)) * velocity.X / denominator, ((a.X * b.Y) - (a.Y * b.X)) * velocity.Y / denominator);
     }
 
-    // Expects velocityLength to be a squared distance
-    static bool SweepInfiniteCollisionResolve(Vector2 pointA, Vector2 pointB, float velocityLength, out Vector2 intersection) {
-        float distA = pointA.LengthSquared();
-        float distB = pointB.LengthSquared();
-        float dist;
-        if (distA < distB) {
-            dist = distA;
-            intersection = pointA;
-        }
-        else {
-            dist = distB;
-            intersection = pointB;
-        }
+    static bool ApproxEither(Vector2 a, Vector2 b, Vector2 newPoint)
+        => ApproxEqual(a, newPoint) || ApproxEqual(b, newPoint);
 
-        return dist < velocityLength;
+    static bool ApproxEqual(Vector2 a, Vector2 b) => Vector2.DistanceSquared(a, b) < TOLERANCE;
+
+    static bool ApproxZero(float cross) => MathF.Abs(cross) < TOLERANCE;
+
+    static bool ApproxZero(float crossA, float crossB)
+    => ApproxZero(crossA) && ApproxZero(crossB);
+
+    static Vector2 CloserToZero(Vector2 a, Vector2 b)
+        => a.LengthSquared() < b.LengthSquared() ? a : b;
+
+    static Vector2 PerpDirection(Vector2 pointA, Vector2 pointB, Vector2 velocity) {
+        Vector2 perp = (pointB - pointA).TurnLeft();
+        if (Vector2.Dot(perp, velocity) < 0) { perp = -perp; }
+        return perp;
     }
 
-    // Expects velocityLength to be a squared distance
-    void SweepLineIntersection(Vector2 pointA, Vector2 pointB, Vector2 velocity, float velocityLength) {
-        if (!new Line(Vector2.Zero, velocity).IntersectionLineSegment(new(pointA, pointB), out Vector2 intersection)) { return; }
-
-        Normal = PerpDirection(pointA, pointB, velocity).Normalized();
-
-        // NaN is returned if the lines are the same
-        if (intersection == Vector2.NaN) {
-            if (!SweepInfiniteCollisionResolve(pointA, pointB, velocityLength, out intersection)) {
-                Normal = -velocity;
-                return;
-            }
-        }
-        else {
-            if (SweepIntersectionLength(intersection, velocity) > velocityLength) { return; }
-        }
-
-        Fraction = VelocityFraction(intersection, velocity);
-        Collided = true;
-    }
-
-    static Vector2 PerpDirection(Vector2 pointA, Vector2 pointB, Vector2 facingDirection) {
-        Vector2 line = pointB - pointA;
-        Vector2 direction = Calc.TripleProduct(line, pointA, line);
-        if (Vector2.Dot(direction, facingDirection) < 0) { direction = -direction; }
-        return direction;
+    static Vector2 ClosestUnclamped(Vector2 point, Vector2 velocity) {
+        Line line = new(Vector2.Zero, velocity);
+        return line.On(line.ClosestTUnclamped(point)) - point;
+        // return new Line(Vector2.Zero, velocity).ClosestPoint(point) - point;
     }
 }

@@ -73,10 +73,12 @@ public readonly struct CollisionResult {
         public readonly Vector2 OriginalVelocity = Vector2.Zero;
         public readonly Vector2 AdjustedVelocity = Vector2.Zero;
         public readonly Vector2 AdjustedVelocityClamped = Vector2.Zero;
+        public readonly Vector2 Normal = Vector2.UnitY;
 
-        internal SweepResult(bool collided, float fraction, Vector2 velocity) {
+        internal SweepResult(bool collided, float fraction, Vector2 normal, Vector2 velocity) {
             Collided = collided;
             OriginalVelocity = velocity;
+            Normal = normal;
 
             Fraction = fraction;
             AdjustedVelocity = OriginalVelocity * Fraction;
@@ -94,7 +96,7 @@ public readonly struct CollisionResult {
         internal SweepResult(JDASweep sweep)
             // Assuming collider A because manual sweep checks will order the colliders correctly
             //  Need to use a more robust setup if this is used for an eventual broadphase
-            : this(sweep.Collided, sweep.Fraction, sweep.Ctx.A.Velocity) { }
+            : this(sweep.Collided, sweep.Fraction, sweep.Normal, sweep.Ctx.A.Velocity) { }
     }
 
 

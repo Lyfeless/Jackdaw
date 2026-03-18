@@ -509,7 +509,7 @@ public class CollisionManager {
             components.Add(new(other, [.. colliders.OrderBy(e => e.Sweep.Fraction)]));
         }
 
-        if (components.Count == 0) { return new(new CollisionResult.SweepResult(false, 1, velocity)); }
+        if (components.Count == 0) { return new(new CollisionResult.SweepResult(false, 1, Vector2.UnitY, velocity)); }
         return new([.. components.OrderBy(e => e.Sweep.Fraction)]);
     }
     #endregion
