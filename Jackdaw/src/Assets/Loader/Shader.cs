@@ -23,7 +23,7 @@ public class ShaderLoader() : AssetLoaderStage() {
         string shaderExtension = $".{assets.GraphicsDevice.Driver.GetShaderExtension()}";
 
         foreach (ShaderConfigEntry entry in shaderConfig.ShaderConfigs) {
-            AssetProviderItem item = new(assets.Config.ShaderGroup, entry.Name, shaderExtension);
+            AssetProviderItem item = new(assets.Config.ShaderGroup, entry.Path, shaderExtension);
             if (!assets.Provider.HasItem(item)) { continue; }
 
             using Stream shaderStream = assets.Provider.GetItemStream(item);
