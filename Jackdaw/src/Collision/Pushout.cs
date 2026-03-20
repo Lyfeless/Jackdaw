@@ -4,6 +4,8 @@ using Foster.Framework;
 namespace Jackdaw;
 
 internal struct EPAPushout {
+    const float SEPERATION_AMOUNT = 0.01f;
+
     readonly struct Edge {
         public readonly Vector2 From;
         public readonly Vector2 To;
@@ -63,11 +65,15 @@ internal struct EPAPushout {
 
             // Return immediately if pushout is as close as possible
             supportDistance = MathF.Abs(supportDistance - closestEdge.Distance);
-            if (supportDistance <= TOLERANCE) { return; }
+            if (supportDistance <= TOLERANCE) {
+                Pushout = ApplySeperation(Pushout);
+                return;
+            }
 
             edges[closestIndex] = new(closestEdge.From, newSupport, isClockwise);
             edges.Add(new(newSupport, closestEdge.To, isClockwise));
         }
+        Pushout = ApplySeperation(Pushout);
     }
 
     static bool IsClockwiseWinding(Vector2 a, Vector2 b, Vector2 c) {
@@ -84,4 +90,7 @@ internal struct EPAPushout {
         }
         return closestEdge;
     }
+
+    static Vector2 ApplySeperation(Vector2 pushout)
+        => pushout + (pushout.Normalized() * SEPERATION_AMOUNT);
 }

@@ -43,18 +43,12 @@ public readonly struct CollisionResult {
     }
 
     internal readonly struct Data {
-        const float SEPERATION_AMOUNT = 0.0001f;
-
         public readonly Vector2 Pushout = Vector2.Zero;
         public readonly SweepResult Sweep = new();
 
-        internal Data(EPAPushout pushout) : this(pushout.Collided, pushout.Pushout) { }
-        internal Data(bool collided, Vector2 pushout) {
+        internal Data(EPAPushout pushout) : this(pushout.Pushout) { }
+        internal Data(Vector2 pushout) {
             Pushout = pushout;
-            // Apply a small amount of additional pushout to stop objects getting stuck
-            if (collided) {
-                Pushout += Pushout.Normalized() * SEPERATION_AMOUNT;
-            }
         }
 
         internal Data(JDASweep sweep) : this(new SweepResult(sweep)) { }
@@ -65,8 +59,6 @@ public readonly struct CollisionResult {
     }
 
     public readonly struct SweepResult {
-        const float SEPERATION_AMOUNT = 0.0001f;
-
         public readonly bool Collided = false;
         public readonly float Fraction = 1;
         public readonly float FractionClamped = 1;
@@ -82,12 +74,6 @@ public readonly struct CollisionResult {
 
             Fraction = fraction;
             AdjustedVelocity = OriginalVelocity * Fraction;
-
-            // Apply a small amount of additional pushout to stop objects getting stuck
-            if (Collided) {
-                AdjustedVelocity -= AdjustedVelocity.Normalized() * SEPERATION_AMOUNT;
-                Fraction = JDASweep.VelocityFraction(AdjustedVelocity, OriginalVelocity);
-            }
 
             FractionClamped = Calc.Clamp(Fraction);
             AdjustedVelocityClamped = OriginalVelocity * FractionClamped;

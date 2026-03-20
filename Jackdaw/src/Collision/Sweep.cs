@@ -6,6 +6,7 @@ namespace Jackdaw;
 internal struct JDASweep {
     const int ITERATION_LIMIT = 32;
     public const float TOLERANCE = 0.0001f;
+    const float SEPERATION_AMOUNT = 0.01f;
 
     public readonly ColliderContextPair Ctx;
 
@@ -82,10 +83,23 @@ internal struct JDASweep {
             return;
         }
 
+        // Apply a small amount of additional pushout to stop objects getting stuck
+        if (FractionCollided(frac)) {
+            frac = VelocityFraction(ApplySeperation(intersection, normal), velocity);
+        }
+
         Fraction = Math.Min(frac, 1);
-        Collided = frac <= 1;
+        Collided = FractionCollided(frac);
         Normal = normal;
     }
+
+    static Vector2 ApplySeperation(Vector2 point, Vector2 normal) {
+        Vector2 pointNormal = point.Normalized();
+        Vector2 seperation = pointNormal * (SEPERATION_AMOUNT / Vector2.Dot(normal, pointNormal));
+        return point + seperation;
+    }
+
+    static bool FractionCollided(float fraction) => fraction <= 1;
 
     static bool CrossesVelocity(float crossA, float crossB) {
         int signA = Math.Sign(crossA);
