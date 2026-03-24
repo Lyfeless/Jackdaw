@@ -107,23 +107,16 @@ internal readonly struct ColliderContext {
     public ColliderContext(Collider collider)
         : this(collider, Matrix3x2.Identity, Matrix3x2.Identity, Vector2.Zero) { }
 
-    public ColliderContext(CollisionComponent component, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity) {
-        Collider = component.Collider;
-        Position = position;
-        PositionInv = positionInv;
-        Velocity = velocity;
-    }
-
     public ColliderContext(CollisionComponent component, Matrix3x2 position, Matrix3x2 positionInv)
-        : this(component, position, positionInv, Vector2.Zero) { }
+        : this(component.Collider, position, positionInv, Vector2.Zero) { }
     public ColliderContext(CollisionComponent component, Matrix3x2 position)
-        : this(component, position, position.Invert(), Vector2.Zero) { }
+        : this(component.Collider, position, position.Invert(), Vector2.Zero) { }
     public ColliderContext(CollisionComponent component, Matrix3x2 position, Vector2 velocity)
-        : this(component, position, position.Invert(), velocity) { }
+        : this(component.Collider, position, position.Invert(), velocity) { }
     public ColliderContext(CollisionComponent component, Vector2 velocity)
-        : this(component, component.Actor.Transform.GlobalMatrix, component.Actor.Transform.GlobalMatrixInverse, velocity) { }
+        : this(component.Collider, component.Actor.Transform.GlobalMatrix, component.Actor.Transform.GlobalMatrixInverse, velocity) { }
     public ColliderContext(CollisionComponent component)
-        : this(component, component.Actor.Transform.GlobalMatrix, component.Actor.Transform.GlobalMatrixInverse, Vector2.Zero) { }
+        : this(component, Vector2.Zero) { }
 
     public ColliderContext WithCollider(Collider collider) => new(
         collider,
@@ -133,7 +126,7 @@ internal readonly struct ColliderContext {
     );
 
     public Vector2 Support(Vector2 direction) {
-        Vector2 adjustedDirection = direction.TransformDirection(PositionInv);
+        Vector2 adjustedDirection = Vector2.TransformNormal(direction, PositionInv);
         return Vector2.Transform(Collider.Support(adjustedDirection), Position);
     }
 }

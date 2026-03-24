@@ -5,21 +5,23 @@ namespace Jackdaw;
 
 public static class Vector2Extensions {
     extension(Vector2 v) {
-        /// <summary>
-        /// Convert a 2D vector's angle without changing its length.
-        /// </summary>
-        /// <param name="transform">The transform to apply to the direction.</param>
-        /// <returns>The transformed direction.</returns>
-        public Vector2 TransformDirection(Transform transform)
-            => TransformDirection(v, transform.Matrix);
+        public float Dot(Vector2 other) => Vector2.Dot(v, other);
 
-        /// <summary>
-        /// Convert a 2D vector's angle without changing its length.
-        /// </summary>
-        /// <param name="transform">The matrix to transform the direction by.</param>
-        /// <returns>The transformed direction.</returns>
-        public Vector2 TransformDirection(Matrix3x2 transform) {
-            return Vector2.Transform(v, transform) - transform.Translation;
+        public bool SameDirection(Vector2 other) => v.Dot(other) > 0;
+
+        public bool SameDirectionInclusive(Vector2 other) => v.Dot(other) >= 0;
+
+        public bool OppositeDirection(Vector2 other) => !v.SameDirectionInclusive(other);
+
+        public bool OppositeDirectionInclusive(Vector2 other) => !v.SameDirection(other);
+
+        public static Vector2 PerpendicularAway(Vector2 a, Vector2 b, Vector2 target)
+        => -PerpendicularToward(a, b, target);
+
+        public static Vector2 PerpendicularToward(Vector2 a, Vector2 b, Vector2 target) {
+            Vector2 perp = (a - b).TurnLeft();
+            if (OppositeDirection(perp, target - a)) { return -perp; }
+            return perp;
         }
     }
 }

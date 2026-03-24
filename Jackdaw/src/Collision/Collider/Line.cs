@@ -41,7 +41,7 @@ public class LineCollider(Vector2 point1, Vector2 point2) : Collider {
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 direction) => Vector2.Dot(point2 - point1, direction) < 0 ? point1 : point2;
+    public override Vector2 Support(Vector2 direction) => (point1 - point2).SameDirectionInclusive(direction) ? point1 : point2;
 
     static Rect GetBounds(Vector2 point1, Vector2 point2) => Rect.Between(point1, point2);
 }

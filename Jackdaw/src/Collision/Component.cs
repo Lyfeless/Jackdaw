@@ -9,8 +9,6 @@ namespace Jackdaw;
 /// <param name="game">The current game instance.</param>
 /// <param name="collider">The collider to use for collision checking.</param>
 public class CollisionComponent(Game game, Collider collider) : Component(game) {
-    public record struct CollisionInfo(CollisionComponent Other, Vector2 Pushout);
-
     /// <summary>
     /// The current collider.
     /// </summary>

@@ -101,7 +101,7 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
     public override Vector2 Support(Vector2 direction) {
-        return (Vector2.Dot(point2 - point1, direction) < 0 ? point1 : point2) + (radius * direction.Normalized());
+        return ((point1 - point2).SameDirectionInclusive(direction) ? point1 : point2) + (radius * direction.Normalized());
     }
 
     static Rect GetBounds(Vector2 point1, Vector2 point2, float radius) {

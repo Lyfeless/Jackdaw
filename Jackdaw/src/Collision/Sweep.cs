@@ -141,6 +141,5 @@ internal struct JDASweep {
     static Vector2 ClosestUnclamped(Vector2 point, Vector2 velocity) {
         Line line = new(Vector2.Zero, velocity);
         return line.On(line.ClosestTUnclamped(point)) - point;
-        // return new Line(Vector2.Zero, velocity).ClosestPoint(point) - point;
     }
 }

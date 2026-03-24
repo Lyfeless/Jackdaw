@@ -24,26 +24,21 @@ internal struct GJKSimplex {
         direction = -direction;
         if (!Add(direction)) { return; }
 
-        Vector2 AInv = -A;
-        Vector2 AB = B + AInv;
-        direction = Calc.TripleProduct(AB, AInv, AB);
+        direction = Vector2.PerpendicularToward(A, B, Vector2.Zero);
         if (!Add(direction)) { return; }
 
         // Adjust points until they cover the origin
         while (true) {
-            Vector2 CInv = -C;
-            Vector2 CB = B + CInv;
-            Vector2 CA = A + CInv;
-            Vector2 perpCB = Calc.TripleProduct(CA, CB, CB);
-            Vector2 perpCA = Calc.TripleProduct(CB, CA, CA);
-            if (Vector2.Dot(perpCB, CInv) > 0) {
+            Vector2 perpCB = Vector2.PerpendicularToward(C, B, Vector2.Zero);
+            Vector2 perpCA = Vector2.PerpendicularToward(C, A, Vector2.Zero);
+            if (perpCB.OppositeDirection(A)) {
                 SetA(B);
                 SetB(C);
 
                 direction = perpCB;
                 if (!Add(direction)) { return; }
             }
-            else if (Vector2.Dot(perpCA, CInv) > 0) {
+            else if (perpCA.OppositeDirection(B)) {
                 SetB(C);
 
                 direction = perpCA;
@@ -73,5 +68,5 @@ internal struct GJKSimplex {
     readonly Vector2 InitialDirection() => TransformedCenter(Ctx.B) - TransformedCenter(Ctx.A);
     static Vector2 TransformedCenter(ColliderContext collider) => Vector2.Transform(collider.Collider.Center, collider.Position);
 
-    static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => Vector2.Dot(direction, point) >= 0;
+    static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => point.SameDirectionInclusive(direction);
 }
