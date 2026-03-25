@@ -66,7 +66,7 @@ internal struct GJKSimplex {
     }
 
     readonly Vector2 InitialDirection() => TransformedCenter(Ctx.B) - TransformedCenter(Ctx.A);
-    static Vector2 TransformedCenter(ColliderContext collider) => Vector2.Transform(collider.Collider.Center, collider.Position);
+    static Vector2 TransformedCenter(ColliderContext collider) => Vector2.Transform(collider.Collider.Center, collider.Position.Matrix);
 
     static bool PointCrossesOrigin(Vector2 point, Vector2 direction) => point.SameDirectionInclusive(direction);
 }

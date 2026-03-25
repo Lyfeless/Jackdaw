@@ -29,11 +29,8 @@ public class CircleCollider(Circle circle) : Collider {
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    static Rect GetBounds(Circle circle) {
-        return new Rect(circle.Position.X - circle.Radius, circle.Position.Y - circle.Radius, circle.Radius + circle.Radius, circle.Radius + circle.Radius);
-    }
+    static Rect GetBounds(Circle circle) => circle.Bounds;
 
-    public override Vector2 Support(Vector2 direction) {
-        return Circle.Position + (Circle.Radius * direction.Normalized());
-    }
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position)
+        => GetGlobalPoint(Circle.Position + (Circle.Radius * GetLocalDirection(direction, position).Normalized()), position);
 }

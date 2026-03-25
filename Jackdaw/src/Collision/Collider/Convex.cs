@@ -36,19 +36,21 @@ public abstract class ConvexCollider(IConvexShape shape) : Collider {
         return builder.Rect;
     }
 
-    public override Vector2 Support(Vector2 direction) {
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) {
+        Vector2 localDirection = GetLocalDirection(direction, position);
+
         float furthestDistance = float.NegativeInfinity;
         Vector2 furthestPoint = Vector2.Zero;
 
         for (int i = 0; i < Shape.Points; ++i) {
             Vector2 comparePoint = Shape.GetPoint(i);
-            float compareDistance = Vector2.Dot(comparePoint, direction);
+            float compareDistance = Vector2.Dot(comparePoint, localDirection);
             if (compareDistance > furthestDistance) {
                 furthestDistance = compareDistance;
                 furthestPoint = comparePoint;
             }
         }
 
-        return furthestPoint;
+        return GetGlobalPoint(furthestPoint, position);
     }
 }

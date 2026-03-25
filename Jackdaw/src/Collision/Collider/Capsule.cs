@@ -100,8 +100,11 @@ public class CapsuleCollider(Vector2 point1, Vector2 point2, float radius) : Col
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 direction) {
-        return ((point1 - point2).SameDirectionInclusive(direction) ? point1 : point2) + (radius * direction.Normalized());
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) {
+        Vector2 localDirection = GetLocalDirection(direction, position);
+        Vector2 origin = (point1 - point2).SameDirectionInclusive(localDirection) ? point1 : point2;
+        Vector2 offset = radius * GetLocalDirection(direction, position).Normalized();
+        return GetGlobalPoint(origin + offset, position);
     }
 
     static Rect GetBounds(Vector2 point1, Vector2 point2, float radius) {

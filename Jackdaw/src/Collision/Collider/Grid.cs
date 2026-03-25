@@ -52,7 +52,7 @@ public class GridCollider(Vector2 position, Grid<Collider?> grid, Vector2 tileSi
     public override bool Multi => true;
 
     // Support function will never be called by collision functions because it has subcolliders
-    public override Vector2 Support(Vector2 direction) => throw new NotImplementedException();
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) => throw new NotImplementedException();
 
     public override Collider[] GetSubColliders(Rect bounds) {
         Vector2 min = Vector2.Max(bounds.TopLeft, Bounds.TopLeft);

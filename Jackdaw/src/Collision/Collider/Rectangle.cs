@@ -33,8 +33,10 @@ public class RectangleCollider(Rect rect) : Collider {
     public override bool Multi => false;
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 direction) {
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) {
         Vector2 halfRect = Rect.Size / 2;
-        return Rect.Position + halfRect + (halfRect * new Vector2(Calc.NormalizedSign(direction.X), Calc.NormalizedSign(direction.Y)));
+        Vector2 localDirection = GetLocalDirection(direction, position);
+        Vector2 localSupport = Rect.Position + halfRect + (halfRect * new Vector2(Calc.NormalizedSign(localDirection.X), Calc.NormalizedSign(localDirection.Y)));
+        return GetGlobalPoint(localSupport, position);
     }
 }

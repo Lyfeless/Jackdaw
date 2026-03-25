@@ -85,7 +85,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetAllCollisions(CollisionComponent collider, Matrix3x2 position)
-        => GetAllCollisions(collider, position, position.Invert());
+        => GetAllCollisions(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get all collisions between given collider component and all registered collision components at a given location.
@@ -94,9 +94,18 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetAllCollisions(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetAllCollisions(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetAllCollisions(collider, new InvertableMatrix(position, positionInv));
+
+    /// <summary>
+    /// Get all collisions between given collider component and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public CollisionResult GetAllCollisions(CollisionComponent collider, InvertableMatrix position) {
         ActiveComponent = collider;
-        CollisionResult info = GetAllCollisions(collider.Collider, position, positionInv);
+        CollisionResult info = GetAllCollisions(collider.Collider, position);
         ActiveComponent = null;
         return info;
     }
@@ -135,7 +144,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetAllCollisions(Collider collider, Matrix3x2 position)
-        => GetAllCollisions(collider, position, position.Invert());
+        => GetAllCollisions(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get all collisions between given collider and all registered collision components at a given location.
@@ -143,15 +152,24 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
+    /// <returns></returns>
+    public CollisionResult GetAllCollisions(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetAllCollisions(collider, new InvertableMatrix(position, positionInv));
+
+    /// <summary>
+    /// Get all collisions between given collider and all registered collision components at a given location.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetAllCollisions(Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetAllCollisions(Collider collider, InvertableMatrix position) {
         List<CollisionResult.ComponentResult> components = [];
 
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
 
             ColliderContextPair ctx = new(
-                new(collider, position, positionInv),
+                new(collider, position),
                 new(other)
             );
 
@@ -220,7 +238,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetFirstCollision(CollisionComponent collider, Matrix3x2 position)
-        => GetFirstCollision(collider, position, position.Invert());
+        => GetFirstCollision(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get the first object the given collider component collides with at a given location.
@@ -230,9 +248,19 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetFirstCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetFirstCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetFirstCollision(collider, new InvertableMatrix(position, positionInv));
+
+    /// <summary>
+    /// Get the first object the given collider component collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider component to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
+    public CollisionResult GetFirstCollision(CollisionComponent collider, InvertableMatrix position) {
         ActiveComponent = collider;
-        CollisionResult info = GetFirstCollision(collider.Collider, position, positionInv);
+        CollisionResult info = GetFirstCollision(collider.Collider, position);
         ActiveComponent = null;
         return info;
     }
@@ -275,7 +303,7 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetFirstCollision(Collider collider, Matrix3x2 position)
-        => GetFirstCollision(collider, position, position.Invert());
+        => GetFirstCollision(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get the first object the given collider collides with at a given location.
@@ -285,12 +313,15 @@ public class CollisionManager {
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetFirstCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetFirstCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetFirstCollision(collider, new InvertableMatrix(position, positionInv));
+
+    public CollisionResult GetFirstCollision(Collider collider, InvertableMatrix position) {
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
 
             ColliderContextPair ctx = new(
-                new(collider, position, positionInv),
+                new(collider, position),
                 new(other)
             );
 
@@ -414,7 +445,7 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Vector2 velocity)
-        => GetSweptCollision(collider, position, position.Invert(), velocity);
+        => GetSweptCollision(collider, new InvertableMatrix(position), velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -424,9 +455,20 @@ public class CollisionManager {
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity) {
+    public CollisionResult GetSweptCollision(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
+        => GetSweptCollision(collider, new InvertableMatrix(position, positionInv), velocity);
+
+    /// <summary>
+    /// Get collision results for a shapecast.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="velocity"></param>
+    /// <param name="velocity">The collider's velocity.</param>
+    /// <returns>Information about collision check results.</returns>
+    public CollisionResult GetSweptCollision(CollisionComponent collider, InvertableMatrix position, Vector2 velocity) {
         ActiveComponent = collider;
-        CollisionResult info = GetSweptCollision(collider.Collider, position, positionInv, velocity);
+        CollisionResult info = GetSweptCollision(collider.Collider, position, velocity);
         ActiveComponent = null;
         return info;
     }
@@ -469,7 +511,7 @@ public class CollisionManager {
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetSweptCollision(Collider collider, Matrix3x2 position, Vector2 velocity)
-        => GetSweptCollision(collider, position, position.Invert(), velocity);
+        => GetSweptCollision(collider, new InvertableMatrix(position), velocity);
 
     /// <summary>
     /// Get collision results for a shapecast.
@@ -479,7 +521,10 @@ public class CollisionManager {
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
-    public CollisionResult GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity) {
+    public CollisionResult GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
+        => GetSweptCollision(collider, new InvertableMatrix(position, positionInv), velocity);
+
+    public CollisionResult GetSweptCollision(Collider collider, InvertableMatrix position, Vector2 velocity) {
         // If object isn't moving run basic collision check to avoid extra calculations
         if (velocity == Vector2.Zero) { return GetAllCollisions(collider, position); }
 
@@ -489,7 +534,7 @@ public class CollisionManager {
             if (ShouldSkipCollider(other)) { continue; }
 
             ColliderContextPair ctx = new(
-                new(collider, position, positionInv, velocity),
+                new(collider, position, velocity),
                 new(other)
             );
 
@@ -572,7 +617,7 @@ public class CollisionManager {
     /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushout(CollisionComponent collider, Matrix3x2 position)
-        => GetCollisionPushout(collider, position, position.Invert());
+        => GetCollisionPushout(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry.
@@ -584,9 +629,12 @@ public class CollisionManager {
     /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public CollisionResult GetCollisionPushout(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetCollisionPushout(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetCollisionPushout(collider, new InvertableMatrix(position, positionInv));
+
+    public CollisionResult GetCollisionPushout(CollisionComponent collider, InvertableMatrix position) {
         ActiveComponent = collider;
-        CollisionResult info = GetCollisionPushout(collider.Collider, position, positionInv);
+        CollisionResult info = GetCollisionPushout(collider.Collider, position);
         ActiveComponent = null;
         return info;
     }
@@ -637,7 +685,7 @@ public class CollisionManager {
     /// <param name="position">The transform to apply to the collider.</param>
     /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushout(Collider collider, Matrix3x2 position)
-        => GetCollisionPushout(collider, position, position.Invert());
+        => GetCollisionPushout(collider, new InvertableMatrix(position));
 
     /// <summary>
     /// Get the distance required to push the collider out of geometry.
@@ -649,14 +697,17 @@ public class CollisionManager {
     /// <param name="position">The transform to apply to the collider.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
     /// <returns>Information about collision pushout results.</returns>
-    public CollisionResult GetCollisionPushout(Collider collider, Matrix3x2 position, Matrix3x2 positionInv) {
+    public CollisionResult GetCollisionPushout(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
+        => GetCollisionPushout(collider, new InvertableMatrix(position, positionInv));
+
+    public CollisionResult GetCollisionPushout(Collider collider, InvertableMatrix position) {
         List<CollisionResult.ComponentResult> components = [];
 
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
 
             ColliderContextPair ctx = new(
-                new(collider, position, positionInv),
+                new(collider, position),
                 new(other)
             );
 
@@ -741,7 +792,7 @@ public class CollisionManager {
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushoutInDirection(CollisionComponent collider, Matrix3x2 position, Vector2 direction)
-        => GetSweptCollision(collider, position, position.Invert(), -direction);
+        => GetSweptCollision(collider, new InvertableMatrix(position), -direction);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry in a given direction.
@@ -807,7 +858,7 @@ public class CollisionManager {
     /// <param name="direction">The direction to push the collider in. The resulting vector will have the same angle with an adjusted length.</param>
     /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushoutInDirection(Collider collider, Matrix3x2 position, Vector2 direction)
-        => GetSweptCollision(collider, position, position.Invert(), -direction);
+        => GetSweptCollision(collider, new InvertableMatrix(position), -direction);
 
     /// <summary>
     /// Get the distance required to push the collision component out of geometry in a given direction.

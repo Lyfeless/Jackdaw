@@ -42,9 +42,28 @@ public abstract class Collider {
     public abstract Vector2 Center { get; }
 
     /// <summary>
-    /// The gjk support function for the shape.
+    /// The GJK support function for the shape.
     /// </summary>
-    /// <param name="direction">the ray direction vector.</param>
+    /// <param name="direction">The ray direction vector.</param>
+    /// <param name="position">The collider's global transformation.</param>
     /// <returns>The nearest support point in the given direction.</returns>
-    public abstract Vector2 Support(Vector2 direction);
+    public abstract Vector2 Support(Vector2 direction, InvertableMatrix position);
+
+    /// <summary>
+    /// Transform the direction into the collider's local space.
+    /// </summary>
+    /// <param name="direction">The direction to transform.</param>
+    /// <param name="position">The collider's global position.</param>
+    /// <returns>The direction transformed to be local to the collider.</returns>
+    protected static Vector2 GetLocalDirection(Vector2 direction, InvertableMatrix position)
+        => Vector2.TransformNormal(direction, position.MatrixInverse);
+
+    /// <summary>
+    /// Transform the point from the collider's local space back into world space.
+    /// </summary>
+    /// <param name="point">The point to transform.</param>
+    /// <param name="position">The collider's global position.</param>
+    /// <returns>The point in global space.</returns>
+    protected static Vector2 GetGlobalPoint(Vector2 point, InvertableMatrix position)
+        => Vector2.Transform(point, position.Matrix);
 }

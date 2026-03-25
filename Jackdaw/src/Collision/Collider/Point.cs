@@ -18,5 +18,5 @@ public class PointCollider(Vector2 point) : Collider {
 
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 direction) => Point;
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) => Point + position.Matrix.Translation;
 }

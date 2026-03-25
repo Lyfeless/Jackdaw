@@ -31,24 +31,24 @@ internal readonly struct ColliderContextPair(ColliderContext a, ColliderContext 
     public bool BoundsOverlap() => Moving ? BoundsOverlapMoving() : BoundsOverlapStatic();
 
     bool BoundsOverlapStatic() {
-        Rect boundsAOffset = A.Collider.Bounds.TransformAABB(A.Position);
-        Rect boundsBOffset = B.Collider.Bounds.TransformAABB(B.Position);
+        Rect boundsAOffset = A.Collider.Bounds.TransformAABB(A.Position.Matrix);
+        Rect boundsBOffset = B.Collider.Bounds.TransformAABB(B.Position.Matrix);
         return boundsAOffset.Overlaps(boundsBOffset);
     }
 
     bool BoundsOverlapMoving() {
-        Rect boundAOffset = A.Collider.Bounds.TransformAABB(A.Position);
+        Rect boundAOffset = A.Collider.Bounds.TransformAABB(A.Position.Matrix);
         Rect sweptBoundsB = SweptBounds(B.Collider, B.Velocity);
         Rect sweptBoundsBCombined = SweptBounds(sweptBoundsB, -A.Velocity);
-        Rect sweptBoundsBCombinedOffset = sweptBoundsBCombined.TransformAABB(B.Position);
+        Rect sweptBoundsBCombinedOffset = sweptBoundsBCombined.TransformAABB(B.Position.Matrix);
         return sweptBoundsBCombinedOffset.Overlaps(boundAOffset);
     }
 
     public Rect GetSubColliderBounds() => Moving ? GetSubColliderBoundsMoving() : GetSubColliderBoundsStatic();
-    Rect GetSubColliderBoundsStatic() => B.Collider.Bounds.TransformAABB(B.Position * A.PositionInv);
+    Rect GetSubColliderBoundsStatic() => B.Collider.Bounds.TransformAABB(B.Position.Matrix * A.Position.MatrixInverse);
     Rect GetSubColliderBoundsMoving() {
         Rect sweptBoundsB = SweptBounds(B.Collider, B.Velocity);
-        return sweptBoundsB.TransformAABB(B.Position * A.PositionInv);
+        return sweptBoundsB.TransformAABB(B.Position.Matrix * A.Position.MatrixInverse);
     }
 
     static Rect SweptBounds(Collider collider, Vector2 velocity)
@@ -81,22 +81,18 @@ internal readonly struct ColliderContextPair(ColliderContext a, ColliderContext 
     }
 }
 
-internal readonly struct ColliderContext {
-    public readonly Collider Collider;
-    public readonly Matrix3x2 Position;
-    public readonly Matrix3x2 PositionInv;
-    public readonly Vector2 Velocity;
+internal readonly struct ColliderContext(Collider collider, InvertableMatrix position, Vector2 velocity) {
+    public readonly Collider Collider = collider;
+    public readonly InvertableMatrix Position = position;
+    public readonly Vector2 Velocity = velocity;
 
-    public readonly bool Moving;
+    public readonly bool Moving = velocity != Vector2.Zero;
 
-    public ColliderContext(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity) {
-        Collider = collider;
-        Position = position;
-        PositionInv = positionInv;
-        Velocity = velocity;
+    public ColliderContext(Collider collider, InvertableMatrix position)
+        : this(collider, position, Vector2.Zero) { }
 
-        Moving = Velocity != Vector2.Zero;
-    }
+    public ColliderContext(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
+        : this(collider, new InvertableMatrix(position, positionInv), velocity) { }
 
     public ColliderContext(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
         : this(collider, position, positionInv, Vector2.Zero) { }
@@ -121,12 +117,8 @@ internal readonly struct ColliderContext {
     public ColliderContext WithCollider(Collider collider) => new(
         collider,
         Position,
-        PositionInv,
         Velocity
     );
 
-    public Vector2 Support(Vector2 direction) {
-        Vector2 adjustedDirection = Vector2.TransformNormal(direction, PositionInv);
-        return Vector2.Transform(Collider.Support(adjustedDirection), Position);
-    }
+    public Vector2 Support(Vector2 direction) => Collider.Support(direction, Position);
 }

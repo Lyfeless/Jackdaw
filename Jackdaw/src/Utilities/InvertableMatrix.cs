@@ -24,7 +24,7 @@ public struct InvertableMatrix {
     /// </summary>
     /// <param name="matrix">The matrix to store.</param>
     /// <param name="matrixInverse">The matrix inverse.</param>
-    InvertableMatrix(Matrix3x2 matrix, Matrix3x2 matrixInverse) {
+    public InvertableMatrix(Matrix3x2 matrix, Matrix3x2 matrixInverse) {
         this.matrix = matrix;
         this.matrixInverse = matrixInverse;
     }
