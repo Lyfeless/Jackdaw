@@ -25,16 +25,20 @@ public class CachedRenderComponent : Component {
         }
     }
 
+    internal CachedRenderComponent(Game game, ICacheableObject cachable, RectInt bounds) : base(game) {
+        CachedObject = cachable;
+        this.bounds = bounds;
+        RenderedComponent = new(game.GraphicsDevice, 0, 0);
+    }
+
     /// <summary>
     /// Create and cache a component within a rendering bound.
     /// </summary>
     /// <param name="game">The current game instance.</param>
     /// <param name="component">The component to cache.</param>
     /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
-    public CachedRenderComponent(Game game, Component component, RectInt bounds) : base(game) {
-        CachedObject = new CachableComponent(component);
-        this.bounds = bounds;
-    }
+    public CachedRenderComponent(Game game, Component component, RectInt bounds)
+        : this(game, new CachableComponent(component), bounds) { }
 
     /// <summary>
     /// Create and cache an actor within a rendering bound.
@@ -42,10 +46,8 @@ public class CachedRenderComponent : Component {
     /// <param name="game">The current game instance.</param>
     /// <param name="actor">The actor to cache.</param>
     /// <param name="bounds">The bounds to render the component in, relative to the component. Anything outside the bounds will be clipped.</param>
-    public CachedRenderComponent(Game game, Actor actor, RectInt bounds) : base(game) {
-        CachedObject = new CachableActor(actor);
-        this.bounds = bounds;
-    }
+    public CachedRenderComponent(Game game, Actor actor, RectInt bounds)
+        : this(game, new CachableActor(actor), bounds) { }
 
     protected override void Update() {
         if (!uncached) { return; }
