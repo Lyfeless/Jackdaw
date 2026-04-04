@@ -463,7 +463,6 @@ public class CollisionManager {
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The transform to apply to the collider.</param>
-    /// <param name="velocity"></param>
     /// <param name="velocity">The collider's velocity.</param>
     /// <returns>Information about collision check results.</returns>
     public CollisionResult GetSweptCollision(CollisionComponent collider, InvertableMatrix position, Vector2 velocity) {

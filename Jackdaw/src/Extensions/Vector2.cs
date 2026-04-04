@@ -23,5 +23,7 @@ public static class Vector2Extensions {
             if (OppositeDirection(perp, target - a)) { return -perp; }
             return perp;
         }
+
+        public Vector2 Rotate(float by) => Calc.AngleToVector(v.Angle() + by, v.Length());
     }
 }

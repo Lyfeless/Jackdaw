@@ -115,7 +115,7 @@ internal struct JDASweep {
 
     static Vector2 Intersection(Vector2 a, Vector2 b, Vector2 velocity) {
         float denominator = ((a.X - b.X) * velocity.Y) - ((a.Y - b.Y) * velocity.X);
-        if (denominator == 0) { Console.WriteLine("denom 0"); return CloserToZero(a, b); }
+        if (denominator == 0) { return CloserToZero(a, b); }
         return new(((a.X * b.Y) - (a.Y * b.X)) * velocity.X / denominator, ((a.X * b.Y) - (a.Y * b.X)) * velocity.Y / denominator);
     }
 
