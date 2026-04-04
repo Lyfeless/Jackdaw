@@ -92,9 +92,7 @@ internal static class SaveFileLoader {
     };
 
     static SaveData LoadJSON(string savePath) {
-        string json = File.ReadAllText(savePath);
-
-        JsonNode? jsonObj = JsonNode.Parse(json);
+        JsonNode? jsonObj = ReadJsonObject(savePath);
         if (jsonObj == null) { return JsonDataInvalid(savePath); }
 
         JsonNode? version = jsonObj[VERSION_CONTAINER];
@@ -132,23 +130,30 @@ internal static class SaveFileLoader {
     }
 
     internal static BinaryReader? CreateBinaryReader(string savePath) {
-        if (!File.Exists(savePath)) { return null; }
-        return new(File.Open(savePath, FileMode.Open));
+        using FileStream? stream = OpenForRead(savePath);
+        if (stream == null) { return null; }
+        return new(stream);
     }
 
     internal static BinaryWriter CreateBinaryWriter(string savePath) {
-        FileStream file = File.Open(savePath, FileMode.OpenOrCreate);
-        file.SetLength(0);
-        return new(file);
+        using TemporaryFile file = new(savePath);
+        using FileStream stream = File.Open(file.Name, FileMode.Open);
+        return new(stream);
     }
 
+    internal static JsonNode? ReadJsonObject(string savePath)
+        => JsonNode.Parse(File.ReadAllText(savePath));
 
-    internal static void WriteJsonObject(JsonNode node, string path) {
-        using FileStream file = new(path, FileMode.OpenOrCreate);
-        file.SetLength(0);
-
-        using Utf8JsonWriter writer = new(file);
+    internal static void WriteJsonObject(JsonNode node, string savePath) {
+        using TemporaryFile file = new(savePath);
+        using FileStream stream = File.Open(file.Name, FileMode.Open);
+        using Utf8JsonWriter writer = new(stream);
         node.WriteTo(writer);
+    }
+
+    static FileStream? OpenForRead(string path) {
+        if (!Path.Exists(path)) { return null; }
+        return File.Open(path, FileMode.Open);
     }
 
     static DecomposedPath DecomposePath(string path) => new(
