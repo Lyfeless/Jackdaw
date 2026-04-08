@@ -16,6 +16,12 @@ public interface IAssetStorage {
     public void Add(string name, object asset);
 
     /// <summary>
+    /// Remove an asset from the storage.
+    /// </summary>
+    /// <param name="name">The asset's name id.</param>
+    public void Remove(string name);
+
+    /// <summary>
     /// Get the names of all assets currently stored in the container.
     /// </summary>
     /// <returns>A list of asset names.</returns>
@@ -47,6 +53,8 @@ internal class AssetStorage(Type type) : IAssetStorage {
     object? Fallback = null;
 
     public void Add(string name, object asset) => Assets.Add(name, asset);
+
+    public void Remove(string name) => Assets.Remove(name);
 
     public string[] GetAssetNames() => [.. Assets.Keys];
 

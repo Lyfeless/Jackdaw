@@ -12,7 +12,9 @@ public class PackerLoader() : AssetLoaderStage() {
         Padding = 1
     };
 
-    public override void Run(Assets assets) {
+    public override AssetProviderItem[] GetLoadOptions(Assets assets) => [];
+
+    public override void RunLoad(Assets assets, AssetCollection collection) {
         var output = Packer.Pack();
         List<Texture> pages = [];
 
@@ -22,9 +24,13 @@ public class PackerLoader() : AssetLoaderStage() {
 
         foreach (var entry in output.Entries) {
             Subtexture texture = new(pages[entry.Page], entry.Source, entry.Frame);
-            assets.Add(entry.Name, texture);
+            AddAsset(assets, entry.Name, texture);
         }
+
+        Packer.Clear();
     }
+
+    public override void RunUnload(Assets assets, AssetCollection collection) { }
 
     public void Add(string name, string file) => Packer.Add(name, file);
     public void Add(string name, Image image) => Packer.Add(name, image);

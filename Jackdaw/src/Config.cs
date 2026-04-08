@@ -65,6 +65,24 @@ public struct GameContentConfig() {
     public AssetLoaderStage[] CustomAssetLoaders = [];
 
     /// <summary>
+    /// If the asset loader should load individual collections, otherwise all assets are loaded upfront. <br/>
+    /// Defaults to false.
+    /// </summary>
+    public bool UseAssetCollections = false;
+
+    /// <summary>
+    /// The asset collections to load immediately after game is created.
+    /// Only used if <see cref="UseAssetCollections" /> is enabled.
+    /// </summary>
+    public string[] StartupCollections = [];
+
+    /// <summary>
+    /// The method used for loading asset collections. <br/>
+    /// Only used if <see cref="UseAssetCollections" /> is enabled. <br/>
+    /// </summary>
+    public AssetCollectionBuilder[] Collections = AssetCollectionBuilder.FromAll();
+
+    /// <summary>
     /// The provider group name to search for texture files. <br/>
     /// Defaults to "Textures".
     /// </summary>

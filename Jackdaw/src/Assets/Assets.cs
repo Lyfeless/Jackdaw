@@ -1,4 +1,3 @@
-using System.Reflection;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -7,11 +6,9 @@ namespace Jackdaw;
 /// Manager class used for storing and loading game assets including textures, sounds, fonts, etc
 /// </summary>
 public class Assets {
-    readonly Dictionary<Type, IAssetStorage> LoadedAssets = [];
-    readonly List<AssetLoaderStage> LoaderStages = [];
-    bool Loaded = false;
-
-    readonly Dictionary<Type, string> TypeWarnings = [];
+    readonly AssetStoragePipeline Storage = new();
+    public readonly AssetLoaderPipeline Loaders;
+    readonly Dictionary<string, AssetCollection> Collections = [];
 
     /// <summary>
     /// The game instance the assets are being used for.
@@ -44,121 +41,72 @@ public class Assets {
 
         Provider = config.AssetProvider;
 
-        RegisterLoaderStage(new TextureLoader());
-        RegisterLoaderStage(new TextureFallbackLoader());
-        RegisterLoaderStage(new AsepriteLoader());
-        RegisterLoaderStage(new AsepriteAnimationLoader());
-        RegisterLoaderStage(new PackerLoader());
-        RegisterLoaderStage(new AnimationLoader());
-        RegisterLoaderStage(new FontLoader());
-        RegisterLoaderStage(new ShaderLoader());
+        Loaders = new(this);
 
-        AddTypeWarning<Image>("Use Subtexture to access auto-loaded image data.");
-        AddTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");
-        AddTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
+        RegisterLoaders(config);
+        SetTypeWarnings();
+        CreateCollections(config);
+        SetDefaultFallbacks();
+
+        Load(config);
+    }
+
+    void Load(GameContentConfig config) {
+        if (config.UseAssetCollections) {
+            foreach (string name in config.StartupCollections) {
+                LoadCollection(name);
+            }
+        }
+        else {
+            LoadCollection(string.Empty);
+        }
+    }
+
+    void RegisterLoaders(GameContentConfig config) {
+        Loaders.Register(new TextureLoader());
+        Loaders.Register(new AsepriteLoader());
+        Loaders.Register(new AsepriteAnimationLoader());
+        Loaders.Register(new PackerLoader());
+        Loaders.Register(new AnimationLoader());
+        Loaders.Register(new FontLoader());
+        Loaders.Register(new ShaderLoader());
 
         foreach (AssetLoaderStage stage in config.CustomAssetLoaders) {
-            RegisterLoaderStage(stage);
+            Loaders.Register(stage);
         }
-
-        Load();
     }
 
-    /// <summary>
-    /// Add a custom asset loader for a specific asset type. <br/>
-    /// Only needed for assets that require custom logic when accessed,
-    /// any asset that doesn't need additional logic after loading is will automatically use a default storage system.
-    /// </summary>
-    /// <typeparam name="T">The type to register the storage for.</typeparam>
-    /// <param name="storage">The asset storage object.</param>
-    public void RegisterCustomAssetStorage<T>(IAssetStorage storage)
-        => RegisterCustomAssetStorage(typeof(T), storage);
+    void CreateCollections(GameContentConfig config) {
+        AssetProviderItem[] loadOptions = Loaders.GetLoadOptions();
 
-    /// <summary>
-    /// Add a custom asset loader for a specific asset type. <br/>
-    /// Only needed for assets that require custom logic when accessed,
-    /// any asset that doesn't need additional logic after loading is will automatically use a default storage system.
-    /// </summary>
-    /// <param name="type">The type to register the storage for.</param>
-    /// <param name="storage">The asset storage object.</param>
-    public void RegisterCustomAssetStorage(Type type, IAssetStorage storage) {
-        if (LoadedAssets.ContainsKey(type)) {
-            Log.Warning($"Attempting to add a new storage object for type {type} when one already exists, skipping.");
-            return;
-        }
-        LoadedAssets.Add(type, storage);
-    }
-
-    /// <summary>
-    /// Find an asset loader stage in the queue by type. Currently only one loader of each type is supported.
-    /// </summary>
-    /// <typeparam name="T">The loader type to find.</typeparam>
-    /// <returns>The asset loader, null if no loader matches the given type.</returns>
-    public T? FindLoaderStage<T>() where T : AssetLoaderStage => (T?)LoaderStages.FirstOrDefault(e => e.GetType() == typeof(T));
-
-    /// <summary>
-    /// Info to append to exceptions when searching for an asset of a specified type. <br/>
-    /// Used mostly for informing programs searching for the wrong asset types.
-    /// </summary>
-    /// <typeparam name="T">The asset type to show the warning for.</typeparam>
-    /// <param name="warning">The warning to show in exceptions.</param>
-    public void AddTypeWarning<T>(string warning) => AddTypeWarning(typeof(T), warning);
-
-    /// <summary>
-    /// Info to append to exceptions when searching for an asset of a specified type. <br/>
-    /// Used mostly for informing programs searching for the wrong asset types.
-    /// </summary>
-    /// <param name="type">The asset type to show the warning for.</param>
-    /// <param name="warning">The warning to show in exceptions.</param>
-    public void AddTypeWarning(Type type, string warning) => TypeWarnings.Add(type, warning);
-
-    void Load() {
-        if (Loaded) {
-            Log.Warning("Assets: Attempting to run asset load after load has already run, skipping.");
+        if (!config.UseAssetCollections) {
+            Collections.Add(string.Empty, AssetCollectionBuilder.SingleFromAll().Filter(loadOptions));
             return;
         }
 
-        for (int i = LoaderStages.Count; i > 0; --i) {
-            AssetLoaderStage? loader = NextLoaderStage() ?? throw new Exception("Assets: AssetLoader ordering error, can't finish loading assets due to dependancy loop.");
-            loader.Run(this);
-            LoaderStages.Remove(loader);
+        foreach (AssetCollectionBuilder collection in config.Collections) {
+            Collections.Add(collection.Name, collection.Filter(loadOptions));
         }
-
-        Loaded = true;
     }
 
-    void RegisterLoaderStage(AssetLoaderStage loader) {
-        if (LoaderStages.Any(e => e.GetType() == loader.GetType())) {
-            Log.Warning($"Trying to add a second loader of type {loader.GetType()}. Behavior is currently unsupported, skipping.");
-            return;
-        }
-        LoaderStages.Add(loader);
+    void SetTypeWarnings() {
+        Storage.SetTypeWarning<Image>("Use Subtexture to access auto-loaded image data.");
+        Storage.SetTypeWarning<Texture>("Use Subtexture to access auto-loaded texture data.");
+        Storage.SetTypeWarning<Font>("Use Spritefont to access auto-loaded font data.");
     }
 
-    AssetLoaderStage? NextLoaderStage() {
-        foreach (AssetLoaderStage loader in LoaderStages) {
-            if (CanRunLoaderStage(loader)) { return loader; }
-        }
+    void SetDefaultFallbacks() {
+        // Texture Fallback
+        using Stream textureStream = FallbackProvider.GetItemStream(new("", "texture", ".png"));
+        SetFallback(new Subtexture(new Texture(GraphicsDevice, new Image(textureStream))));
 
-        return null;
+        //Font Fallback
+        using Stream fontStream = FallbackProvider.GetItemStream(new("", "font", ".ttf"));
+        SetFallback(new SpriteFont(GraphicsDevice, fontStream, 16));
+
+        // Animation Fallback
+        SetFallback(new AnimationData(GetFallback<Subtexture>(), [new(0, TimeSpan.Zero)], TimeSpan.Zero));
     }
-
-    bool CanRunLoaderStage(AssetLoaderStage loader) {
-        foreach (AssetLoaderStage other in LoaderStages) {
-            if (loader == other) { continue; }
-            if (other.IsBefore(loader) || loader.IsAfter(other)) { return false; }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Add a loaded asset to storage.
-    /// </summary>
-    /// <typeparam name="T">The type of asset to add.</typeparam>
-    /// <param name="name">The asset name id. Must be unique within the asset type.</param>
-    /// <param name="asset">The asset to add.</param>
-    public void Add<T>(string name, T asset) => GetStorage<T>(true).Add(name, asset!);
 
     /// <summary>
     /// Set the fallback asset for a specific type. <br/>
@@ -166,7 +114,8 @@ public class Assets {
     /// </summary>
     /// <typeparam name="T">The type of asset to set the fallback for.</typeparam>
     /// <param name="asset">The asset to set as fallback.</param>
-    public void SetFallback<T>(T asset) => GetStorage<T>(true).SetFallback(asset!);
+    public void SetFallback<T>(T asset)
+        => Storage.Get<T>(AssetStoragePipeline.RequestFailResponse.CREATE).SetFallback(asset!);
 
     /// <summary>
     /// Get the name ids of all loaded assets of a type.
@@ -180,10 +129,8 @@ public class Assets {
     /// </summary>
     /// <param name="type">The asset type to get the name ids of.</param>
     /// <returns>A list of name ids.</returns>
-    public string[] GetLoadedAssetNames(Type type) {
-        if (!LoadedAssets.TryGetValue(type, out IAssetStorage? storage)) { return []; }
-        return storage.GetAssetNames();
-    }
+    public string[] GetLoadedAssetNames(Type type)
+        => Storage.Get(type, AssetStoragePipeline.RequestFailResponse.NOTHING).GetAssetNames();
 
     /// <summary>
     /// Get a loaded asset from storage.
@@ -191,7 +138,7 @@ public class Assets {
     /// <typeparam name="T">The type of asset to find.</typeparam>
     /// <param name="name">The name id of the asset to find.</param>
     /// <returns>The requested asset, or the asset type's fallback if the name id isn't present.</returns>
-    public T Get<T>(string name) => (T)GetStorage<T>().Get(name);
+    public T Get<T>(string name) => (T)Storage.Get<T>().Get(name);
 
     /// <summary>
     /// Get the fallback asset for the given type.
@@ -199,7 +146,7 @@ public class Assets {
     /// </summary>
     /// <typeparam name="T">The asset type to get the fallback for.</typeparam>
     /// <returns>The asset type's fallback value.</returns>
-    public T GetFallback<T>() => (T)GetStorage<T>().GetFallback();
+    public T GetFallback<T>() => (T)Storage.Get<T>().GetFallback();
 
     /// <summary>
     /// Get a loaded texture asset from storage.
@@ -229,20 +176,70 @@ public class Assets {
     /// <returns>The requested animation asset, or the fallback animation if the name id isn't present.</returns>
     public AnimationData GetAnimationData(string name) => Get<AnimationData>(name);
 
-    IAssetStorage GetStorage<T>(bool create = false)
-        => GetStorage(typeof(T), create);
-
-    IAssetStorage GetStorage(Type type, bool create = false) {
-        if (!LoadedAssets.TryGetValue(type, out IAssetStorage? value)) {
-            if (create) {
-                value = new AssetStorage(type);
-                LoadedAssets.Add(type, value);
-            }
-            else {
-                TypeWarnings.TryGetValue(type, out string? warning);
-                throw new Exception($"Assets: No assets initialized for type {type}, could not send fallback. {warning}");
-            }
-        }
-        return value;
+    public void LoadCollection(string name) {
+        if (!Collections.TryGetValue(name, out AssetCollection collection)) { return; }
+        Loaders.RunLoad(collection);
     }
+
+    public Task LoadCollectionAsync(string name) {
+        throw new NotImplementedException();
+    }
+
+    public void UnloadCollection(string name) {
+        if (!Collections.TryGetValue(name, out AssetCollection collection)) { return; }
+        Loaders.RunUnload(collection);
+    }
+
+    public Task UnloadCollectionAsync(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsCollectionLoaded(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsCollectionLoading(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsCollectionLoadedOrLoading(string name)
+        => IsCollectionLoaded(name) || IsCollectionLoading(name);
+
+    public bool IsCollectionUnloaded(string name)
+        => !IsCollectionLoadedOrLoading(name);
+
+
+    public bool WaitForCollectionLoad(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool WaitForCollectionUnload(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsAssetLoaded<T>(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsAssetLoading<T>(string name) {
+        throw new NotImplementedException();
+    }
+
+    public bool IsAssetLoadedOrLoading<T>(string name)
+        => IsAssetLoaded<T>(name) || IsAssetLoading<T>(name);
+
+    public bool IsAssetUnloaded<T>(string name)
+        => !IsAssetLoadedOrLoading<T>(name);
+
+    public void WaitForAssetLoad<T>(string name) {
+        throw new NotImplementedException();
+    }
+
+    public void WaitForAssetUnload<T>(string name) {
+        throw new NotImplementedException();
+    }
+
+    internal void Add<T>(string name, T asset) => Storage.Get<T>(AssetStoragePipeline.RequestFailResponse.CREATE).Add(name, asset!);
+
+    internal void Remove<T>(string name) => Storage.Get<T>(AssetStoragePipeline.RequestFailResponse.NOTHING).Remove(name);
 }

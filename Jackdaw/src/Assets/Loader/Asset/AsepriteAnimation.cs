@@ -4,11 +4,12 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// Asset loader for creating animations from aseprite files, needs to bne run after <see cref="PackerLoader" /> runs so the textures exist.
+/// Asset loader for creating animations from aseprite files, needs to be run after <see cref="PackerLoader" /> runs so the textures exist.
 /// </summary>
 public class AsepriteAnimationLoader : AssetLoaderStage {
     record struct Animation(string Name, Aseprite Data);
-    readonly List<Animation> animations = [];
+    readonly List<Animation> add = [];
+    readonly List<string> remove = [];
 
     static readonly AsepriteConfig DefaultConfig = new() {
         Looping = false,
@@ -21,12 +22,17 @@ public class AsepriteAnimationLoader : AssetLoaderStage {
         SetAfter<PackerLoader>();
     }
 
-    public override void Run(Assets assets) {
-        foreach (Animation animation in animations) {
+    public override AssetProviderItem[] GetLoadOptions(Assets assets) => [];
+
+    public override void RunLoad(Assets assets, AssetCollection collection) {
+        foreach (Animation animation in add) {
             AnimationData? anim = GetAnimationData(assets, animation.Name, animation.Data, GetConfig(assets, animation.Name));
-            if (anim != null) { assets.Add(animation.Name, anim); }
+            if (anim != null) { AddAsset(assets, animation.Name, anim); }
         }
+        add.Clear();
     }
+
+    public override void RunUnload(Assets assets, AssetCollection collection) { }
 
     /// <summary>
     /// Add a new aseprite animation to be created in the loader run.
@@ -34,7 +40,7 @@ public class AsepriteAnimationLoader : AssetLoaderStage {
     /// <param name="name">The animation's name id.</param>
     /// <param name="data">The aseprite file with the animation data.</param>
     public void AddAnimation(string name, Aseprite data)
-        => animations.Add(new(name, data));
+        => add.Add(new(name, data));
 
     static AnimationData? GetAnimationData(Assets assets, string name, Aseprite aseprite, AsepriteConfig config) {
         Subtexture[] textures = new Subtexture[aseprite.Frames.Length];

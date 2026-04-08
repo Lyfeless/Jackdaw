@@ -10,11 +10,24 @@ public abstract class AssetLoaderStage() {
     readonly List<Type> After = [];
 
     /// <summary>
-    /// The code to be run when the loader's stage is executed.
+    /// Get a list of all assets the stage is able to load in as assets.
     /// </summary>
     /// <param name="assets">The game instance's asset controller.</param>
-    public abstract void Run(Assets assets);
+    public abstract AssetProviderItem[] GetLoadOptions(Assets assets);
 
+    /// <summary>
+    /// Run the loader stage on a given asset collection.
+    /// </summary>
+    /// <param name="assets">The game instance's asset controller.</param>
+    /// <param name="collection">The asset collection to load from.</param>
+    public abstract void RunLoad(Assets assets, AssetCollection collection);
+
+    /// <summary>
+    /// Unload all assets from a given asset collection.
+    /// </summary>
+    /// <param name="assets">The game instance's asset controller.</param>
+    /// <param name="collection">The asset collection to unload.</param>
+    public abstract void RunUnload(Assets assets, AssetCollection collection);
 
     /// <summary>
     /// Ensure this loader stage is run before a different stage of the given type executes.
@@ -49,6 +62,12 @@ public abstract class AssetLoaderStage() {
         After.Add(type);
         return this;
     }
+
+    public static void AddAsset<T>(Assets assets, string name, T asset)
+        => assets.Add(name, asset);
+
+    public static void RemoveAsset<T>(Assets assets, string name)
+        => assets.Remove<T>(name);
 
     internal bool IsBefore(AssetLoaderStage loader) => IsBefore(loader.GetType());
     internal bool IsBefore(Type type) => Before.Contains(type);

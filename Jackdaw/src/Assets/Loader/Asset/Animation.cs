@@ -11,28 +11,47 @@ public class AnimationLoader : AssetLoaderStage {
         SetAfter<PackerLoader>();
     }
 
-    public override void Run(Assets assets) {
-        assets.SetFallback(new AnimationData(assets.GetFallback<Subtexture>(), [new(0, TimeSpan.Zero)], TimeSpan.Zero));
+    public override AssetProviderItem[] GetLoadOptions(Assets assets)
+        => assets.Provider.GetItemsInGroup(assets.Config.AnimationGroup, [
+            assets.Config.AnimationExtension,
+            assets.Config.AnimationGroupExtension
+        ]);
 
-        // Load single animations
-        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.AnimationGroup, assets.Config.AnimationExtension)) {
-            using Stream stream = assets.Provider.GetItemStream(item);
-            AnimationConfig? data = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationConfig);
+    public override void RunLoad(Assets assets, AssetCollection collection) {
+        foreach (AssetProviderItem item in FilterSingles(assets, collection)) {
+            AnimationConfig? data = GetSingleConfig(assets, item);
             if (data == null) { continue; }
             AddAnimation(assets, item.Name, data);
         }
 
-        // Load animation group files
-        foreach (AssetProviderItem item in assets.Provider.GetItemsInGroup(assets.Config.AnimationGroup, assets.Config.AnimationGroupExtension)) {
-            using Stream stream = assets.Provider.GetItemStream(item);
-            AnimationGroupConfig? data = JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationGroupConfig);
+        foreach (AssetProviderItem item in FilterGroups(assets, collection)) {
+            AnimationGroupConfig? data = GetGroupConfig(assets, item);
             if (data == null) { continue; }
             foreach (AnimationConfigEntry entry in data.Entries) {
-                string name = $"{item.Name}/{entry.Name}";
-                AddAnimation(assets, name, entry.Animation);
+                AddAnimation(assets, GetGroupEntryName(item, entry), entry.Animation);
             }
         }
     }
+
+    public override void RunUnload(Assets assets, AssetCollection collection) {
+        foreach (AssetProviderItem item in FilterSingles(assets, collection)) {
+            RemoveAsset<AnimationData>(assets, item.Name);
+        }
+
+        foreach (AssetProviderItem item in FilterGroups(assets, collection)) {
+            AnimationGroupConfig? data = GetGroupConfig(assets, item);
+            if (data == null) { continue; }
+            foreach (AnimationConfigEntry entry in data.Entries) {
+                RemoveAsset<AnimationData>(assets, GetGroupEntryName(item, entry));
+            }
+        }
+    }
+
+    static AssetProviderItem[] FilterSingles(Assets assets, AssetCollection collection)
+        => collection.Filter(assets.Config.AnimationGroup, assets.Config.AnimationExtension);
+
+    static AssetProviderItem[] FilterGroups(Assets assets, AssetCollection collection)
+        => collection.Filter(assets.Config.AnimationGroup, assets.Config.AnimationGroupExtension);
 
     static void AddAnimation(Assets assets, string name, AnimationConfig animConfig) {
         AnimationData? anim = animConfig.AnimationType switch {
@@ -41,8 +60,20 @@ public class AnimationLoader : AssetLoaderStage {
             _ => null
         };
 
-        if (anim != null) { assets.Add(name, anim); }
+        if (anim != null) { AddAsset(assets, name, anim); }
     }
+
+    static AnimationConfig? GetSingleConfig(Assets assets, AssetProviderItem item) {
+        using Stream stream = assets.Provider.GetItemStream(item);
+        return JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationConfig);
+    }
+
+    static AnimationGroupConfig? GetGroupConfig(Assets assets, AssetProviderItem item) {
+        using Stream stream = assets.Provider.GetItemStream(item);
+        return JsonSerializer.Deserialize(stream, SourceGenerationContext.Default.AnimationGroupConfig);
+    }
+
+    static string GetGroupEntryName(AssetProviderItem item, AnimationConfigEntry entry) => $"{item.Name}/{entry.Name}";
 
     static AnimationData? GetSpriteSheetAnimation(Assets assets, AnimationConfig config) {
         Subtexture spritesheet = assets.GetSubtexture(config.Spritesheet);
