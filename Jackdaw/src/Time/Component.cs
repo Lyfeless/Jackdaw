@@ -1,14 +1,11 @@
 namespace Jackdaw;
 
 /// <summary>
-/// A wrapper for the timer object to automatically run actions when finished.
+/// A wrapper for the timer object to automatically run actions when finished. <br/>
+/// Not ticking by default.
 /// </summary>
-/// <param name="game">The current game instance.</param>
-/// <param name="duration">The timer's duration.</param>
-/// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
-/// <param name="startTime">The time offset the timer should begin with.</param>
-public class TimerComponent(Game game, TimeSpan duration, string? timeTracker = null, TimeSpan? startTime = null) : Component(game) {
-    readonly TicklessTimer Timer = new(game, duration, timeTracker, startTime);
+public class TimerComponent : Component {
+    readonly TicklessTimer Timer;
 
     /// <summary>
     /// If the timer should reset when finished.
@@ -24,6 +21,14 @@ public class TimerComponent(Game game, TimeSpan duration, string? timeTracker = 
     /// The action to run when the timer finishes or loops.
     /// </summary>
     public Action? Callback;
+    /// <param name="game">The current game instance.</param>
+    /// <param name="duration">The timer's duration.</param>
+    /// <param name="timeTracker">The tracker to use for the current time. Defaults to normal time.</param>
+    /// <param name="startTime">The time offset the timer should begin with.</param>
+    public TimerComponent(Game game, TimeSpan duration, string? timeTracker = null, TimeSpan? startTime = null) : base(game) {
+        Timer = new(game, duration, timeTracker, startTime);
+        Visible = false;
+    }
 
     /// <summary>
     /// A wrapper for the timer object to automatically run actions when finished.

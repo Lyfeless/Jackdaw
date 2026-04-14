@@ -4,17 +4,14 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A renderable grid of sprites.
+/// A renderable grid of sprites. <br/>
+/// Not ticking by default.
 /// </summary>
-/// <param name="game">The current game instance.</param>
-/// <param name="position">The grid position.</param>
-/// <param name="grid">The grid instance.</param>
-/// <param name="tileSize">The size of each tile.</param>
-public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : Component(game), IStackableGrid<Sprite?>, ISpatialGrid {
-    protected readonly Grid<Sprite> Grid = grid;
+public class GridRenderComponent : Component, IStackableGrid<Sprite?>, ISpatialGrid {
+    protected readonly Grid<Sprite> Grid;
 
-    protected Point2 position = position;
-    protected Point2 tileSize = tileSize;
+    protected Point2 position;
+    protected Point2 tileSize;
 
     /// <summary>
     /// The grid position.
@@ -35,6 +32,16 @@ public class GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, 
     public Point2 TileCount => Grid.TileCount;
 
     public Rect Bounds => new(Position, Grid.TileCount * TileSize);
+    /// <param name="game">The current game instance.</param>
+    /// <param name="position">The grid position.</param>
+    /// <param name="grid">The grid instance.</param>
+    /// <param name="tileSize">The size of each tile.</param>
+    public GridRenderComponent(Game game, Point2 position, Grid<Sprite> grid, Point2 tileSize) : base(game) {
+        Grid = grid;
+        this.position = position;
+        this.tileSize = tileSize;
+        Ticking = false;
+    }
 
     /// <summary>
     /// A renderable grid of sprites.

@@ -4,13 +4,10 @@ using Foster.Framework;
 namespace Jackdaw;
 
 /// <summary>
-/// A simple text rendering component.
+/// A simple text rendering component. <br/>
+/// Not ticking by default.
 /// </summary>
-/// <param name="game">The current game instance.</param>
-/// <param name="text">The text to render.</param>
-/// <param name="font">The font data.</param>
-/// <param name="color">The text color.</param>
-public class TextRenderComponent(Game game, string text, SpriteFont font, Color color) : Component(game) {
+public class TextRenderComponent : Component {
     /// <summary>
     /// How to position text relative to the position.
     /// </summary>
@@ -45,8 +42,8 @@ public class TextRenderComponent(Game game, string text, SpriteFont font, Color 
         BOTTOM
     }
 
-    string text = text;
-    SpriteFont font = font;
+    string text;
+    SpriteFont font;
     Vector2 offset = Vector2.Zero;
     Alignment alignHorizontal = Alignment.LEFT;
     Alignment alignVertical = Alignment.TOP;
@@ -76,7 +73,7 @@ public class TextRenderComponent(Game game, string text, SpriteFont font, Color 
     /// <summary>
     /// The text color.
     /// </summary>
-    public Color Color = color;
+    public Color Color;
 
     /// <summary>
     /// The position offset.
@@ -101,7 +98,7 @@ public class TextRenderComponent(Game game, string text, SpriteFont font, Color 
     }
 
     /// <summary>
-    /// How to algin the text vertically relative to its position.
+    /// How to align the text vertically relative to its position.
     /// </summary>
     public Alignment AlignVertical {
         get => alignVertical;
@@ -114,7 +111,19 @@ public class TextRenderComponent(Game game, string text, SpriteFont font, Color 
     /// <summary>
     /// The rectangular region the text occupies.
     /// </summary>
-    public Rect Bounds { get; private set; } = GetBounds(Vector2.Zero, text, font, Alignment.LEFT, Alignment.TOP);
+    public Rect Bounds { get; private set; }
+
+    /// <param name="game">The current game instance.</param>
+    /// <param name="text">The text to render.</param>
+    /// <param name="font">The font data.</param>
+    /// <param name="color">The text color.</param>
+    public TextRenderComponent(Game game, string text, SpriteFont font, Color color) : base(game) {
+        this.text = text;
+        this.font = font;
+        Color = color;
+        Bounds = GetBounds(Vector2.Zero, text, font, Alignment.LEFT, Alignment.TOP);
+        Ticking = false;
+    }
 
     /// <summary>
     /// A simple text rendering component.

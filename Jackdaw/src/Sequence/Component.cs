@@ -1,12 +1,11 @@
 namespace Jackdaw;
 
 /// <summary>
-/// Component responsible for playing back a given sequence.
+/// Component responsible for playing back a given sequence. <br/>
+/// Not visible by default.
 /// </summary>
-/// <param name="game">The current game instance.</param>
-/// <param name="sequence">The sequence to run.</param>
-public class SequenceComponent(Game game, Sequence sequence) : Component(game) {
-    Sequence sequence = sequence;
+public class SequenceComponent : Component {
+    Sequence sequence;
 
     /// <summary>
     /// The sequence to run.
@@ -46,6 +45,13 @@ public class SequenceComponent(Game game, Sequence sequence) : Component(game) {
     /// If the component should automatically run the sequence when added to the node tree.
     /// </summary>
     public bool Autostart = false;
+
+    /// <param name="game">The current game instance.</param>
+    /// <param name="sequence">The sequence to run.</param>
+    public SequenceComponent(Game game, Sequence sequence) : base(game) {
+        this.sequence = sequence;
+        Visible = false;
+    }
 
     protected override void EnterTree() {
         if (Autostart) { Run(); }
