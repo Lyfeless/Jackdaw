@@ -17,7 +17,7 @@ public class TextureLoader : AssetLoaderStage {
         => assets.Provider.GetItemsInGroup(assets.Config.TextureGroup, TextureExtensions);
 
     public override void RunLoad(Assets assets, AssetCollection collection) {
-        PackerLoader? packer = assets.Loaders.Find<PackerLoader>();
+        PackerLoader? packer = Find<PackerLoader>(assets);
         if (packer == null) { return; }
 
         foreach (AssetProviderItem item in Filter(assets, collection)) {

@@ -18,8 +18,8 @@ public class AsepriteLoader : AssetLoaderStage {
         => assets.Provider.GetItemsInGroup(assets.Config.TextureGroup, AsepriteExtensions);
 
     public override void RunLoad(Assets assets, AssetCollection collection) {
-        PackerLoader? packer = assets.Loaders.Find<PackerLoader>();
-        AsepriteAnimationLoader? animationLoader = assets.Loaders.Find<AsepriteAnimationLoader>();
+        PackerLoader? packer = Find<PackerLoader>(assets);
+        AsepriteAnimationLoader? animationLoader = Find<AsepriteAnimationLoader>(assets);
         if (packer == null || animationLoader == null) { return; }
 
         foreach (AssetProviderItem item in Filter(assets, collection)) {

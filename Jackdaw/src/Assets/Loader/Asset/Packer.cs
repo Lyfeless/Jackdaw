@@ -15,14 +15,14 @@ public class PackerLoader() : AssetLoaderStage() {
     public override AssetProviderItem[] GetLoadOptions(Assets assets) => [];
 
     public override void RunLoad(Assets assets, AssetCollection collection) {
-        var output = Packer.Pack();
+        Packer.Output output = Packer.Pack();
         List<Texture> pages = [];
 
-        foreach (var page in output.Pages) {
+        foreach (Image? page in output.Pages) {
             pages.Add(new Texture(assets.GraphicsDevice, page));
         }
 
-        foreach (var entry in output.Entries) {
+        foreach (Packer.Entry entry in output.Entries) {
             Subtexture texture = new(pages[entry.Page], entry.Source, entry.Frame);
             AddAsset(assets, entry.Name, texture);
         }

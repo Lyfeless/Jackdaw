@@ -69,6 +69,9 @@ public abstract class AssetLoaderStage() {
     public static void RemoveAsset<T>(Assets assets, string name)
         => assets.Remove<T>(name);
 
+    public static T? Find<T>(Assets assets) where T : AssetLoaderStage
+        => assets.Loaders.Find<T>();
+
     internal bool IsBefore(AssetLoaderStage loader) => IsBefore(loader.GetType());
     internal bool IsBefore(Type type) => Before.Contains(type);
     internal bool IsAfter(AssetLoaderStage loader) => IsAfter(loader.GetType());

@@ -15,7 +15,7 @@ public readonly struct AssetCollectionBuilder {
         foreach (IAssetCollectionBuilderElement element in Elements) {
             filtered = filtered.Concat(element.Filter(items));
         }
-        return new([.. filtered]);
+        return new(Name, [.. filtered]);
     }
 
     public static AssetCollectionBuilder[] FromAll()
@@ -32,11 +32,14 @@ public readonly struct AssetCollectionBuilder {
         throw new NotImplementedException();
     }
 
-    public static AssetCollectionBuilder[] FromProviderFile(AssetProviderItem item) {
+    public static AssetCollectionBuilder[] FromProviderFile(IAssetProvider provider, string group, string name, string extension)
+        => FromProviderFile(provider, new(group, name, extension));
+
+    public static AssetCollectionBuilder[] FromProviderFile(IAssetProvider provider, AssetProviderItem item) {
         throw new NotImplementedException();
     }
 
-    public static AssetCollectionBuilder[] FromProviderFiles(params AssetProviderItem[] items) {
+    public static AssetCollectionBuilder[] FromProviderFiles(IAssetProvider provider, string group, string extension, params string[] names) {
         throw new NotImplementedException();
     }
 
@@ -55,7 +58,7 @@ public class AssetCollectionBuilderInstance {
     }
 
     public AssetCollectionBuilderInstance NewCollection(string name) {
-        if (newElements.Count > 0) { builders.Add(new AssetCollectionBuilder(newName, [.. newElements])); }
+        AddBuilder();
         newName = name;
         newElements.Clear();
         return this;
@@ -66,13 +69,18 @@ public class AssetCollectionBuilderInstance {
         return this;
     }
 
-    public AssetCollectionBuilderInstance AllWithin(string group, string path) {
-        newElements.Add(new AssetCollectionBuilderElementAllWithin(group, path, []));
+    public AssetCollectionBuilderInstance AllInGroup(string group) {
+        newElements.Add(new AssetCollectionBuilderElementAllIn(group, string.Empty, []));
         return this;
     }
 
-    public AssetCollectionBuilderInstance AllWithin(string group, string path, params string[] extensions) {
-        newElements.Add(new AssetCollectionBuilderElementAllWithin(group, path, extensions));
+    public AssetCollectionBuilderInstance AllInGroupPath(string group, string path) {
+        newElements.Add(new AssetCollectionBuilderElementAllIn(group, path, []));
+        return this;
+    }
+
+    public AssetCollectionBuilderInstance AllInGroupPathExtension(string group, string path, params string[] extensions) {
+        newElements.Add(new AssetCollectionBuilderElementAllIn(group, path, extensions));
         return this;
     }
 
@@ -86,8 +94,14 @@ public class AssetCollectionBuilderInstance {
         return this;
     }
 
-    public AssetCollectionBuilder[] Finish()
-        => [.. builders];
+    public AssetCollectionBuilder[] Finish() {
+        AddBuilder();
+        return [.. builders];
+    }
+
+    void AddBuilder() {
+        if (newElements.Count > 0) { builders.Add(new AssetCollectionBuilder(newName, [.. newElements])); }
+    }
 
     public static implicit operator AssetCollectionBuilder[](AssetCollectionBuilderInstance instance) => instance.Finish();
 }
@@ -100,7 +114,7 @@ internal struct AssetCollectionBuilderElementAll : IAssetCollectionBuilderElemen
     public readonly AssetProviderItem[] Filter(AssetProviderItem[] items) => items;
 }
 
-internal struct AssetCollectionBuilderElementAllWithin(string group, string path, string[] extensions) : IAssetCollectionBuilderElement {
+internal struct AssetCollectionBuilderElementAllIn(string group, string path, string[] extensions) : IAssetCollectionBuilderElement {
     public readonly AssetProviderItem[] Filter(AssetProviderItem[] items) {
         // CS1673.... hm
         string compareGroup = group;
@@ -112,7 +126,7 @@ internal struct AssetCollectionBuilderElementAllWithin(string group, string path
     static bool Compare(AssetProviderItem item, string group, string path, string[] extensions) {
         return
             item.Group == group &&
-            item.Name.StartsWith(path) &&
+            (path == string.Empty || item.Name.StartsWith(path)) &&
             (extensions.Length == 0 || extensions.Contains(item.Extension));
     }
 }

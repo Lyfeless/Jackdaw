@@ -24,7 +24,7 @@ public class FontLoader() : AssetLoaderStage() {
 
     public override void RunUnload(Assets assets, AssetCollection collection) {
         foreach (AssetProviderItem item in Filter(assets, collection)) {
-            assets.Remove<SpriteFont>(item.Name);
+            RemoveAsset<SpriteFont>(assets, item.Name);
         }
     }
 

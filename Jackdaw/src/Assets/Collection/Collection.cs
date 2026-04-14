@@ -1,6 +1,7 @@
 namespace Jackdaw;
 
-public readonly struct AssetCollection(AssetProviderItem[] items) {
+public readonly struct AssetCollection(string name, AssetProviderItem[] items) {
+    public readonly string Name = name;
     public readonly AssetProviderItem[] Items = items;
 
     public AssetProviderItem[] Filter(string group)

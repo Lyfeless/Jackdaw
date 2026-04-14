@@ -26,7 +26,7 @@ internal class AnimationConfig {
     public AnimationType AnimationType { get; set; } = AnimationType.SPRITESHEET;
 
     [JsonPropertyName("spritesheet")]
-    public string Spritesheet { get; set; } = "";
+    public string Spritesheet { get; set; } = string.Empty;
 
     [JsonPropertyName("textures")]
     public string[] Textures { get; set; } = [];
