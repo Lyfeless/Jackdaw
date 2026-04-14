@@ -147,12 +147,14 @@ public class Game : App {
     }
 
     protected override void Render() {
-        Window.Clear(BackgroundColor);
-        Batcher.Clear();
+        lock (GraphicsDevice) {
+            Window.Clear(BackgroundColor);
+            Batcher.Clear();
 
-        Batcher.PushBlend(BlendMode.NonPremultiplied);
-        root?.Render(Batcher);
-        Batcher.Render(Window);
+            Batcher.PushBlend(BlendMode.NonPremultiplied);
+            root?.Render(Batcher);
+            Batcher.Render(Window);
+        }
     }
 
     internal void QueueInvalidate(Component component)

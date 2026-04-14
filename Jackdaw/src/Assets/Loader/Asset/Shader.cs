@@ -39,7 +39,11 @@ public class ShaderLoader() : AssetLoaderStage() {
                 StorageBufferCount: entry.StorageBuffers
             );
 
-            AddAsset(assets, entry.Name, new Shader(assets.GraphicsDevice, createInfo));
+            Shader shader;
+            lock (assets.GraphicsDevice) {
+                shader = new(assets.GraphicsDevice, createInfo);
+            }
+            AddAsset(assets, entry.Name, shader);
         }
     }
 

@@ -18,7 +18,12 @@ public class FontLoader() : AssetLoaderStage() {
         foreach (AssetProviderItem item in Filter(assets, collection)) {
             FontConfigEntry? configEntry = config.FontConfigs.FirstOrDefault(e => e.Name == item.Name);
             using Stream stream = assets.Provider.GetItemStream(item);
-            AddAsset(assets, item.Name, new SpriteFont(assets.GraphicsDevice, stream, configEntry?.Size ?? FontConfig.DefaultFontSize));
+
+            SpriteFont font;
+            lock (assets.GraphicsDevice) {
+                font = new(assets.GraphicsDevice, stream, configEntry?.Size ?? FontConfig.DefaultFontSize);
+            }
+            AddAsset(assets, item.Name, font);
         }
     }
 

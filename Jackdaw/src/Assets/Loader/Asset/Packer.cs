@@ -19,7 +19,10 @@ public class PackerLoader() : AssetLoaderStage() {
         List<Texture> pages = [];
 
         foreach (Image? page in output.Pages) {
-            pages.Add(new Texture(assets.GraphicsDevice, page));
+            Thread.Sleep(1000);
+            lock (assets.GraphicsDevice) {
+                pages.Add(new Texture(assets.GraphicsDevice, page));
+            }
         }
 
         foreach (Packer.Entry entry in output.Entries) {
