@@ -50,7 +50,7 @@ public class Assets {
 
         Collections = new(this, config.UseAssetCollections
             ? config.Collections
-            : [AssetCollectionBuilder.SingleFromAll()]
+            : AssetCollectionBuilder.FromAll()
         );
 
         Load(config);

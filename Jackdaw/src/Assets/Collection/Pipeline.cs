@@ -7,14 +7,12 @@ public class AssetCollectionPipeline {
 
     readonly Dictionary<string, AssetCollection> Collections = [];
 
-    public AssetCollectionPipeline(Assets assets, AssetCollectionBuilder[] builders) {
+    public AssetCollectionPipeline(Assets assets, AssetCollectionBuilderContainer builder) {
         Assets = assets;
 
         AssetProviderItem[] loadOptions = assets.Loaders.GetLoadOptions();
 
-        foreach (AssetCollectionBuilder builder in builders) {
-            Collections.Add(builder.Name, builder.Filter(loadOptions));
-        }
+        Collections = builder.FilterAll(assets, loadOptions);
     }
 
     public void Load(string name) {

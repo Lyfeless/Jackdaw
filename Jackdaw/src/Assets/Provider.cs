@@ -101,4 +101,27 @@ public readonly struct AssetProviderItem(string group, string name, string exten
     public static bool operator !=(AssetProviderItem left, AssetProviderItem right) => !(left == right);
 
     public override int GetHashCode() => HashCode.Combine(Group, Name, Extension);
+
+    public static AssetProviderItem FromString(string item) {
+        string group = string.Empty;
+        string name = string.Empty;
+        string extension = string.Empty;
+
+        string[] splitPeriod = item.Split('.');
+
+        if (splitPeriod.Length > 1) { extension = $".{splitPeriod[^1]}"; }
+
+        string itemNoExtension = item[..^extension.Length];
+        string[] splitSlash = itemNoExtension.Split('/');
+
+        if (splitSlash.Length > 1) {
+            group = splitSlash[0];
+            name = itemNoExtension[(group.Length + 1)..];
+        }
+        else {
+            name = itemNoExtension;
+        }
+
+        return new(group, name, extension);
+    }
 }

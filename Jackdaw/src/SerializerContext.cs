@@ -20,4 +20,5 @@ namespace Jackdaw;
 [JsonSerializable(typeof(bool[]))]
 [JsonSerializable(typeof(float[]))]
 [JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(Dictionary<string, string[]>))]
 internal partial class SourceGenerationContext : JsonSerializerContext { }

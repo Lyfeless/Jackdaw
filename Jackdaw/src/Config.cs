@@ -80,7 +80,7 @@ public struct GameContentConfig() {
     /// The method used for loading asset collections. <br/>
     /// Only used if <see cref="UseAssetCollections" /> is enabled. <br/>
     /// </summary>
-    public AssetCollectionBuilder[] Collections = AssetCollectionBuilder.FromAll();
+    public AssetCollectionBuilderContainer Collections = AssetCollectionBuilder.FromAll();
 
     /// <summary>
     /// The provider group name to search for texture files. <br/>

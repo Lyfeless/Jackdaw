@@ -1,5 +1,36 @@
+using System.Text.Json;
+
 namespace Jackdaw;
 
+public readonly struct AssetCollectionBuilderContainer {
+    internal readonly AssetCollectionBuilder[] Builders = [];
+
+    readonly bool UseProvider = false;
+    readonly AssetProviderItem ProviderItem;
+
+    internal AssetCollectionBuilderContainer(AssetCollectionBuilder[] builders) {
+        Builders = builders;
+    }
+
+    internal AssetCollectionBuilderContainer(AssetProviderItem providerItem) {
+        UseProvider = true;
+        ProviderItem = providerItem;
+    }
+
+    internal Dictionary<string, AssetCollection> FilterAll(Assets assets, AssetProviderItem[] items) {
+        AssetCollectionBuilderContainer container = this;
+        if (UseProvider && assets.Provider.HasItem(ProviderItem)) {
+            using Stream stream = assets.Provider.GetItemStream(ProviderItem);
+            container = AssetCollectionBuilder.FromStream(stream);
+        }
+
+        Dictionary<string, AssetCollection> collections = [];
+        foreach (AssetCollectionBuilder builder in container.Builders) {
+            collections.Add(builder.Name, builder.Filter(items));
+        }
+        return collections;
+    }
+}
 
 public readonly struct AssetCollectionBuilder {
     public readonly string Name;
@@ -18,33 +49,54 @@ public readonly struct AssetCollectionBuilder {
         return new(Name, [.. filtered]);
     }
 
-    public static AssetCollectionBuilder[] FromAll()
-        => [SingleFromAll()];
+    public static AssetCollectionBuilderContainer FromAll()
+        => new([new(string.Empty, new AssetCollectionBuilderElementAll())]);
 
-    public static AssetCollectionBuilder SingleFromAll()
-        => new(string.Empty, new AssetCollectionBuilderElementAll());
-
-    public static AssetCollectionBuilder[] FromFile(string path) {
-        throw new NotImplementedException();
+    public static AssetCollectionBuilderContainer FromFile(string path) {
+        if (!Path.Exists(path)) { return new([]); }
+        using FileStream stream = File.OpenRead(path);
+        return FromStream(stream);
     }
 
-    public static AssetCollectionBuilder[] FromFiles(params string[] paths) {
-        throw new NotImplementedException();
+    public static AssetCollectionBuilderContainer FromProviderFile(string group, string name, string extension)
+        => FromProviderFile(new(group, name, extension));
+
+    public static AssetCollectionBuilderContainer FromProviderFile(AssetProviderItem item) => new(item);
+
+    public static AssetCollectionBuilderInstance NewCollection(string name) => new(name);
+
+    internal static AssetCollectionBuilderContainer FromStream(Stream stream) {
+        Dictionary<string, string[]> collections;
+
+        try {
+            Dictionary<string, string[]>? output = JsonSerializer.Deserialize(
+                stream, SourceGenerationContext.Default.DictionaryStringStringArray);
+            if (output == null) { return new([]); }
+            collections = output;
+        } catch { return new([]); }
+
+        return new([.. collections.Select(e => ParseElements(e.Key, e.Value))]);
     }
 
-    public static AssetCollectionBuilder[] FromProviderFile(IAssetProvider provider, string group, string name, string extension)
-        => FromProviderFile(provider, new(group, name, extension));
+    static AssetCollectionBuilder ParseElements(string name, string[] entries)
+        => new(name, [.. entries.Select(ParseSingleElement)]);
 
-    public static AssetCollectionBuilder[] FromProviderFile(IAssetProvider provider, AssetProviderItem item) {
-        throw new NotImplementedException();
+    static IAssetCollectionBuilderElement ParseSingleElement(string entry) {
+        if (entry == string.Empty) { return new AssetCollectionBuilderElementAllIn(string.Empty, string.Empty, []); }
+
+        bool isFilter = entry.StartsWith('>');
+        if (isFilter) { entry = entry[1..]; }
+        AssetProviderItem item = AssetProviderItem.FromString(entry);
+
+        if (!isFilter) { return new AssetCollectionBuilderSingle(item); }
+
+        string[] extensionFilter = item.Extension == string.Empty ? [] : [item.Extension];
+
+        // paths with no subfolders are treated as full group searches
+        if (item.Group == string.Empty) { return new AssetCollectionBuilderElementAllIn(item.Name, string.Empty, extensionFilter); }
+
+        return new AssetCollectionBuilderElementAllIn(item.Group, item.Name, extensionFilter);
     }
-
-    public static AssetCollectionBuilder[] FromProviderFiles(IAssetProvider provider, string group, string extension, params string[] names) {
-        throw new NotImplementedException();
-    }
-
-    public static AssetCollectionBuilderInstance NewCollection(string name)
-        => new(name);
 }
 
 public class AssetCollectionBuilderInstance {
@@ -83,6 +135,14 @@ public class AssetCollectionBuilderInstance {
         newElements.Add(new AssetCollectionBuilderElementAllIn(group, path, extensions));
         return this;
     }
+
+    public AssetCollectionBuilderInstance AllInGroupExtension(string group, params string[] extensions) {
+        newElements.Add(new AssetCollectionBuilderElementAllIn(group, string.Empty, extensions));
+        return this;
+    }
+
+    public AssetCollectionBuilderInstance Single(string group, string name, string extension)
+        => Single(new(group, name, extension));
 
     public AssetCollectionBuilderInstance Single(AssetProviderItem item) {
         newElements.Add(new AssetCollectionBuilderSingle(item));
