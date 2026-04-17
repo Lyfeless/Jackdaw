@@ -2,7 +2,7 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
-internal class AssetStoragePipeline {
+public class AssetStoragePipeline {
     internal enum RequestFailResponse {
         THROW,
         CREATE,

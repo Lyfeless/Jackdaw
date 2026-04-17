@@ -7,8 +7,8 @@ namespace Jackdaw;
 /// Manager class used for storing and loading game assets including textures, sounds, fonts, etc
 /// </summary>
 public class Assets {
-    readonly AssetStoragePipeline Storage = new();
     internal readonly AssetLoaderPipeline Loaders;
+    public readonly AssetStoragePipeline Storage = new();
     public readonly AssetCollectionPipeline Collections;
 
     /// <summary>
