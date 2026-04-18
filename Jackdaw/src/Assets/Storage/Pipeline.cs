@@ -2,6 +2,9 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Manager for adding and finding storage objects for different types of assets.
+/// </summary>
 public class AssetStoragePipeline {
     internal enum RequestFailResponse {
         THROW,

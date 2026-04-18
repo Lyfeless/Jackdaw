@@ -19,12 +19,14 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
     ///     The group name to load asset from. This will be the first element in the resource's name <br/>
     ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
     /// </param>
+#pragma warning disable IL2026
     public EmbeddedResourceAssetProvider(string root) {
         Assembly entry = Assembly.GetEntryAssembly()!;
         AssemblyName[] referenced = entry.GetReferencedAssemblies();
         Assemblies = [entry, .. referenced.Select(Assembly.Load)];
         LoadAllAssemblies(root);
     }
+#pragma warning restore IL2026
 
     /// <summary>
     /// An asset provider for loading data from embedded files inside the project's assemblies.

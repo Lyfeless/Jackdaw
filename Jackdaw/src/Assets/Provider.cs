@@ -102,6 +102,11 @@ public readonly struct AssetProviderItem(string group, string name, string exten
 
     public override int GetHashCode() => HashCode.Combine(Group, Name, Extension);
 
+    /// <summary>
+    /// Convert a relative file path into an asset provider item.
+    /// </summary>
+    /// <param name="item">The realtive file path to convert.</param>
+    /// <returns></returns>
     public static AssetProviderItem FromString(string item) {
         string group = string.Empty;
         string name = string.Empty;

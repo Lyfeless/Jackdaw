@@ -1,14 +1,24 @@
-using System.Collections.Concurrent;
 using Foster.Framework;
 
 namespace Jackdaw;
 
 /// <summary>
-/// Manager class used for storing and loading game assets including textures, sounds, fonts, etc
+/// Manager class used for storing and loading game assets including textures, sounds, fonts, etc.
 /// </summary>
 public class Assets {
-    internal readonly AssetLoaderPipeline Loaders;
+    /// <summary>
+    /// Utilities for managing asset loaders.
+    /// </summary>
+    public readonly AssetLoaderPipeline Loaders;
+
+    /// <summary>
+    /// Utilities for registering asset storage objects.
+    /// </summary>
     public readonly AssetStoragePipeline Storage = new();
+
+    /// <summary>
+    /// Utilities for handling the loading for collections of assets.
+    /// </summary>
     public readonly AssetCollectionPipeline Collections;
 
     /// <summary>
@@ -36,7 +46,7 @@ public class Assets {
     /// </summary>
     public readonly EmbeddedResourceAssetProvider FallbackProvider = new("Fallback");
 
-    public Assets(Game game, GameContentConfig config) {
+    internal Assets(Game game, GameContentConfig config) {
         Game = game;
         Config = config;
 

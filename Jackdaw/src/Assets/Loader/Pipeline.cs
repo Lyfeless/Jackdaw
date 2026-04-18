@@ -1,16 +1,18 @@
-using System.Collections;
 using System.Collections.Concurrent;
 using Foster.Framework;
 
 namespace Jackdaw;
 
-internal class AssetLoaderPipeline {
+/// <summary>
+/// Manager for registering and running asset loader operations.
+/// </summary>
+public class AssetLoaderPipeline {
     public enum QueueAction {
         LOAD_COLLECTION,
         UNLOAD_COLLECTION
     }
 
-    struct QueueElement(AssetCollection collection, QueueAction action) {
+    readonly struct QueueElement(AssetCollection collection, QueueAction action) {
         public readonly AssetCollection Collection = collection;
         public readonly QueueAction Action = action;
         public readonly Semaphore Semaphore = new(0, 1);
@@ -30,7 +32,7 @@ internal class AssetLoaderPipeline {
     bool IsQueueFinished => !IsQueueRunning;
     bool IsQueueRunning => QueueWorkerThread.IsAlive;
 
-    public AssetLoaderPipeline(Assets assets) {
+    internal AssetLoaderPipeline(Assets assets) {
         Assets = assets;
         QueueWorkerThread = new(QueueWorker);
     }
@@ -42,7 +44,7 @@ internal class AssetLoaderPipeline {
     /// <returns>The asset loader, null if no loader matches the given type.</returns>
     public T? Find<T>() where T : AssetLoaderStage => (T?)Stages.FirstOrDefault(e => e.GetType() == typeof(T));
 
-    public void Register(AssetLoaderStage loader) {
+    internal void Register(AssetLoaderStage loader) {
         if (Stages.Any(e => e.GetType() == loader.GetType())) {
             Log.Warning($"Asset Loader: Trying to add a second loader of type {loader.GetType()}. Behavior is currently unsupported, skipping.");
             return;
@@ -50,7 +52,7 @@ internal class AssetLoaderPipeline {
         Stages.Add(loader);
     }
 
-    public AssetProviderItem[] GetLoadOptions() {
+    internal AssetProviderItem[] GetLoadOptions() {
         IEnumerable<AssetProviderItem> options = [];
         foreach (AssetLoaderStage stage in Stages) {
             options = options.Concat(stage.GetLoadOptions(Assets));
@@ -58,12 +60,12 @@ internal class AssetLoaderPipeline {
         return [.. options];
     }
 
-    public void RunLoad(AssetCollection collection) {
+    internal void RunLoad(AssetCollection collection) {
         if (!CanLoadCollection(collection.Name)) { return; }
         Run(collection, QueueAction.LOAD_COLLECTION);
     }
 
-    public void RunUnload(AssetCollection collection) {
+    internal void RunUnload(AssetCollection collection) {
         if (!CanUnloadCollection(collection.Name)) { return; }
         Run(collection, QueueAction.UNLOAD_COLLECTION);
     }
@@ -79,23 +81,23 @@ internal class AssetLoaderPipeline {
         }
     }
 
-    public void RunLoadAsync(AssetCollection collection) {
+    internal void RunLoadAsync(AssetCollection collection) {
         if (!CanLoadCollection(collection.Name)) { return; }
         RunAsync(collection, QueueAction.LOAD_COLLECTION);
     }
 
-    public void RunUnloadAsync(AssetCollection collection) {
+    internal void RunUnloadAsync(AssetCollection collection) {
         if (!CanUnloadCollection(collection.Name)) { return; }
         RunAsync(collection, QueueAction.UNLOAD_COLLECTION);
     }
 
-    public void RunAsync(AssetCollection collection, QueueAction action) {
+    internal void RunAsync(AssetCollection collection, QueueAction action) {
         LoadQueue.Enqueue(new(collection, action));
         TryStartQueue();
     }
 
-    public void WaitForLoad(string collection) => WaitFor(collection, QueueAction.LOAD_COLLECTION);
-    public void WaitForUnload(string collection) => WaitFor(collection, QueueAction.UNLOAD_COLLECTION);
+    internal void WaitForLoad(string collection) => WaitFor(collection, QueueAction.LOAD_COLLECTION);
+    internal void WaitForUnload(string collection) => WaitFor(collection, QueueAction.UNLOAD_COLLECTION);
 
     void WaitFor(string collection, QueueAction action) {
         if (IsQueueFinished) { return; }
@@ -104,8 +106,8 @@ internal class AssetLoaderPipeline {
         ((QueueElement)element).Semaphore.WaitOne();
     }
 
-    public void WaitForLoadAll() => WaitForAll(QueueAction.LOAD_COLLECTION);
-    public void WaitForUnloadAll() => WaitForAll(QueueAction.UNLOAD_COLLECTION);
+    internal void WaitForLoadAll() => WaitForAll(QueueAction.LOAD_COLLECTION);
+    internal void WaitForUnloadAll() => WaitForAll(QueueAction.UNLOAD_COLLECTION);
 
     void WaitForAll(QueueAction action) {
         if (IsQueueFinished) { return; }
@@ -118,19 +120,26 @@ internal class AssetLoaderPipeline {
         }
     }
 
-    public void WaitForQueueFinish() => QueueWorkerThread.Join();
+    internal void WaitForQueueFinish() => QueueWorkerThread.Join();
 
-    public bool IsLoaded(string name) {
+    internal bool IsLoaded(string name) {
         lock (LoadedCollections) {
             return LoadedCollections.Contains(name);
         }
     }
 
-    public bool IsLoading(string name) => LoadQueue.Any(e => e.Collection.Name == name);
+    internal bool IsLoading(string name) => AnyInQueue(name, QueueAction.LOAD_COLLECTION);
 
-    public bool IsLoadedOrLoading(string name) => IsLoaded(name) || IsLoading(name);
+    internal bool IsLoadedOrLoading(string name) => IsLoaded(name) || IsLoading(name);
 
-    public bool IsUnloaded(string name) => !IsLoadedOrLoading(name);
+    internal bool IsUnloaded(string name) => !IsLoadedOrLoading(name);
+
+    internal bool IsUnloading(string name) => AnyInQueue(name, QueueAction.UNLOAD_COLLECTION);
+
+    internal bool IsUnloadedOrUnloading(string name) => IsUnloaded(name) || IsUnloading(name);
+
+    bool AnyInQueue(string name, QueueAction action)
+        => LoadQueue.Any(e => e.Collection.Name == name && e.Action == action);
 
     void SetInterrupt(QueueElement element) {
         ShouldInterrupt = true;
@@ -194,6 +203,11 @@ internal class AssetLoaderPipeline {
     bool CanUnloadCollection(string name) {
         if (IsUnloaded(name)) {
             Log.Warning($"Asset Loader: Asset collection {name} is already unloaded, skipping unload.");
+            return false;
+        }
+
+        if (IsUnloading(name)) {
+            Log.Warning($"Asset Loader: Asset collection {name} is already unloading, skipping unload.");
             return false;
         }
 
