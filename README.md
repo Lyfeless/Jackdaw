@@ -13,8 +13,7 @@ Game game = new(new GameConfig() {
     ApplicationName = "JackdawExample",
     Window = new() {
         Title = "My First Jackdaw Game",
-        Width = 320,
-        Height = 180,
+        Size = new(320, 180),
         ClearColor = Color.CornflowerBlue
     }
 });
@@ -24,7 +23,7 @@ Actor rootActor = new(game);
 rootActor.Position = new(100, 50);
 
 // Add a component to the root
-SpriteSingle sprite = new(game.Assets.GetSubtexture("fallback-man"));
+SpriteSingle sprite = new(game.Assets.GetFallback<Subtexture>());
 rootActor.Components.Add(new DisplayObjectRenderComponent(game, sprite));
 
 // Assign the root actor to the game;
