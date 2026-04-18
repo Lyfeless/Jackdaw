@@ -7,14 +7,20 @@ namespace Jackdaw;
 /// </summary>
 public class AssetCollectionPipeline {
     readonly Assets Assets;
-
     readonly Dictionary<string, AssetCollection> Collections = [];
+    readonly bool BlockLoads = false;
+
+    internal AssetCollectionPipeline(Assets assets)
+        : this(assets, AssetCollectionBuilder.FromAll()) {
+        // Manually load all asset collection before locking loads
+        Load(string.Empty);
+        BlockLoads = true;
+    }
 
     internal AssetCollectionPipeline(Assets assets, AssetCollectionBuilderContainer builder) {
         Assets = assets;
 
         AssetProviderItem[] loadOptions = assets.Loaders.GetLoadOptions();
-
         Collections = builder.FilterAll(assets, loadOptions);
     }
 
@@ -23,8 +29,10 @@ public class AssetCollectionPipeline {
     /// </summary>
     /// <param name="name">The collection to load.</param>
     public void Load(string name) {
+        if (BlockLoads) { WarnCollectionEnabled(); return; }
+
         if (!Collections.TryGetValue(name, out AssetCollection collection)) {
-            Log.Warning($"Asset Loader: no matching collection {name} exists, skipping load.");
+            Log.Warning($"Asset Loader: No matching collection {name} exists, skipping load.");
             return;
         }
 
@@ -36,8 +44,10 @@ public class AssetCollectionPipeline {
     /// </summary>
     /// <param name="name">The collection to load.</param>
     public void LoadAsync(string name) {
+        if (BlockLoads) { WarnCollectionEnabled(); return; }
+
         if (!Collections.TryGetValue(name, out AssetCollection collection)) {
-            Log.Warning($"Asset Loader: no matching collection {name} exists, skipping load.");
+            Log.Warning($"Asset Loader: No matching collection {name} exists, skipping load.");
             return;
         }
 
@@ -49,8 +59,10 @@ public class AssetCollectionPipeline {
     /// </summary>
     /// <param name="name">The collection to unload.</param>
     public void Unload(string name) {
+        if (BlockLoads) { WarnCollectionEnabled(); return; }
+
         if (!Collections.TryGetValue(name, out AssetCollection collection)) {
-            Log.Warning($"Asset Loader: no matching collection {name} exists, skipping unload.");
+            Log.Warning($"Asset Loader: No matching collection {name} exists, skipping unload.");
             return;
         }
 
@@ -62,8 +74,10 @@ public class AssetCollectionPipeline {
     /// </summary>
     /// <param name="name">The collection to unload.</param>
     public void UnloadAsync(string name) {
+        if (BlockLoads) { WarnCollectionEnabled(); return; }
+
         if (!Collections.TryGetValue(name, out AssetCollection collection)) {
-            Log.Warning($"Asset Loader: no matching collection {name} exists, skipping unload.");
+            Log.Warning($"Asset Loader: No matching collection {name} exists, skipping unload.");
             return;
         }
 
@@ -138,4 +152,8 @@ public class AssetCollectionPipeline {
     /// Halt the current thread until all asset collections queued for load or unload are completed.
     /// </summary>
     public void WaitForLoadQueueFinish() => Assets.Loaders.WaitForQueueFinish();
+
+    static void WarnCollectionEnabled() {
+        Log.Warning($"Asset Loader: Asset collections are not enabled, all assets are already loaded. For manual asset collection loading options, enable 'UseAssetCollections' in the game's content config.");
+    }
 }

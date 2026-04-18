@@ -58,22 +58,14 @@ public class Assets {
         SetTypeWarnings();
         SetDefaultFallbacks();
 
-        Collections = new(this, config.UseAssetCollections
-            ? config.Collections
-            : AssetCollectionBuilder.FromAll()
-        );
-
-        Load(config);
-    }
-
-    void Load(GameContentConfig config) {
         if (config.UseAssetCollections) {
+            Collections = new(this, config.Collections);
             foreach (string name in config.StartupCollections) {
                 Collections.Load(name);
             }
         }
         else {
-            Collections.Load(string.Empty);
+            Collections = new(this);
         }
     }
 
