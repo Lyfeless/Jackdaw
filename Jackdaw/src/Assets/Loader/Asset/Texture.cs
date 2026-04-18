@@ -26,9 +26,7 @@ public class TextureLoader : AssetLoaderStage {
         }
     }
 
-    public override void RunUnload(Assets assets, AssetCollection collection) {
-        foreach (AssetProviderItem item in Filter(assets, collection)) { RemoveAsset<Subtexture>(assets, item.Name); }
-    }
+    public override void RunUnload(Assets assets, AssetCollection collection) { }
 
     static AssetProviderItem[] Filter(Assets assets, AssetCollection collection)
         => collection.Filter(assets.Config.TextureGroup, TextureExtensions);

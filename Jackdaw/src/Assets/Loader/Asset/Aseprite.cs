@@ -38,7 +38,7 @@ public class AsepriteLoader : AssetLoaderStage {
 
     public override void RunUnload(Assets assets, AssetCollection collection) {
         foreach (AssetProviderItem item in Filter(assets, collection)) {
-            RemoveAsset<Subtexture>(assets, item.Name);
+            // Aseprite file isn't guarenteed to have an animation but this is faster than checking
             RemoveAsset<AnimationData>(assets, item.Name);
         }
     }

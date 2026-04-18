@@ -12,6 +12,8 @@ public class PackerLoader() : AssetLoaderStage() {
         Padding = 1
     };
 
+    readonly Dictionary<string, string[]> collectionNameCache = [];
+
     public override AssetProviderItem[] GetLoadOptions(Assets assets) => [];
 
     public override void RunLoad(Assets assets, AssetCollection collection) {
@@ -30,10 +32,19 @@ public class PackerLoader() : AssetLoaderStage() {
             AddAsset(assets, entry.Name, texture);
         }
 
+        if (!collectionNameCache.ContainsKey(collection.Name)) {
+            collectionNameCache.Add(collection.Name, [.. output.Entries.Select(e => e.Name)]);
+        }
+
         Packer.Clear();
     }
 
-    public override void RunUnload(Assets assets, AssetCollection collection) { }
+    public override void RunUnload(Assets assets, AssetCollection collection) {
+        if (!collectionNameCache.TryGetValue(collection.Name, out string[]? names) || names == null) { return; }
+        foreach (string name in names) {
+            RemoveAsset<Subtexture>(assets, name);
+        }
+    }
 
     public void Add(string name, string file) => Packer.Add(name, file);
     public void Add(string name, Image image) => Packer.Add(name, image);
