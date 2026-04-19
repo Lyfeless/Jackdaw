@@ -17,7 +17,7 @@ public sealed class Actor {
     /// <summary>
     /// An invalid actor. Any actors with this as a parent are not part of the scene tree.
     /// </summary>
-    public readonly static Actor Invalid = new(null!) { IsValid = false, Ticking = false, Visible = false };
+    public readonly static Actor Invalid = new((Game)null!) { IsValid = false, Ticking = false, Visible = false };
 
     /// <summary>
     /// The active game instance.
@@ -287,6 +287,11 @@ public sealed class Actor {
         RenderActions = new(this);
     }
 
+    public Actor(Game game, params Component[] components) : this(game) => Components.AddAll(components);
+    public Actor(Game game, params Actor[] children) : this(game) => Children.AddAll(children);
+    public Actor(Component component) : this(component.Game) => Components.Add(component);
+    public Actor(Actor child) : this(child.Game) => Children.Add(child);
+
     /// <summary>
     /// Update all components and children. <br/>
     /// Updates all children first, then updates all components. <br/>
@@ -452,9 +457,7 @@ public sealed class Actor {
     /// <param name="children">The children to add to the actor.</param>
     /// <returns>The actor with all of the given children added to it.</returns>
     public static Actor With(Actor actor, params Actor[] children) {
-        foreach (Actor child in children) {
-            actor.Children.Add(child);
-        }
+        actor.Children.AddAll(children);
         return actor;
     }
 
@@ -473,9 +476,7 @@ public sealed class Actor {
     /// <param name="components">The components to add to the actor.</param>
     /// <returns>The actor with all of the given components added to it.</returns>
     public static Actor With(Actor actor, params Component[] components) {
-        foreach (Component component in components) {
-            actor.Components.Add(component);
-        }
+        actor.Components.AddAll(components);
         return actor;
     }
 
