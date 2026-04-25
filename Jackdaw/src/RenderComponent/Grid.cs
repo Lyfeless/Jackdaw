@@ -54,6 +54,8 @@ public class GridRenderComponent : Component, IStackableGrid<Sprite?>, ISpatialG
         : this(game, position, new Grid<Sprite>(gridSize), tileSize) { }
 
     protected override void Render(Batcher batcher) {
+        if (TileCount.X == 0 || TileCount.Y == 0) { return; }
+
         Rect bounds = new Rect(Game.Window.Width, Game.Window.Height).TransformAABB(Actor.Transform.GlobalDisplayMatrixInverse);
 
         Vector2 topLeft = Game.Convert.LocalToTile(bounds.TopLeft, this);
