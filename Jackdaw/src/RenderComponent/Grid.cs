@@ -32,6 +32,7 @@ public class GridRenderComponent : Component, IStackableGrid<Sprite?>, ISpatialG
     public Point2 TileCount => Grid.TileCount;
 
     public Rect Bounds => new(Position, Grid.TileCount * TileSize);
+
     /// <param name="game">The current game instance.</param>
     /// <param name="position">The grid position.</param>
     /// <param name="grid">The grid instance.</param>

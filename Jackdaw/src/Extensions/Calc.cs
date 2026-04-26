@@ -3,6 +3,9 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Additional calc utilities not natively provided by Foster or System.
+/// </summary>
 public static class CalcExtensions {
     extension(Calc) {
         /// <summary>

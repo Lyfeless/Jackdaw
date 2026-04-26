@@ -3,6 +3,9 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Utilities for converting between tile and local positions in a grid.
+/// </summary>
 public static class SpatialGridConverter {
     extension(ISpatialGrid grid) {
         /// <summary>

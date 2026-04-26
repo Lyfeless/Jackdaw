@@ -7,7 +7,7 @@ namespace Jackdaw;
 /// Manager for registering and running asset loader operations.
 /// </summary>
 public class AssetLoaderPipeline {
-    public enum QueueAction {
+    internal enum QueueAction {
         LOAD_COLLECTION,
         UNLOAD_COLLECTION
     }

@@ -1,5 +1,8 @@
 namespace Jackdaw;
 
+/// <summary>
+/// A single group of savedata elements.
+/// </summary>
 public class SaveDataNode {
     /// <summary>
     /// The node's stored string values.

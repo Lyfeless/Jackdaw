@@ -46,8 +46,34 @@ public class PackerLoader() : AssetLoaderStage() {
         }
     }
 
+    /// <summary>
+    /// Add an image to the packer.
+    /// </summary>
+    /// <param name="name">The asset's name.</param>
+    /// <param name="file">The file path to load.</param>
     public void Add(string name, string file) => Packer.Add(name, file);
+
+    /// <summary>
+    /// Add an image to the packer.
+    /// </summary>
+    /// <param name="name">The asset's name.</param>
+    /// <param name="image">The image to add.</param>
     public void Add(string name, Image image) => Packer.Add(name, image);
+
+    /// <summary>
+    /// Add an image to the packer.
+    /// </summary>
+    /// <param name="name">The asset's name.</param>
+    /// <param name="image">The image to add.</param>
+    /// <param name="clip">The bounds to clip the image to.</param>
     public void Add(string name, Image image, RectInt clip) => Packer.Add(name, image, clip);
+
+    /// <summary>
+    /// Add an image to the packer.
+    /// </summary>
+    /// <param name="name">The asset's name.</param>
+    /// <param name="width">The image's width.</param>
+    /// <param name="height">The image's height.</param>
+    /// <param name="pixels">The image's pixel data.</param>
     public void Add(string name, int width, int height, ReadOnlySpan<Color> pixels) => Packer.Add(name, width, height, pixels);
 }

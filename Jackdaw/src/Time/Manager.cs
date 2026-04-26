@@ -125,7 +125,7 @@ public class TimeManager(Game game) {
         return tracker.Scale;
     }
 
-    public void Update() {
+    internal void Update() {
         foreach (TimeTracker tracker in trackers.Values) {
             tracker.Update(Game.Time.Delta);
         }

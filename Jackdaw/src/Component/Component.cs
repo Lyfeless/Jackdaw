@@ -80,6 +80,10 @@ public abstract class Component {
     bool addedToActor = false;
     bool addedToTree = false;
 
+    /// <summary>
+    /// Initialize data required for all components. Must be called from any inheriting components.
+    /// </summary>
+    /// <param name="game"></param>
     public Component(Game game) {
         Game = game;
         Match = new(this);

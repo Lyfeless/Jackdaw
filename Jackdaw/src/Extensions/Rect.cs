@@ -3,6 +3,9 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Utility functions for doing calculations with rectangles.
+/// </summary>
 public static class RectExtensions {
     extension(Rect rect) {
         /// <summary>

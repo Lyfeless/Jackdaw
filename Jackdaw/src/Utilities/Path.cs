@@ -239,6 +239,11 @@ public readonly struct PathSegmentQuadraticBezier : IPathSegment {
     public readonly Vector2 EndOffset { get; }
     public float Length { get; }
 
+    /// <summary>
+    /// Create a new bezier segment.
+    /// </summary>
+    /// <param name="control">The segment's control point, relative to the start point.</param>
+    /// <param name="end">The segment's end point, relative to the start point.</param>
     public PathSegmentQuadraticBezier(Vector2 control, Vector2 end) {
         Control = control;
         EndOffset = end;
@@ -317,6 +322,12 @@ public readonly struct PathSegmentCubicBezier : IPathSegment {
     public readonly Vector2 EndOffset { get; }
     public float Length { get; }
 
+    /// <summary>
+    /// Create a new bezier segment.
+    /// </summary>
+    /// <param name="controlA">The segment's first control point, relative to the start point.</param>
+    /// <param name="controlB">The segment's second control point, relative to the start point.</param>
+    /// <param name="end">The segment's end point, relative to the start point.</param>
     public PathSegmentCubicBezier(Vector2 controlA, Vector2 controlB, Vector2 end) {
         ControlA = controlA;
         ControlB = controlB;

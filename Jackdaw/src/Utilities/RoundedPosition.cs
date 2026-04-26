@@ -18,12 +18,37 @@ public struct RoundedPosition {
     /// </summary>
     public Point2 Rounded { get; private set; }
 
+    /// <summary>
+    /// Create a rounded position at the given location.
+    /// </summary>
+    /// <param name="position">The position's value.</param>
     public RoundedPosition(Vector2 position) {
         Set(position);
     }
+
+    /// <summary>
+    /// Create a rounded position at the origin.
+    /// </summary>
     public RoundedPosition() : this(Vector2.Zero) { }
+
+    /// <summary>
+    /// Create a rounded position at the given location.
+    /// </summary>
+    /// <param name="x">The x position value.</param>
+    /// <param name="y">The y position value.</param>
     public RoundedPosition(float x, float y) : this(new Vector2(x, y)) { }
+
+    /// <summary>
+    /// Create a rounded position at the given location.
+    /// </summary>
+    /// <param name="x">The x position value.</param>
+    /// <param name="y">The y position value.</param>
     public RoundedPosition(int x, int y) : this(new(x, y)) { }
+
+    /// <summary>
+    /// Create a rounded position at the given location.
+    /// </summary>
+    /// <param name="position">The position's value.</param>
     public RoundedPosition(Point2 position) : this((Vector2)position) { }
 
     /// <summary>

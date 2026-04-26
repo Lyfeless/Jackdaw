@@ -276,6 +276,10 @@ public sealed class Actor {
     bool componentsTicking = true;
     bool childrenTicking = true;
 
+    /// <summary>
+    /// Create a new empty actor.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
     public Actor(Game game) {
         Game = game;
         Parent = Invalid;
@@ -287,9 +291,30 @@ public sealed class Actor {
         RenderActions = new(this);
     }
 
+    /// <summary>
+    /// Create a new actor pre-assigned with the supplied components.
+    /// </summary>
+    /// <param name="game">The game instance</param>
+    /// <param name="components">The components to add to the actor.</param>
     public Actor(Game game, params Component[] components) : this(game) => Components.AddAll(components);
+
+    /// <summary>
+    /// Create a new actor pre-assigned with the supplied children.
+    /// </summary>
+    /// <param name="game">The game instance</param>
+    /// <param name="children">The children to add to the actor.</param>
     public Actor(Game game, params Actor[] children) : this(game) => Children.AddAll(children);
+
+    /// <summary>
+    /// Create a new actor from a single component.
+    /// </summary>
+    /// <param name="component">The component to add to the actor.</param>
     public Actor(Component component) : this(component.Game) => Components.Add(component);
+
+    /// <summary>
+    /// Create a new actor from a single child.
+    /// </summary>
+    /// <param name="child">The child to add to the actor.</param>
     public Actor(Actor child) : this(child.Game) => Children.Add(child);
 
     /// <summary>

@@ -2,6 +2,9 @@ using System.Numerics;
 
 namespace Jackdaw;
 
+/// <summary>
+/// Utility functions for doing calculations with matrices.
+/// </summary>
 public static class Matrix3x2Extensions {
     extension(Matrix3x2 mat) {
         /// <summary>

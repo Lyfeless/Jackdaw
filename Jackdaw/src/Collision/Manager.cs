@@ -316,6 +316,13 @@ public class CollisionManager {
     public CollisionResult GetFirstCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
         => GetFirstCollision(collider, new InvertableMatrix(position, positionInv));
 
+    /// <summary>
+    /// Get the first object the given collider collides with at a given location.
+    /// Not guarenteed to be the closest, used mostly for performance when full collision information isn't needed.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The global position the collisions should be checked from.</param>
+    /// <returns>Information about collision check results.</returns>
     public CollisionResult GetFirstCollision(Collider collider, InvertableMatrix position) {
         foreach (CollisionComponent other in Colliders) {
             if (ShouldSkipCollider(other)) { continue; }
@@ -523,6 +530,13 @@ public class CollisionManager {
     public CollisionResult GetSweptCollision(Collider collider, Matrix3x2 position, Matrix3x2 positionInv, Vector2 velocity)
         => GetSweptCollision(collider, new InvertableMatrix(position, positionInv), velocity);
 
+    /// <summary>
+    /// Get collision results for a shapecast.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <param name="velocity">The collider's velocity.</param>
+    /// <returns>Information about collision check results.</returns>
     public CollisionResult GetSweptCollision(Collider collider, InvertableMatrix position, Vector2 velocity) {
         // If object isn't moving run basic collision check to avoid extra calculations
         if (velocity == Vector2.Zero) { return GetAllCollisions(collider, position); }
@@ -560,9 +574,9 @@ public class CollisionManager {
 
     #region Manual Pushout Checks
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -571,9 +585,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, collider.Actor.Transform.GlobalMatrix, collider.Actor.Transform.GlobalMatrixInverse);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -583,9 +597,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -595,9 +609,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, position.Matrix, position.MatrixInverse);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -607,9 +621,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, Matrix3x2.CreateTranslation(position));
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -619,9 +633,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, new InvertableMatrix(position));
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -631,6 +645,15 @@ public class CollisionManager {
     public CollisionResult GetCollisionPushout(CollisionComponent collider, Matrix3x2 position, Matrix3x2 positionInv)
         => GetCollisionPushout(collider, new InvertableMatrix(position, positionInv));
 
+    /// <summary>
+    /// Get the distance required to push the collision component out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collision component to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushout(CollisionComponent collider, InvertableMatrix position) {
         ActiveComponent = collider;
         CollisionResult info = GetCollisionPushout(collider.Collider, position);
@@ -639,9 +662,9 @@ public class CollisionManager {
     }
 
     /// <summary>
-    /// Get the distance required to push the collider out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
@@ -651,9 +674,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, position.GlobalMatrix, position.GlobalMatrixInverse);
 
     /// <summary>
-    /// Get the distance required to push the collider out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
@@ -663,9 +686,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, position.Matrix, position.MatrixInverse);
 
     /// <summary>
-    /// Get the distance required to push the collider out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
@@ -675,9 +698,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, Matrix3x2.CreateTranslation(position));
 
     /// <summary>
-    /// Get the distance required to push the collider out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
@@ -687,9 +710,9 @@ public class CollisionManager {
         => GetCollisionPushout(collider, new InvertableMatrix(position));
 
     /// <summary>
-    /// Get the distance required to push the collider out of geometry.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collider to check against.</param>
@@ -699,6 +722,15 @@ public class CollisionManager {
     public CollisionResult GetCollisionPushout(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
         => GetCollisionPushout(collider, new InvertableMatrix(position, positionInv));
 
+    /// <summary>
+    /// Get the distance required to push the collider out of geometry. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
+    /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
+    /// </summary>
+    /// <param name="collider">The collider to check against.</param>
+    /// <param name="position">The transform to apply to the collider.</param>
+    /// <returns>Information about collision pushout results.</returns>
     public CollisionResult GetCollisionPushout(Collider collider, InvertableMatrix position) {
         List<CollisionResult.ComponentResult> components = [];
 
@@ -730,9 +762,9 @@ public class CollisionManager {
     }
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -742,9 +774,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, collider.Actor.Transform.GlobalMatrix, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -755,9 +787,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -768,9 +800,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -781,9 +813,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, Matrix3x2.CreateTranslation(position), -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -794,9 +826,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, new InvertableMatrix(position), -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -808,9 +840,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, position, positionInv, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -821,9 +853,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, position.GlobalMatrix, position.GlobalMatrixInverse, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -834,9 +866,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, position.Matrix, position.MatrixInverse, -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -847,9 +879,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, Matrix3x2.CreateTranslation(position), -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>
@@ -860,9 +892,9 @@ public class CollisionManager {
         => GetSweptCollision(collider, new InvertableMatrix(position), -direction);
 
     /// <summary>
-    /// Get the distance required to push the collision component out of geometry in a given direction.
-    /// Note: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
-    /// as pushout is calculated per-collider.
+    /// Get the distance required to push the collision component out of geometry in a given direction. <br/>
+    /// NOTE: The shortest pushout distance isn't guarenteed to not move the collider into more geometry,
+    /// as pushout is calculated per-collider. <br/>
     /// The returned data is sorted by distance, so if the pushout isn't valid the rest of the data can be tested sequentially.
     /// </summary>
     /// <param name="collider">The collision component to check against.</param>

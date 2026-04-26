@@ -7,6 +7,9 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="blend">The blend mode to apply.</param>
 public class RenderActionBlend(BlendMode blend) : ActorRenderAction() {
+    /// <summary>
+    /// The blend mode to apply.
+    /// </summary>
     public BlendMode Blend = blend;
 
     public override void PreRender(RenderActionContainer container) {

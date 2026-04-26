@@ -5,8 +5,17 @@ namespace Jackdaw;
 /// Create a new save data storage using <see cref="Load"/>
 /// </summary>
 public class SaveData {
+    /// <summary>
+    /// The file formats available to save a file with.
+    /// </summary>
     public enum Format {
+        /// <summary>
+        /// Store data in a custom binary format. Uses less data but can't be opened by external programs.
+        /// </summary>
         BINARY,
+        /// <summary>
+        /// Store data in a custom binary format. Can be easily viewed and edited in external programs.
+        /// </summary>
         JSON
     }
 

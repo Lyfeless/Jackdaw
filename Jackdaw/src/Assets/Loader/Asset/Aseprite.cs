@@ -43,6 +43,12 @@ public class AsepriteLoader : AssetLoaderStage {
         }
     }
 
+    /// <summary>
+    /// Get the name of a single frame in an aseprite animation.
+    /// </summary>
+    /// <param name="name">The original aseprite image's name</param>
+    /// <param name="frame">The animation frame number.</param>
+    /// <returns>A unique id for the given frame of animation.</returns>
     public static string GetFrameName(string name, int frame) => $"{name}{frame}";
 
     static AssetProviderItem[] Filter(Assets assets, AssetCollection collection)

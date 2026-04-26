@@ -7,6 +7,9 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="material">The material to apply.</param>
 public class RenderActionMaterial(Material material) : ActorRenderAction() {
+    /// <summary>
+    /// The material to apply.
+    /// </summary>
     public Material Material = material;
 
     public override void PreRender(RenderActionContainer container) {

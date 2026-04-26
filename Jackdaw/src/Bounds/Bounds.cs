@@ -8,6 +8,9 @@ namespace Jackdaw;
 /// Not ticking or visible by default.
 /// </summary>
 public class BoundsComponent : Component {
+    /// <summary>
+    /// The bounds for the component.
+    /// </summary>
     public Rect Rect;
 
     /// <param name="game">The current game instance.</param>

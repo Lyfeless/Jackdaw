@@ -73,6 +73,9 @@ public class SequenceComponent : Component {
         }
     }
 
+    /// <summary>
+    /// Begin sequence execution.
+    /// </summary>
     public void Run() {
         if (Running) { Cancel(); }
         Runner = new SingleSequenceRunner(Game, sequence);
@@ -93,6 +96,9 @@ public class SequenceComponent : Component {
         Runner = null;
     }
 
+    /// <summary>
+    /// Stop the sequence from running.
+    /// </summary>
     public void Cancel() {
         if (!Running) { return; }
         Runner!.Cancel();

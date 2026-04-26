@@ -7,12 +7,21 @@ namespace Jackdaw;
 /// <typeparam name="Towner">The type of owner.</typeparam>
 /// <param name="owner">The owning object.</param>
 public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telement : class {
+    /// <summary>
+    /// The element controlling the container.
+    /// </summary>
     public readonly Towner Owner = owner;
 
     /// <summary>
     /// All the elements currently being stored.
     /// </summary>
     public readonly List<Telement> Elements = [];
+
+    /// <summary>
+    /// Get an element from the container.
+    /// </summary>
+    /// <param name="index">The index to get.</param>
+    /// <returns>The element at the given index.</returns>
     public Telement this[int index] {
         get => Elements[index];
         set => Elements[index] = value;

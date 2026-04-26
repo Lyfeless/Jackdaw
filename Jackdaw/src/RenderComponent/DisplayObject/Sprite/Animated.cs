@@ -23,6 +23,9 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     readonly RectInt bounds = new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect.Int();
     public override RectInt Bounds => bounds.Translate(Offset);
 
+    /// <summary>
+    /// If the animation has finished. Will always be false when looping.
+    /// </summary>
     public bool Done => Timer.Done;
 
     /// <summary>

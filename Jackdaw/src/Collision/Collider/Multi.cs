@@ -8,6 +8,9 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="colliders">A list of colliders.</param>
 public class MultiCollider(params Collider[] colliders) : Collider {
+    /// <summary>
+    /// All sub-colliders
+    /// </summary>
     public readonly Collider[] Colliders = colliders;
 
     public override bool Multi => true;

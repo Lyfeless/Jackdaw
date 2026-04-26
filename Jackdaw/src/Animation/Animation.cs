@@ -104,9 +104,19 @@ public class AnimationData(
         return Frames[^1];
     }
 
+    /// <summary>
+    /// Get the texture at a given frame of the animation.
+    /// </summary>
+    /// <param name="duration">The duration through the animation.</param>
+    /// <returns>The animation's texture at the given timestamp.</returns>
     public Subtexture FrameTexture(TimeSpan duration)
         => FrameTexture(GetFrame(duration));
 
+    /// <summary>
+    /// Get the texture at a given frame of the animation.
+    /// </summary>
+    /// <param name="frame">The animation frame.</param>
+    /// <returns>The animation's texture at the given frame.</returns>
     public Subtexture FrameTexture(AnimationFrame frame) {
         Subtexture texture = Textures[frame.Texture];
         RectInt clip = frame.Clip;

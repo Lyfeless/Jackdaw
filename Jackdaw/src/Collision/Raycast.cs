@@ -8,6 +8,9 @@ namespace Jackdaw;
 /// Not visible by default.
 /// </summary>
 public class RaycastComponent : Component {
+    /// <summary>
+    /// The ray to check.
+    /// </summary>
     public Ray Ray;
 
     /// <summary>

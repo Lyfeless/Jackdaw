@@ -7,6 +7,9 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="sampler">The sampler to apply.</param>
 public class RenderActionSampler(TextureSampler sampler) : ActorRenderAction() {
+    /// <summary>
+    /// The sampler to apply.
+    /// </summary>
     public TextureSampler Sampler = sampler;
 
     public override void PreRender(RenderActionContainer container) {

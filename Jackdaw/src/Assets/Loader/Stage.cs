@@ -63,12 +63,31 @@ public abstract class AssetLoaderStage() {
         return this;
     }
 
+    /// <summary>
+    /// Add an asset to the loaded asset storage.
+    /// </summary>
+    /// <typeparam name="T">The type of asset to add.</typeparam>
+    /// <param name="assets">The game instance's asset manager.</param>
+    /// <param name="name">The asset's name.</param>
+    /// <param name="asset">The asset.</param>
     public static void AddAsset<T>(Assets assets, string name, T asset)
         => assets.Add(name, asset);
 
+    /// <summary>
+    /// Remove an asset from the loaded asset storage.
+    /// </summary>
+    /// <typeparam name="T">The type of asset to remove.</typeparam>
+    /// <param name="assets">The game instance's asset manager.</param>
+    /// <param name="name">The asset's name.</param>
     public static void RemoveAsset<T>(Assets assets, string name)
         => assets.Remove<T>(name);
 
+    /// <summary>
+    /// Find a registered asset loaded stage.
+    /// </summary>
+    /// <typeparam name="T">The type of stage to find.</typeparam>
+    /// <param name="assets">The game instance's asset manager.</param>
+    /// <returns>The asset loader of the given type, if one exists.</returns>
     public static T? Find<T>(Assets assets) where T : AssetLoaderStage
         => assets.Loaders.Find<T>();
 
