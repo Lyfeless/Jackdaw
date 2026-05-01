@@ -14,13 +14,14 @@ public class RenderActionScissor(BoundsComponent bounds) : ActorRenderAction() {
     public BoundsComponent Bounds = bounds;
 
     /// <summary>
-    /// If the scissor should be relative to the actor it's attached to.
+    /// If the scissor should be relative to the actor it's attached to. <br/>
+    /// Batcher scissors are always axis aligned, so this may behave unpredictably if the actor has any rotation.
     /// </summary>
     public bool Relative = true;
 
     public override void PreRender(RenderActionContainer container) {
         Rect rect = Bounds.Rect;
-        if (Relative) { rect = rect.Translate(container.Owner.GlobalPosition); }
+        if (Relative) { rect = rect.TransformAABB(container.Owner.Transform.GlobalMatrix); }
         container.CurrentBatcher.PushScissor(rect.Int());
     }
 
