@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -46,6 +45,7 @@ public class Game : App {
     public Rng Random = new(DateTime.Now.Millisecond);
 
     Color BackgroundColor;
+    readonly bool useCrashlog;
 
     readonly Batcher Batcher;
 
@@ -96,6 +96,8 @@ public class Game : App {
 
         Batcher = new(GraphicsDevice);
 
+        useCrashlog = config.CreateCrashlog;
+
         root = Actor.Invalid;
     }
 
@@ -104,20 +106,18 @@ public class Game : App {
     /// Automatically handles crashlog creation when running in release.
     /// </summary>
     public void Start() {
-#if DEBUG
-        // Crash normally in debug so error debugging still works
-        Run();
-#else
-        // Send to crashlog in release
-        try {
+        if (useCrashlog) {
+            try {
+                Run();
+            } catch (Exception e) {
+                using FileStream stream = File.OpenWrite("crashlog.txt");
+                using StreamWriter writer = new(stream);
+                writer.WriteLine(e.ToString());
+            }
+        }
+        else {
             Run();
         }
-        catch (Exception e) {
-            using FileStream stream = File.OpenWrite("crashlog.txt");
-            using StreamWriter writer = new(stream);
-            writer.WriteLine(e.ToString());
-        }
-#endif
     }
 
     protected override void Startup() { }

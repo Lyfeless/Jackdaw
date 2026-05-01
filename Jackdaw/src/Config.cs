@@ -12,6 +12,12 @@ public struct GameConfig() {
     public string ApplicationName = "JackdawGame";
 
     /// <summary>
+    /// If the program should create a crashlog if an exception occurs. <br/>
+    /// Should always stay enabled for released projects, but can be turned off for use with debugging tools.
+    /// </summary>
+    public bool CreateCrashlog = true;
+
+    /// <summary>
     /// Configuration data for the window.
     /// </summary>
     public GameWindowConfig Window = new();
