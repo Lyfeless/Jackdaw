@@ -113,7 +113,7 @@ public sealed class Actor {
     /// <summary>
     /// If the actor's componenents will render due to local and parent visibility states.
     /// </summary>
-    public bool GlobalComponentsVisible => ComponentsVisible && ParentTicking;
+    public bool GlobalComponentsVisible => ComponentsVisible && ParentChildrenVisible;
 
     /// <summary>
     /// If the actor's children should render.
@@ -130,7 +130,7 @@ public sealed class Actor {
     /// <summary>
     /// If the actor's children will render due to local and parent visibility states.
     /// </summary>
-    public bool GlobalChildrenVisible => ChildrenVisible && ParentTicking;
+    public bool GlobalChildrenVisible => ChildrenVisible && ParentChildrenVisible;
 
     /// <summary>
     /// If the actor's components and children are rendering.
@@ -147,12 +147,12 @@ public sealed class Actor {
     /// <summary>
     /// If the actor will render due to local and parent visibility states.
     /// </summary>
-    public bool GlobalVisible => Visible && ParentVisible;
+    public bool GlobalVisible => Visible && ParentChildrenVisible;
 
     /// <summary>
     /// If all parents above the actor are rendering their children
     /// </summary>
-    public bool ParentVisible { get; internal set; } = true;
+    public bool ParentChildrenVisible { get; internal set; } = true;
 
     /// <summary>
     /// If the actor's components should tick.
@@ -169,7 +169,7 @@ public sealed class Actor {
     /// <summary>
     /// If the actor's componenents will tick due to local and parent visibility states.
     /// </summary>
-    public bool GlobalComponentsTicking => ComponentsTicking && ParentTicking;
+    public bool GlobalComponentsTicking => ComponentsTicking && ParentChildrenTicking;
 
     /// <summary>
     /// If the actor's children should tick.
@@ -186,7 +186,7 @@ public sealed class Actor {
     /// <summary>
     /// If the actor's children will tick due to local and parent visibility states.
     /// </summary>
-    public bool GlobalChildrenTicking => ChildrenTicking && ParentTicking;
+    public bool GlobalChildrenTicking => ChildrenTicking && ParentChildrenTicking;
 
     /// <summary>
     /// If the actor's components and children are ticking.
@@ -203,12 +203,12 @@ public sealed class Actor {
     /// <summary>
     /// If the actor will tick due to local and parent visibility states.
     /// </summary>
-    public bool GlobalTicking => Ticking && ParentTicking;
+    public bool GlobalTicking => Ticking && ParentChildrenTicking;
 
     /// <summary>
     /// If all parents above the actor are ticking their children.
     /// </summary>
-    public bool ParentTicking { get; internal set; } = true;
+    public bool ParentChildrenTicking { get; internal set; } = true;
 
     /// <summary>
     /// If the actor's children are both visible and ticking.
@@ -251,7 +251,7 @@ public sealed class Actor {
     /// <summary>
     /// If all parents above the actor are ticking and rendering their children.
     /// </summary>
-    public bool ParentActive => ParentTicking && ParentVisible;
+    public bool ParentActive => ParentChildrenTicking && ParentChildrenVisible;
 
     /// <summary>
     /// If the actor is currently in the game's node tree.
@@ -333,7 +333,7 @@ public sealed class Actor {
     /// Both are rendered in the order they're stored in their container, from first to last.
     /// </summary>
     internal void Render(Batcher batcher) {
-        if (!Visible) { return; }
+        if (!ComponentsVisible && !ChildrenVisible) { return; }
 
         Transform.CacheDisplay();
         batcher.PushMatrix(Transform.LocalDisplayMatrix);
@@ -441,7 +441,7 @@ public sealed class Actor {
     }
 
     internal void ParentTickingChanged() {
-        ParentTicking = Parent.GlobalChildrenTicking;
+        ParentChildrenTicking = Parent.IsValid && Parent.ChildrenTicking;
         ChildrenTickingChanged();
         ComponentTickingChanged();
     }
@@ -451,7 +451,7 @@ public sealed class Actor {
     internal void ComponentTickingChanged() => Components.RunAll(e => e.OnTickingChanged());
 
     internal void ParentVisibilityChanged() {
-        ParentVisible = Parent.GlobalChildrenVisible;
+        ParentChildrenVisible = Parent.IsValid && Parent.ChildrenVisible;
         ChildrenVisibilityChanged();
         ComponentVisibilityChanged();
     }
