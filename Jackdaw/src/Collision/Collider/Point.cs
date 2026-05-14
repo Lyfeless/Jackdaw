@@ -8,9 +8,15 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="point">The point location.</param>
 public class PointCollider(Vector2 point) : Collider {
-    Vector2 Point = point;
+    static readonly Vector2 BoundsOffset = new(0.0001f);
+    static readonly Vector2 BoundsSize = new(0.0002f);
 
-    public override Rect Bounds => new(Point, Vector2.Zero);
+    /// <summary>
+    /// The local point the collider should check.
+    /// </summary>
+    public Vector2 Point = point;
+
+    public override Rect Bounds => new(Point + BoundsOffset, BoundsSize);
 
     public override Vector2 Center => Point;
 
@@ -18,5 +24,5 @@ public class PointCollider(Vector2 point) : Collider {
 
     public override Collider[] GetSubColliders(Rect bounds) => [this];
 
-    public override Vector2 Support(Vector2 direction, InvertableMatrix position) => Point + position.Matrix.Translation;
+    public override Vector2 Support(Vector2 direction, InvertableMatrix position) => GetGlobalPoint(Point, position);
 }
