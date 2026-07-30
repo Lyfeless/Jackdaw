@@ -18,7 +18,7 @@ internal static class SaveFileLoader {
 
         if (backupFiles.Length == 0) {
             if (singleExists) { return LoadSaveData(savePath); }
-            Log.Info($"Save file {savePath} has no primary or backup files, creating new.");
+            Log.Info($"SaveData: Save file {savePath} has no primary or backup files, creating new.");
             return new(savePath);
         }
 
@@ -73,7 +73,8 @@ internal static class SaveFileLoader {
     }
 
     static SaveData LoadBinary(string savePath) {
-        BinaryReader? reader = CreateBinaryReader(savePath);
+        using FileStream stream = File.Open(savePath, FileMode.Open);
+        using BinaryReader reader = new(stream);
         if (reader == null) {
             Log.Warning($"SaveData: Failed to read data at path {savePath}, could not load");
             return new(savePath);
@@ -129,18 +130,6 @@ internal static class SaveFileLoader {
         return true;
     }
 
-    internal static BinaryReader? CreateBinaryReader(string savePath) {
-        using FileStream? stream = OpenForRead(savePath);
-        if (stream == null) { return null; }
-        return new(stream);
-    }
-
-    internal static BinaryWriter CreateBinaryWriter(string savePath) {
-        using TemporaryFile file = new(savePath);
-        using FileStream stream = File.Open(file.Name, FileMode.Open);
-        return new(stream);
-    }
-
     internal static JsonNode? ReadJsonObject(string savePath)
         => JsonNode.Parse(File.ReadAllText(savePath));
 
@@ -149,11 +138,6 @@ internal static class SaveFileLoader {
         using FileStream stream = File.Open(file.Name, FileMode.Open);
         using Utf8JsonWriter writer = new(stream);
         node.WriteTo(writer);
-    }
-
-    static FileStream? OpenForRead(string path) {
-        if (!Path.Exists(path)) { return null; }
-        return File.Open(path, FileMode.Open);
     }
 
     static DecomposedPath DecomposePath(string path) => new(

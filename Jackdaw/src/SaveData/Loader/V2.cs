@@ -170,7 +170,9 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
 
     #region Binary saving
     public void SaveBinary(SaveData savedata, string savePath) {
-        using BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savePath);
+        using TemporaryFile file = new(savePath);
+        using FileStream stream = File.Open(file.Name, FileMode.Open);
+        using BinaryWriter writer = new(stream);
 
         // Version
         writer.Write(2);

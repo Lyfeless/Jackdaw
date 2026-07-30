@@ -102,7 +102,9 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
     }
 
     public void SaveBinary(SaveData savedata, string savePath) {
-        BinaryWriter writer = SaveFileLoader.CreateBinaryWriter(savePath);
+        using TemporaryFile file = new(savePath);
+        using FileStream stream = File.Open(file.Name, FileMode.Open);
+        using BinaryWriter writer = new(stream);
 
         // Version
         writer.Write(1);
@@ -134,8 +136,6 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
             writer.Write(key);
             writer.Write(value);
         }
-
-        writer.Close();
     }
 
     public void SaveJson(SaveData savedata, string savePath) {
