@@ -224,11 +224,9 @@ public class ActorPosition {
     }
 
     internal void CacheDisplay() {
+        Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * transform.Matrix;
         // Round the position offset to reduce the chance of floating-point imprecision when rendering
-        Transform localRounded = transform;
-        localRounded.Position = localRounded.Position.RoundToPoint2();
-
-        Matrix3x2 localDisplay = Actor.RenderActions.GetDisplayMatrix() * localRounded.Matrix;
+        localDisplay.Translation = localDisplay.Translation.RoundToPoint2();
         localDisplayMatrix.Matrix = localDisplay;
 
         if (Actor.ParentValid) {
