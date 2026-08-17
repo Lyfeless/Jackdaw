@@ -77,7 +77,7 @@ public class AssetLoaderPipeline {
             element.Semaphore.WaitOne();
         }
         else {
-            RunQueueLoad(element);
+            RunQueueByAction(element);
         }
     }
 
@@ -158,11 +158,15 @@ public class AssetLoaderPipeline {
 
     void QueueWorker() {
         while (NextElement(out QueueElement element)) {
-            switch (element.Action) {
-                case QueueAction.LOAD_COLLECTION: RunQueueLoad(element); break;
-                case QueueAction.UNLOAD_COLLECTION: RunQueueUnload(element); break;
-            }
+            RunQueueByAction(element);
             element.Semaphore.Release();
+        }
+    }
+
+    void RunQueueByAction(QueueElement element) {
+        switch (element.Action) {
+            case QueueAction.LOAD_COLLECTION: RunQueueLoad(element); break;
+            case QueueAction.UNLOAD_COLLECTION: RunQueueUnload(element); break;
         }
     }
 
