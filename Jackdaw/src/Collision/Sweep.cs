@@ -101,11 +101,8 @@ internal struct JDASweep {
 
     static bool FractionCollided(float fraction) => fraction <= 1;
 
-    static bool CrossesVelocity(float crossA, float crossB) {
-        int signA = Math.Sign(crossA);
-        int signB = Math.Sign(crossB);
-        return Math.Max(signA, signB) >= 0 && Math.Min(signA, signB) < 0;
-    }
+    static bool CrossesVelocity(float crossA, float crossB)
+        => Math.Max(crossA, crossB) >= 0 && Math.Min(crossA, crossB) <= 0;
 
     public static float VelocityFraction(Vector2 value, Vector2 max)
         // Fraction should be the same on either axis so just use the one that will give more precision

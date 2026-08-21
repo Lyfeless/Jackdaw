@@ -14,7 +14,7 @@ public class CollisionManager {
     #endregion
 
     #region Data
-    readonly List<CollisionComponent> Colliders = [];
+    readonly HashSet<CollisionComponent> Colliders = [];
 
     CollisionComponent? ActiveComponent = null;
     #endregion
