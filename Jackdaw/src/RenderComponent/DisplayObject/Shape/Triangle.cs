@@ -85,21 +85,7 @@ public class DisplayTriangleLines(Triangle triangle, float lineWeight)
         : this(new(ax, ay, bx, by, cx, cy), lineWeight) { }
 
     public override void Render(Batcher batcher) {
-        Vector2 center = Triangle.Center;
-        float halfWeight = LineWeight / 2;
-        Vector2 scaledA = ScalePoint(Triangle.A - center, halfWeight) + center;
-        Vector2 scaledB = ScalePoint(Triangle.B - center, halfWeight) + center;
-        Vector2 scaledC = ScalePoint(Triangle.C - center, halfWeight) + center;
-        batcher.Line(scaledA, scaledB, LineWeight, Color);
-        batcher.Line(scaledB, scaledC, LineWeight, Color);
-        batcher.Line(scaledC, scaledA, LineWeight, Color);
-    }
-
-    static Vector2 ScalePoint(Vector2 point, float amount) {
-        float length = point.Length();
-        float lengthReduced = MathF.Max(length - amount, 0);
-        float scale = lengthReduced / length;
-        return point * scale;
+        batcher.TriangleLine(Triangle, LineWeight, Color);
     }
 }
 

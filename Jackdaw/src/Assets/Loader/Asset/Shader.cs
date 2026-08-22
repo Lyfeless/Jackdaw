@@ -31,17 +31,16 @@ public class ShaderLoader() : AssetLoaderStage() {
             byte[] bytes = new byte[shaderStream.Length];
             shaderStream.ReadExactly(bytes);
 
-            ShaderCreateInfo createInfo = new(
-                Code: bytes,
-                Stage: entry.Stage,
-                SamplerCount: entry.Samplers,
-                UniformBufferCount: entry.Uniforms,
-                StorageBufferCount: entry.StorageBuffers
-            );
-
             Shader shader;
             lock (assets.GraphicsDevice) {
-                shader = new(assets.GraphicsDevice, createInfo);
+                shader = new(
+                    assets.GraphicsDevice,
+                    entry.Stage,
+                    bytes,
+                    entry.Samplers,
+                    entry.Uniforms,
+                    entry.StorageBuffers
+                );
             }
             AddAsset(assets, entry.Name, shader);
         }
