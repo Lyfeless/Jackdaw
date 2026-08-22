@@ -41,6 +41,7 @@ Jackdaw is designed to not require any specific programs to run, so extensions h
 - [LDTK Loader](https://github.com/Lyfeless/Jackdaw.LDTK)
 - [Foster.Audio](https://github.com/Lyfeless/Jackdaw.Foster.Audio)
 - [FMOD](https://github.com/Lyfeless/Jackdaw.FMOD)
+- [ImGui](https://github.com/Lyfeless/Jackdaw.ImGui)
 
 #### Dependancies
 This project is built off of the framework [Foster](https://github.com/FosterFramework/Foster). Anything requiring other external libraries or programs should be implemented through extensions.
