@@ -8,7 +8,8 @@ namespace Jackdaw;
 public class EmbeddedResourceAssetProvider : IAssetProvider {
     record struct ItemMetadeta(int Assembly, string InternalID);
 
-    readonly Assembly[] Assemblies;
+    readonly string Root;
+    readonly List<Assembly> Assemblies;
     readonly Dictionary<string, List<AssetProviderItem>> Groups = [];
     readonly Dictionary<AssetProviderItem, ItemMetadeta> Metadata = [];
 
@@ -19,24 +20,11 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
     ///     The group name to load asset from. This will be the first element in the resource's name <br/>
     ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
     /// </param>
-    public EmbeddedResourceAssetProvider(string root) {
-        Assembly entry = Assembly.GetEntryAssembly()!;
-        AssemblyName[] referenced = entry.GetReferencedAssemblies();
-        Assemblies = [entry, .. referenced.Select(Assembly.Load)];
-        LoadAllAssemblies(root);
-    }
-
-    /// <summary>
-    /// An asset provider for loading data from embedded files inside the project's assemblies.
-    /// </summary>
-    /// <param name="root">
-    ///     The group name to load asset from. This will be the first element in the resource's name <br/>
-    ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
-    /// </param>
     /// <param name="assemblies">The assemblies to load embedded files from.</param>
     public EmbeddedResourceAssetProvider(string root, params Assembly[] assemblies) {
-        Assemblies = assemblies;
-        LoadAllAssemblies(root);
+        Root = root;
+        Assemblies = [.. assemblies];
+        LoadAllAssemblies();
     }
 
     /// <summary>
@@ -54,14 +42,22 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
 
     public void Close() { }
 
-    void LoadAllAssemblies(string root) {
-        for (int i = 0; i < Assemblies.Length; ++i) {
-            LoadAssemblyData(i, root);
+    public void AddAssembly(Type type) => AddAssembly(type.Assembly);
+    public void AddAssembly(Assembly assembly) {
+        if (Assemblies.Contains(assembly)) { return; }
+        int index = Assemblies.Count;
+        Assemblies.Add(assembly);
+        LoadAssemblyData(index);
+    }
+
+    void LoadAllAssemblies() {
+        for (int i = 0; i < Assemblies.Count; ++i) {
+            LoadAssemblyData(i);
         }
     }
 
-    void LoadAssemblyData(int assembly, string root) {
-        string prefix = $"{Assemblies[assembly].GetName().Name}.{root}";
+    void LoadAssemblyData(int assembly) {
+        string prefix = $"{Assemblies[assembly].GetName().Name}.{Root}";
 
         foreach (string str in Assemblies[assembly].GetManifestResourceNames()) {
             if (!str.StartsWith(prefix)) { continue; }

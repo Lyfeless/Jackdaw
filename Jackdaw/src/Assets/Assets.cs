@@ -44,7 +44,7 @@ public class Assets {
     /// <summary>
     /// The provider for accessing fallback files
     /// </summary>
-    public readonly EmbeddedResourceAssetProvider FallbackProvider = new("Fallback");
+    public readonly EmbeddedResourceAssetProvider FallbackProvider = new("Fallback", typeof(Game));
 
     internal Assets(Game game, GameContentConfig config) {
         Game = game;
