@@ -7,6 +7,19 @@ namespace Jackdaw;
 /// </summary>
 public interface IAssetProvider {
     /// <summary>
+    /// Performs any logic for accessing files, if game systems are needed to interact with the file system.<br/>
+    /// Automatically run before any assets are loaded, do not call this function manually.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    public void Open(Game game);
+
+    /// <summary>
+    /// Performs any logic for closing file access.<br/>
+    /// Automatically run on game shutdown, do not call this function manually.
+    /// </summary>
+    public void Close();
+
+    /// <summary>
     /// Get all asset grouping names. <br/>
     /// For file providers, this would be the first level subdirectories in the content folder.
     /// </summary>
@@ -47,11 +60,14 @@ public interface IAssetProvider {
     /// <returns>A list of matching item definitions in the provider group.</returns>
     public AssetProviderItem[] GetItemsInGroup(string group, params string[] extensionFilter);
 
+#pragma warning disable CS0419
     /// <summary>
-    /// Create a stream to load a provider asset.
+    /// Create a stream to load a provider asset. <br/>
+    /// This function may not always check if the file exists, so use <see cref="HasItem" /> first if unsure.
     /// </summary>
     /// <param name="item">The item definition.</param>
     /// <returns>A stream for loading the asset.</returns>
+#pragma warning restore CS0419
     public Stream GetItemStream(AssetProviderItem item);
 }
 

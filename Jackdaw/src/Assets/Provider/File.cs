@@ -1,3 +1,5 @@
+using Foster.Framework;
+
 namespace Jackdaw;
 
 /// <summary>
@@ -6,41 +8,57 @@ namespace Jackdaw;
 /// </summary>
 /// <param name="rootFolder">The folder all asset groups and items are contained within.</param>
 public class FileFolderAssetProvider(string rootFolder) : IAssetProvider {
+    ContentStorage? FileStorage = null;
     public readonly string RootFolder = rootFolder;
 
-    bool RootExists => Directory.Exists(RootFolder);
-    bool GroupExists(string group) => RootExists && Directory.Exists(GroupPath(group));
-    bool ItemExists(AssetProviderItem item) => GroupExists(item.Group) && File.Exists(ItemPath(item));
+    public void Open(Game game) {
+        game.FileSystem.OpenTitleStorage(RootFolder, e => { FileStorage = e; });
+    }
 
-    string GroupPath(string group) => Path.Join(RootFolder, group);
-    string ItemPath(AssetProviderItem item) => Path.Join(RootFolder, item.Group, $"{item.Name}{item.Extension}");
+    public void Close() {
+        FileStorage?.Dispose();
+        FileStorage = null;
+    }
+
+    bool GroupExists(string group) => FileStorage?.DirectoryExists(GroupPath(group)) ?? false;
+    bool ItemExists(AssetProviderItem item) => FileStorage?.FileExists(ItemPath(item)) ?? false;
+
+    static string GroupPath(string group) => group;
+    static string ItemPath(AssetProviderItem item) => Path.Join(item.Group, $"{item.Name}{item.Extension}");
 
     public string[] GetGroups() {
-        if (!RootExists) { return []; }
-        return Directory.GetDirectories(RootFolder);
+        if (FileStorage == null) { return []; }
+        HashSet<string> groups = [];
+        foreach (string str in FileStorage.EnumerateDirectory("/", "*.*", SearchOption.AllDirectories)) {
+            // Remove the first 2 elements of the string because this search prefixes all the names with '//'
+            string[] elements = str[2..].Split("/");
+            string group = elements.Length == 1 ? string.Empty : elements[0];
+            groups.Add(group);
+        }
+        return [.. groups];
     }
 
     public bool HasGroup(string group) => GroupExists(group);
 
     public AssetProviderItem[] GetItemsInGroup(string group, params string[] extensionFilter) {
         if (!GroupExists(group)) { return []; }
-        IEnumerable<string> enumerable = Directory.EnumerateFiles(GroupPath(group), "*.*", SearchOption.AllDirectories);
+        IEnumerable<string> enumerable = FileStorage!.EnumerateDirectory(GroupPath(group), "*.*", SearchOption.AllDirectories);
         if (extensionFilter.Length > 0) { enumerable = enumerable.Where(e => extensionFilter.Any(e.EndsWith)); }
         return [.. enumerable.Select(e => new AssetProviderItem(group, GetAssetName(group, e), Path.GetExtension(e)))];
     }
 
-    public Stream GetItemStream(AssetProviderItem item) => File.OpenRead(ItemPath(item));
-
-    string GetAssetName(string group, string assetPath) {
-        string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
-        name = Path.GetRelativePath(GroupPath(group), name);
-        name = name.Replace("\\", "/");
-        return name;
-    }
+    public Stream GetItemStream(AssetProviderItem item) => FileStorage?.OpenRead(ItemPath(item))!;
 
     public bool HasItem(string group, string name, string extension)
         => HasItem(new(group, name, extension));
 
     public bool HasItem(AssetProviderItem item)
         => ItemExists(item);
+
+    static string GetAssetName(string group, string assetPath) {
+        string name = Path.Join(Path.GetDirectoryName(assetPath), Path.GetFileNameWithoutExtension(assetPath));
+        name = Path.GetRelativePath(GroupPath(group), name);
+        name = name.Replace("\\", "/");
+        return name;
+    }
 }

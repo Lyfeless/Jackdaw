@@ -51,6 +51,7 @@ public class Assets {
         Config = config;
 
         Provider = config.AssetProvider;
+        Provider.Open(Game);
 
         Loaders = new(this);
 
@@ -67,6 +68,10 @@ public class Assets {
         else {
             Collections = new(this);
         }
+    }
+
+    internal void Shutdown() {
+        Provider.Close();
     }
 
     void RegisterLoaders(GameContentConfig config) {

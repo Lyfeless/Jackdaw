@@ -122,7 +122,9 @@ public class Game : App {
 
     protected override void Startup() { }
 
-    protected override void Shutdown() { }
+    protected override void Shutdown() {
+        Assets.Shutdown();
+    }
 
     protected override void Update() {
         if (!containersLocked) {

@@ -19,14 +19,12 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
     ///     The group name to load asset from. This will be the first element in the resource's name <br/>
     ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
     /// </param>
-#pragma warning disable IL2026
     public EmbeddedResourceAssetProvider(string root) {
         Assembly entry = Assembly.GetEntryAssembly()!;
         AssemblyName[] referenced = entry.GetReferencedAssemblies();
         Assemblies = [entry, .. referenced.Select(Assembly.Load)];
         LoadAllAssemblies(root);
     }
-#pragma warning restore IL2026
 
     /// <summary>
     /// An asset provider for loading data from embedded files inside the project's assemblies.
@@ -40,6 +38,21 @@ public class EmbeddedResourceAssetProvider : IAssetProvider {
         Assemblies = assemblies;
         LoadAllAssemblies(root);
     }
+
+    /// <summary>
+    /// An asset provider for loading data from embedded files inside the project's assemblies.
+    /// </summary>
+    /// <param name="root">
+    ///     The group name to load asset from. This will be the first element in the resource's name <br/>
+    ///     For example, Example.file.name.txt would have the root 'Example', group 'file' and name 'name'.
+    /// </param>
+    /// <param name="types">A type from each assembly to load embedded files from.</param>
+    public EmbeddedResourceAssetProvider(string root, params Type[] types)
+        : this(root, [.. types.Select(e => e.Assembly)]) { }
+
+    public void Open(Game game) { }
+
+    public void Close() { }
 
     void LoadAllAssemblies(string root) {
         for (int i = 0; i < Assemblies.Length; ++i) {
