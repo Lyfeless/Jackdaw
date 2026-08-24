@@ -24,7 +24,8 @@ public class AsepriteLoader : AssetLoaderStage {
 
         foreach (AssetProviderItem item in Filter(assets, collection)) {
             using Stream stream = assets.Provider.GetItemStream(item);
-            Aseprite aseprite = new(stream);
+            byte[] bytes = Calc.ReadAllBytes(stream);
+            Aseprite aseprite = new(bytes);
             if (aseprite.Frames.Length == 0) { continue; }
             if (aseprite.Frames.Length == 1) { packer.Add(item.Name, aseprite.RenderFrame(0)); continue; }
             Image[] frames = aseprite.RenderAllFrames();

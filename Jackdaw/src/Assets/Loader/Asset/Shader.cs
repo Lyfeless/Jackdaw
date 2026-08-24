@@ -28,8 +28,7 @@ public class ShaderLoader() : AssetLoaderStage() {
             if (!assets.Provider.HasItem(item)) { continue; }
 
             using Stream shaderStream = assets.Provider.GetItemStream(item);
-            byte[] bytes = new byte[shaderStream.Length];
-            shaderStream.ReadExactly(bytes);
+            byte[] bytes = Calc.ReadAllBytes(shaderStream);
 
             Shader shader;
             lock (assets.GraphicsDevice) {
