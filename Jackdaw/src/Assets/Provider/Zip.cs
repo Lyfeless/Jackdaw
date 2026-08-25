@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Foster.Framework;
+using SDL3;
 
 namespace Jackdaw;
 
@@ -12,7 +14,10 @@ namespace Jackdaw;
 /// </param>
 public class ZipArchiveAssetProvider(string path) : StorageObjectAssetProvider {
     protected override void AssignStorage(Game game) {
-        game.FileSystem.OpenTitleStorage(Callback);
+        // SDL default for accessing the project's root directory will default to using the dotnet runtime location while debugging.
+        //  This workaround exists until I have a better method of opening a storage object directly in the root
+        if (Debugger.IsAttached) { game.FileSystem.OpenTitleStorage(AppContext.BaseDirectory, Callback); }
+        else { game.FileSystem.OpenTitleStorage(Callback); }
     }
 
     void Callback(ContentStorage storage) {
