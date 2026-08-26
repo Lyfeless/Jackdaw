@@ -169,11 +169,7 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
     #endregion
 
     #region Binary saving
-    public void SaveBinary(SaveData savedata, string savePath) {
-        using TemporaryFile file = new(savePath);
-        using FileStream stream = File.Open(file.Name, FileMode.Open);
-        using BinaryWriter writer = new(stream);
-
+    public void SaveBinary(SaveData savedata, BinaryWriter writer) {
         // Version
         writer.Write(2);
 
@@ -214,10 +210,10 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
     #endregion
 
     #region JSON saving
-    public void SaveJson(SaveData savedata, string savePath) {
+    public void SaveJson(SaveData savedata, Utf8JsonWriter writer) {
         JsonNode node = SaveNodeJson(savedata.RootNode);
-        node[SaveFileLoader.VERSION_CONTAINER] = 2;
-        SaveFileLoader.WriteJsonObject(node, savePath);
+        node[SaveDataHandlerUtils.VERSION_CONTAINER] = 2;
+        node.WriteTo(writer);
     }
 
     static JsonNode SaveNodeJson(SaveDataNode savedata) {
@@ -247,7 +243,7 @@ internal class SaveDataFileLoaderV2 : ISaveDataFileVersion {
     static void WriteArrayElementJSON<T>(JsonObject rootNode, string element, Dictionary<string, List<T>> dict, Func<T, JsonNode> writeFunc)
         => WriteSingleElementJSON(rootNode, element, dict, e => { return ArrayElementJSONWriteFunc(rootNode, e, writeFunc); });
 
-    static JsonNode ArrayElementJSONWriteFunc<T>(JsonObject rootNode, List<T> values, Func<T, JsonNode> writeFunc) {
+    static JsonArray ArrayElementJSONWriteFunc<T>(JsonObject rootNode, List<T> values, Func<T, JsonNode> writeFunc) {
         JsonArray node = [];
         foreach (T element in values) {
             node.Add(writeFunc(element));

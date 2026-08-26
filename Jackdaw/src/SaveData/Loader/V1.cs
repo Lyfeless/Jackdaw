@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace Jackdaw;
@@ -101,11 +102,7 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         return savedata;
     }
 
-    public void SaveBinary(SaveData savedata, string savePath) {
-        using TemporaryFile file = new(savePath);
-        using FileStream stream = File.Open(file.Name, FileMode.Open);
-        using BinaryWriter writer = new(stream);
-
+    public void SaveBinary(SaveData savedata, BinaryWriter writer) {
         // Version
         writer.Write(1);
 
@@ -138,9 +135,9 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         }
     }
 
-    public void SaveJson(SaveData savedata, string savePath) {
+    public void SaveJson(SaveData savedata, Utf8JsonWriter writer) {
         JsonObject node = [];
-        node[SaveFileLoader.VERSION_CONTAINER] = 1;
+        node[SaveDataHandlerUtils.VERSION_CONTAINER] = 1;
 
         JsonObject strings = [];
         foreach ((string key, string value) in savedata.Strings) {
@@ -167,6 +164,6 @@ internal class SaveDataFileLoaderV1 : ISaveDataFileVersion {
         node["ints"] = ints;
         node["bools"] = bools;
 
-        SaveFileLoader.WriteJsonObject(node, savePath);
+        node.WriteTo(writer);
     }
 }

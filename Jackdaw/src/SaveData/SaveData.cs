@@ -102,21 +102,22 @@ public class SaveData {
     /// Create a new save data storage. <br/>
     /// Automatically populates with data if any exists. Use <see cref="CreateEmpty"/> to ignore existing data.
     /// </summary>
+    /// <param name="game">The current game instance.</param>
     /// <param name="savePath">The path to using when saving or loading data.</param>
     /// <param name="backup">
     ///     What backup file to use. <br/>
     ///     Leaving at 0 will use the most recent version. Setting to -1 will ignore backups if a matching file exists. <br/>
     ///     To get more info on a save file's options, use <see cref="GetFileInfo"/>.
     /// </param>
-    /// <returns>The new save data storage.</returns>
-    public static SaveData Load(string savePath, int backup = 0) => SaveFileLoader.Load(savePath, backup);
+    public static SaveData Load(Game game, string savePath, int backup = 0) => SaveDataLoadHandler.Load(game, savePath, backup);
 
     /// <summary>
     /// Get information on what options a save file has for loading.
     /// </summary>
+    /// <param name="game">The current game instance</param>
     /// <param name="savePath">The path to check.</param>
     /// <returns>Data about what save options exist for the given path.</returns>
-    public static SaveFileInfo GetFileInfo(string savePath) => SaveFileLoader.GetFileInfo(savePath);
+    public static SaveFileInfo GetFileInfo(Game game, string savePath) => SaveDataLoadHandler.GetFileInfo(game, savePath);
 
     /// <summary>
     /// Create a new save data storage, ignoring any data currently stored at the save path.
@@ -128,11 +129,13 @@ public class SaveData {
     /// <summary>
     /// Save all stored data to file in the save data's <see cref="SaveFormat" />.
     /// </summary>
-    public void Save() => SaveFileLoader.Save(this);
+    /// <param name="game">The current game instance.</param>
+    public void Save(Game game) => SaveDataSaveHandler.Save(game, this);
 
     /// <summary>
     /// Save all stored data to file in the given format.
     /// </summary>
+    /// <param name="game">The current game instance.</param>
     /// <param name="fileFormat">The format to save the file in.</param>
-    public void Save(Format fileFormat) => SaveFileLoader.Save(this, fileFormat);
+    public void Save(Game game, Format fileFormat) => SaveDataSaveHandler.Save(game, this, fileFormat);
 }
