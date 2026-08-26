@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -96,8 +97,6 @@ public class Game : App {
 
         Batcher = new(GraphicsDevice);
 
-        useCrashlog = config.CreateCrashlog;
-
         root = Actor.Invalid;
     }
 
@@ -106,18 +105,8 @@ public class Game : App {
     /// Automatically handles crashlog creation when running in release.
     /// </summary>
     public void Start() {
-        if (useCrashlog) {
-            try {
-                Run();
-            } catch (Exception e) {
-                using FileStream stream = File.OpenWrite("crashlog.txt");
-                using StreamWriter writer = new(stream);
-                writer.WriteLine(e.ToString());
-            }
-        }
-        else {
-            Run();
-        }
+        if (Debugger.IsAttached) { Run(); }
+        else { try { Run(); } catch (Exception e) { WriteCrashlog(e); } }
     }
 
     protected override void Startup() { }
@@ -170,5 +159,11 @@ public class Game : App {
         }
         InvalidateQueue.Clear();
         return true;
+    }
+
+    void WriteCrashlog(Exception e) {
+        using FileStream stream = File.OpenWrite("crashlog.txt");
+        using StreamWriter writer = new(stream);
+        writer.WriteLine(e.ToString());
     }
 }
