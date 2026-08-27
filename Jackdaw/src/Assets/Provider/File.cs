@@ -1,4 +1,5 @@
 using Foster.Framework;
+using SDL3;
 
 namespace Jackdaw;
 
@@ -9,10 +10,11 @@ namespace Jackdaw;
 /// <param name="rootFolder">The folder all asset groups and items are contained within.</param>
 public class FileFolderAssetProvider(string rootFolder) : StorageObjectAssetProvider {
     protected override void AssignStorage(Game game) {
-        game.FileSystem.OpenTitleStorage(rootFolder, Callback);
-    }
+        Task<ContentStorage> storageTask = game.FileSystem.OpenTitleStorageAsync(rootFolder);
+        while (!storageTask.IsCompleted) {
+            SDL.SDL_Delay(1);
+        }
 
-    void Callback(ContentStorage storage) {
-        FileStorage = storage;
+        FileStorage = storageTask.Result;
     }
 }

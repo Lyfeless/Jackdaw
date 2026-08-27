@@ -162,8 +162,7 @@ public class Game : App {
     }
 
     void WriteCrashlog(Exception e) {
-        using FileStream stream = File.OpenWrite("crashlog.txt");
-        using StreamWriter writer = new(stream);
-        writer.WriteLine(e.ToString());
+        using ContentStorage storage = SaveDataHandlerUtils.OpenStorage(this);
+        storage.WriteAllText("crashlog.txt", e.ToString());
     }
 }

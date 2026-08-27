@@ -66,17 +66,6 @@ public readonly struct AssetCollectionBuilder {
         => new([new(string.Empty, new AssetCollectionBuilderElementAll())]);
 
     /// <summary>
-    /// Create an asset collection from a config file on disk.
-    /// </summary>
-    /// <param name="path">The path to the config file.</param>
-    /// <returns>A container for building asset collections.</returns>
-    public static AssetCollectionBuilderContainer FromFile(string path) {
-        if (!Path.Exists(path)) { return new([]); }
-        using FileStream stream = File.OpenRead(path);
-        return FromStream(stream);
-    }
-
-    /// <summary>
     /// Create an asset collection from a config file in the game's asset provider.
     /// </summary>
     /// <param name="group">The config file's asset group.</param>

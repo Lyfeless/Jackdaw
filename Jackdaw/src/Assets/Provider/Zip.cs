@@ -16,11 +16,14 @@ public class ZipArchiveAssetProvider(string path) : StorageObjectAssetProvider {
     protected override void AssignStorage(Game game) {
         // SDL default for accessing the project's root directory will default to using the dotnet runtime location while debugging.
         //  This workaround exists until I have a better method of opening a storage object directly in the root
-        if (Debugger.IsAttached) { game.FileSystem.OpenTitleStorage(AppContext.BaseDirectory, Callback); }
-        else { game.FileSystem.OpenTitleStorage(Callback); }
-    }
+        string root = string.Empty;
+        if (Debugger.IsAttached) { root = AppContext.BaseDirectory; }
 
-    void Callback(ContentStorage storage) {
-        FileStorage = new ZipStorage(storage, path);
+        Task<ContentStorage> storageTask = game.FileSystem.OpenTitleStorageAsync(root);
+        while (!storageTask.IsCompleted) {
+            SDL.SDL_Delay(1);
+        }
+
+        FileStorage = new ZipStorage(storageTask.Result, path);
     }
 }
