@@ -139,7 +139,7 @@ public class AssetCollectionBuilderInstance {
     /// <summary>
     /// Store all builder elements as a collection and begin creating a new collection.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="name">The name of the new collection.</param>
     /// <returns>The collection builder instance.</returns>
     public AssetCollectionBuilderInstance NewCollection(string name) {
         AddBuilder();
@@ -224,7 +224,7 @@ public class AssetCollectionBuilderInstance {
     /// <summary>
     /// Add multiple provider items to the currently building collection.
     /// </summary>
-    /// <param name="items"></param>
+    /// <param name="items">The provider item definitions.</param>
     /// <returns>The collection builder instance.</returns>
     public AssetCollectionBuilderInstance Multiple(params AssetProviderItem[] items) {
         newElements.Add(new AssetCollectionBuilderMultiple(items));

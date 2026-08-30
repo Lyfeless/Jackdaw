@@ -83,7 +83,7 @@ public abstract class Component {
     /// <summary>
     /// Initialize data required for all components. Must be called from any inheriting components.
     /// </summary>
-    /// <param name="game"></param>
+    /// <param name="game">The current game instance.</param>
     public Component(Game game) {
         Game = game;
         Match = new(this);

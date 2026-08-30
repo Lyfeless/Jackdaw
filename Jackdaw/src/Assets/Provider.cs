@@ -121,8 +121,8 @@ public readonly struct AssetProviderItem(string group, string name, string exten
     /// <summary>
     /// Convert a relative file path into an asset provider item.
     /// </summary>
-    /// <param name="item">The realtive file path to convert.</param>
-    /// <returns></returns>
+    /// <param name="item">The relative file path to convert.</param>
+    /// <returns>The file path as an asset provider item.</returns>
     public static AssetProviderItem FromString(string item) {
         string group = string.Empty;
         string name = string.Empty;

@@ -152,7 +152,7 @@ public class CollisionManager {
     /// <param name="collider">The collider to check against.</param>
     /// <param name="position">The global position the collisions should be checked from.</param>
     /// <param name="positionInv">A pre-calculated inverted matrix for the position.</param>
-    /// <returns></returns>
+    /// <returns>Information about collision check results.</returns>
     public CollisionResult GetAllCollisions(Collider collider, Matrix3x2 position, Matrix3x2 positionInv)
         => GetAllCollisions(collider, new InvertableMatrix(position, positionInv));
 

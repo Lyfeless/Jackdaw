@@ -32,7 +32,7 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// <summary>
     /// Get the scale vector required to flip the current sprite.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The amount to scale the sprite to get the desired flip.</returns>
     public Vector2 GetScale() => GetScaleOf(X, Y);
 
     /// <summary>
@@ -40,7 +40,7 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// </summary>
     /// <param name="flipX">If the sprite should flip on the x axis.</param>
     /// <param name="flipY">If the sprite should flip on the y axis.</param>
-    /// <returns></returns>
+    /// <returns>The amount to scale the sprite to get the desired flip.</returns>
     public static Vector2 GetScaleOf(bool flipX, bool flipY)
         => new(flipX ? -1 : 1, flipY ? -1 : 1);
 
@@ -60,7 +60,7 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// <summary>
     /// Returns a copy of the flip with a given y value.
     /// </summary>
-    /// <param name="y"></param>
+    /// <param name="y">The y value for the flip.</param>
     /// <returns>A flip with the new state.</returns>
     public SpriteFlip WithY(bool y) => new(X, y);
 
