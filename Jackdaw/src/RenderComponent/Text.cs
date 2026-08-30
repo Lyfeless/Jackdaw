@@ -8,45 +8,10 @@ namespace Jackdaw;
 /// Not ticking by default.
 /// </summary>
 public class TextRenderComponent : Component {
-    /// <summary>
-    /// How to position text relative to the position.
-    /// </summary>
-    public enum Alignment {
-        /// <summary>
-        /// Align text to furthest negative side of the text bounds. <br/>
-        /// Equivelant to TOP.
-        /// </summary>
-        LEFT,
-
-        /// <summary>
-        /// Align text to furthest negative side of the text bounds. <br/>
-        /// Equivelant to LEFT.
-        /// </summary>
-        TOP,
-
-        /// <summary>
-        /// Align text to center of the text bounds.
-        /// </summary>
-        CENTER,
-
-        /// <summary>
-        /// Align text to furthest positive side of the text bounds. <br/>
-        /// Equivelant to BOTTOM.
-        /// </summary>
-        RIGHT,
-
-        /// <summary>
-        /// Align text to furthest positive side of the text bounds. <br/>
-        /// Equivelant to RIGHT.
-        /// </summary>
-        BOTTOM
-    }
-
     string text;
     SpriteFont font;
     Vector2 offset = Vector2.Zero;
-    Alignment alignHorizontal = Alignment.LEFT;
-    Alignment alignVertical = Alignment.TOP;
+    AlignmentBound alignment = AlignmentBound.TopLeft();
 
     /// <summary>
     /// The text to render.
@@ -87,23 +52,12 @@ public class TextRenderComponent : Component {
     }
 
     /// <summary>
-    /// How to align the text horizontally relative to its position.
+    /// How the text should be aligned relative to its position.
     /// </summary>
-    public Alignment AlignHorizontal {
-        get => alignHorizontal;
+    public AlignmentBound Alignment {
+        get => alignment;
         set {
-            alignHorizontal = value;
-            SetBounds();
-        }
-    }
-
-    /// <summary>
-    /// How to align the text vertically relative to its position.
-    /// </summary>
-    public Alignment AlignVertical {
-        get => alignVertical;
-        set {
-            alignVertical = value;
+            alignment = value;
             SetBounds();
         }
     }
@@ -121,7 +75,7 @@ public class TextRenderComponent : Component {
         this.text = text;
         this.font = font;
         Color = color;
-        Bounds = GetBounds(Vector2.Zero, text, font, Alignment.LEFT, Alignment.TOP);
+        Bounds = GetBounds(Vector2.Zero, text, font, AlignmentBound.TopLeft());
         Ticking = false;
     }
 
@@ -139,22 +93,10 @@ public class TextRenderComponent : Component {
         batcher.Text(Font, Text, Bounds.Position, Color);
     }
 
-    void SetBounds() => Bounds = GetBounds(Offset, text, font, alignHorizontal, alignVertical);
-    static Rect GetBounds(Vector2 offset, string text, SpriteFont font, Alignment alignX, Alignment alignY) {
+    void SetBounds() => Bounds = GetBounds(Offset, text, font, alignment);
+    static Rect GetBounds(Vector2 offset, string text, SpriteFont font, AlignmentBound alignment) {
         Vector2 textSize = font.SizeOf(text);
-        Vector2 alignOffset = GetAlignmentOffset(textSize, alignX, alignY);
+        Vector2 alignOffset = alignment.Get(textSize);
         return new(offset + alignOffset, textSize);
     }
-    static Vector2 GetAlignmentOffset(Vector2 size, Alignment alignX, Alignment alignY) => new(
-        GetAlignmentOffset(size.X, alignX),
-        GetAlignmentOffset(size.Y, alignY)
-    );
-    static float GetAlignmentOffset(float size, Alignment align) => align switch {
-        Alignment.LEFT => 0,
-        Alignment.TOP => 0,
-        Alignment.CENTER => -size / 2,
-        Alignment.RIGHT => -size,
-        Alignment.BOTTOM => -size,
-        _ => 0
-    };
 }

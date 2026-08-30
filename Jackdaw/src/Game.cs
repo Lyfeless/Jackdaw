@@ -46,7 +46,6 @@ public class Game : App {
     public Rng Random = new(DateTime.Now.Millisecond);
 
     Color BackgroundColor;
-    readonly bool useCrashlog;
 
     readonly Batcher Batcher;
 

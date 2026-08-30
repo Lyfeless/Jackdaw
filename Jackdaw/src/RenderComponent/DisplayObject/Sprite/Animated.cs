@@ -42,8 +42,8 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
 
     public override void Render(Batcher batcher) {
         AnimationFrame frame = Frame;
-        bool flipX = frame.FlipX != FlipX;
-        bool flipY = frame.FlipY != FlipY;
-        batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Bounds.Center, Bounds.Size / 2, FlipScale(flipX, flipY), 0, Color);
+        bool flipX = frame.FlipX != Flip.X;
+        bool flipY = frame.FlipY != Flip.Y;
+        batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Bounds.Center, Bounds.Size / 2, SpriteFlip.GetScaleOf(flipX, flipY), 0, Color);
     }
 }

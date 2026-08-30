@@ -34,7 +34,7 @@ public class SpriteStack(params Sprite[] sprites) : Sprite() {
 
     public override void Render(Batcher batcher) {
         RectInt bounds = Bounds;
-        batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Center, FlipScale(), 0));
+        batcher.PushMatrix(Transform.CreateMatrix(bounds.Center, bounds.Center, Flip.GetScale(), 0));
 
         foreach (Sprite sprite in Sprites) {
             sprite.Render(batcher);

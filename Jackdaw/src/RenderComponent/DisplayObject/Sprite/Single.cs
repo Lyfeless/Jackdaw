@@ -21,6 +21,6 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     public SpriteSingle(Assets assets, string texture) : this(assets.GetSubtexture(texture)) { }
 
     public override void Render(Batcher batcher) {
-        batcher.Image(Texture, Bounds.Center, halfSize, FlipScale(), 0, Color);
+        batcher.Image(Texture, Bounds.Center, halfSize, Flip.GetScale(), 0, Color);
     }
 }
