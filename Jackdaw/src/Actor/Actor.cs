@@ -296,14 +296,14 @@ public sealed class Actor {
     /// </summary>
     /// <param name="game">The game instance</param>
     /// <param name="components">The components to add to the actor.</param>
-    public Actor(Game game, params Component[] components) : this(game) => Components.AddAll(components);
+    public Actor(Game game, params Component[] components) : this(game) => Components.Add(components);
 
     /// <summary>
     /// Create a new actor pre-assigned with the supplied children.
     /// </summary>
     /// <param name="game">The game instance</param>
     /// <param name="children">The children to add to the actor.</param>
-    public Actor(Game game, params Actor[] children) : this(game) => Children.AddAll(children);
+    public Actor(Game game, params Actor[] children) : this(game) => Children.Add(children);
 
     /// <summary>
     /// Create a new actor from a single component.
@@ -482,7 +482,7 @@ public sealed class Actor {
     /// <param name="children">The children to add to the actor.</param>
     /// <returns>The actor with all of the given children added to it.</returns>
     public static Actor With(Actor actor, params Actor[] children) {
-        actor.Children.AddAll(children);
+        actor.Children.Add(children);
         return actor;
     }
 
@@ -501,7 +501,7 @@ public sealed class Actor {
     /// <param name="components">The components to add to the actor.</param>
     /// <returns>The actor with all of the given components added to it.</returns>
     public static Actor With(Actor actor, params Component[] components) {
-        actor.Components.AddAll(components);
+        actor.Components.Add(components);
         return actor;
     }
 

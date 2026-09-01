@@ -94,7 +94,7 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     /// </summary>
     /// <param name="children">The children to add.</param>
     /// <returns>The container owner.</returns>
-    public Towner AddAll(params Telement[] children) { foreach (Telement child in children) { Add(child); } return Owner; }
+    public Towner Add(params Telement[] children) { foreach (Telement child in children) { Add(child); } return Owner; }
 
     /// <summary>
     /// Remove a child from the elements array.
@@ -108,7 +108,7 @@ public abstract class ChildContainer<Telement, Towner>(Towner owner) where Telem
     /// </summary>
     /// <param name="children">The children to remove.</param>
     /// <returns>The container owner.</returns>
-    public Towner RemoveAll(params Telement[] children) { foreach (Telement child in children) { Remove(child); } return Owner; }
+    public Towner Remove(params Telement[] children) { foreach (Telement child in children) { Remove(child); } return Owner; }
 
     /// <summary>
     /// Add a child to the start of the elements array.
