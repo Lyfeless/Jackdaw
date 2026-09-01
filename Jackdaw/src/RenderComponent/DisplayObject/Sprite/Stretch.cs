@@ -3,14 +3,25 @@ using Foster.Framework;
 
 namespace Jackdaw;
 
+/// <summary>
+/// A sprite that can be scaled to fit inside a resizable bound.
+/// </summary>
 public class SpriteStretch : Sprite {
     readonly Subtexture Texture;
     readonly RectInt textureBounds;
     readonly Point2 halfSize;
-
-    readonly BoundsComponent BoundsComponent;
     Rect oldRect;
 
+    /// <summary>
+    /// The bounds to scale the sprite to.
+    /// </summary>
+    public readonly BoundsComponent BoundsComponent;
+
+    /// <summary>
+    /// A sprite that can be scaled to fit inside a resizable bound.
+    /// </summary>
+    /// <param name="texture">The sprite's texture.</param>
+    /// <param name="bounds">The bounds to scale the sprite to.</param>
     public SpriteStretch(Subtexture texture, BoundsComponent bounds) {
         Texture = texture;
         textureBounds = new(texture.Size.FloorToPoint2());
