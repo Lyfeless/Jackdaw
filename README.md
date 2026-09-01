@@ -24,7 +24,7 @@ rootActor.Position = new(100, 50);
 
 // Add a component to the root
 SpriteSingle sprite = new(game.Assets.GetFallback<Subtexture>());
-rootActor.Components.Add(new DisplayObjectRenderComponent(game, sprite));
+rootActor.Components.Add(new RenderComponent(game, sprite));
 
 // Assign the root actor to the game;
 game.Root = rootActor;

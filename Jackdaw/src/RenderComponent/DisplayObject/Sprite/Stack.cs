@@ -5,11 +5,14 @@ namespace Jackdaw;
 /// <summary>
 /// A sprite made up of multiple sprites displayed on top of one another.
 /// </summary>
-/// <param name="sprites">All the sprites to display in the stack.</param>
-public class SpriteStack(params Sprite[] sprites) : Sprite() {
-    public readonly Sprite[] Sprites = sprites;
+public class SpriteStack : Sprite {
+    public readonly Sprite[] Sprites;
+    /// <param name="sprites">All the sprites to display in the stack.</param>
+    public SpriteStack(params Sprite[] sprites) : base() {
+        Sprites = sprites;
 
-    public override RectInt Bounds => new BoundsBuilder([.. Sprites.Select(e => e.Bounds)]).Rect.Translate(Offset).Int();
+        CacheBounds();
+    }
 
     /// <summary>
     /// Create a stack of sprites.
@@ -42,4 +45,6 @@ public class SpriteStack(params Sprite[] sprites) : Sprite() {
 
         batcher.PopMatrix();
     }
+
+    public override Rect GetObjectBounds() => new BoundsBuilder([.. Sprites.Select(e => e.Bounds)]).Rect.Translate(Offset).Int();
 }

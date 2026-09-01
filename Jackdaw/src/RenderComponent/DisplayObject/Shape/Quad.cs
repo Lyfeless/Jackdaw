@@ -21,7 +21,7 @@ public class DisplayQuad(Quad quad)
 : DisplayObject, IDisplayObjectQuad {
     public Quad Quad { get; set; } = quad;
 
-    public override RectInt Bounds => Quad.Bounds.Int();
+    public override Rect GetObjectBounds() => Quad.Bounds;
 
     /// <summary>
     /// A renderable filled quad.
@@ -72,7 +72,7 @@ public class DisplayQuadLines(Quad quad, float lineWeight)
     public Quad Quad { get; set; } = quad;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Quad.Bounds.Int();
+    public override Rect GetObjectBounds() => Quad.Bounds;
 
     /// <summary>
     /// A renderable quad outline.
@@ -129,7 +129,7 @@ public class DisplayQuadLinesDashed(Quad quad, float lineWeight, float dashLengt
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
 
-    public override RectInt Bounds => Quad.Bounds.Int();
+    public override Rect GetObjectBounds() => Quad.Bounds;
 
     /// <summary>
     /// A renderable dashed quad outline.

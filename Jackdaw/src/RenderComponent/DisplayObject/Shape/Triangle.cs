@@ -21,7 +21,7 @@ public class DisplayTriangle(Triangle triangle)
     : DisplayObject, IDisplayObjectTriangle {
     public Triangle Triangle { get; set; } = triangle;
 
-    public override RectInt Bounds => Triangle.Bounds.Int();
+    public override Rect GetObjectBounds() => Triangle.Bounds;
 
     /// <summary>
     /// A renderable filled triangle.
@@ -59,7 +59,7 @@ public class DisplayTriangleLines(Triangle triangle, float lineWeight)
     public Triangle Triangle { get; set; } = triangle;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Triangle.Bounds.Int();
+    public override Rect GetObjectBounds() => Triangle.Bounds;
 
     /// <summary>
     /// A renderable triangle outline.
@@ -102,7 +102,7 @@ public class DisplayTriangleLinesDashed(Triangle triangle, float lineWeight, flo
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
 
-    public override RectInt Bounds => Triangle.Bounds.Int();
+    public override Rect GetObjectBounds() => Triangle.Bounds;
 
     /// <summary>
     /// A renderable dashed triangle outline.

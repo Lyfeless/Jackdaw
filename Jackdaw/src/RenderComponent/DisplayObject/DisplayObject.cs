@@ -5,16 +5,19 @@ namespace Jackdaw;
 
 /// <summary>
 /// An object that can be rendered to the screen. <br/>
-/// Use a <see cref="DisplayObjectRenderComponent" /> to render.
+/// Use a <see cref="RenderComponent" /> to render.
 /// </summary>
 public abstract class DisplayObject {
-    /// <summary>
-    /// The bounds the object should use to determine if it should render
-    /// </summary>
-    public abstract RectInt Bounds { get; }
+    internal Point2 offset = Point2.Zero;
+    internal AlignmentBound alignment = new();
 
     /// <summary>
-    /// The top-left corner of the object's bounds
+    /// The object's rendering bounds.
+    /// </summary>
+    public RectInt Bounds = new(0, 0);
+
+    /// <summary>
+    /// The top-left corner of the object's bounds.
     /// </summary>
     public Vector2 Position => Bounds.Position;
 
@@ -29,15 +32,38 @@ public abstract class DisplayObject {
     public Color Color = Color.White;
 
     /// <summary>
+    /// The position offset of the display element, independant of the object's alignment.
+    /// </summary>
+    public Point2 Offset {
+        get => offset;
+        set {
+            offset = value;
+            CacheBounds();
+        }
+    }
+
+    /// <summary>
+    /// How the element should be aligned relative to its position.
+    /// Defaults to aligning the top left corner to the object's position.
+    /// </summary>
+    public AlignmentBound Alignment {
+        get => alignment;
+        set {
+            alignment = value;
+            CacheBounds();
+        }
+    }
+
+    /// <summary>
     /// Check if the object is currently inside the window's view bounds.
     /// </summary>
-    /// <param name="game">The current game instance.</param>
+    /// <param name="bounds">The view bounds the object should render in.</param>
     /// <param name="actor">The actor the object is rendered relative to.</param>
     /// <param name="offset">The renderer component's relative offset.</param>
     /// <returns>If the object is onscreen.</returns>
-    public bool IsOnScreen(Game game, Actor actor, Point2 offset) {
+    public bool IsOnScreen(RectInt bounds, Actor actor, Point2 offset) {
         Rect globalBounds = GetGlobalRenderBounds(actor, offset);
-        return game.Window.BoundsInPixels().Overlaps(globalBounds);
+        return bounds.Overlaps(globalBounds);
     }
 
     /// <summary>
@@ -56,4 +82,22 @@ public abstract class DisplayObject {
     /// </summary>
     /// <param name="batcher">The batcher to render to.</param>
     public abstract void Render(Batcher batcher);
+
+    /// <summary>
+    /// Get the size and position of the overriden element's bounding box. Used to calculate the display object's overal bounds. <br/>
+    /// Run <see cref="CacheBounds"/> whenever this value could change.
+    /// </summary>
+    /// <returns></returns>
+    public abstract Rect GetObjectBounds();
+
+    /// <summary>
+    /// Stores the display object's bounding box using the bounds provided by <see cref="GetObjectBounds"/>
+    /// and the object's offsets. <br/>
+    /// Automatically calculated when changing offset values, but not called by default on creation.
+    /// Make sure to run once all necessary values are initialized for the display object.
+    /// </summary>
+    protected void CacheBounds() {
+        Rect source = GetObjectBounds();
+        Bounds = source.Translate(offset + alignment.Get(source.Size)).Int();
+    }
 }

@@ -21,7 +21,7 @@ public class DisplayPolygon(Polygon polygon)
     : DisplayObject, IDisplayObjectPolygon {
     public Polygon Polygon { get; set; } = polygon;
 
-    public override RectInt Bounds => Polygon.Bounds.Int();
+    public override Rect GetObjectBounds() => Polygon.Bounds;
 
     /// <summary>
     /// A renderable filled polygon.
@@ -55,7 +55,7 @@ public class DisplayPolygonLines(Polygon polygon, float lineWeight)
     public Polygon Polygon { get; set; } = polygon;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Polygon.Bounds.Int();
+    public override Rect GetObjectBounds() => Polygon.Bounds;
 
     /// <summary>
     /// A renderable polygon outline.
@@ -94,7 +94,7 @@ public class DisplayPolygonLinesDashed(Polygon polygon, float lineWeight, float 
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
 
-    public override RectInt Bounds => Polygon.Bounds.Int();
+    public override Rect GetObjectBounds() => Polygon.Bounds;
 
     /// <summary>
     /// A renderable dashed polygon outline.

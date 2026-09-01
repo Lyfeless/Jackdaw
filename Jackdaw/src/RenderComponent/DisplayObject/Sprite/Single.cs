@@ -5,13 +5,18 @@ namespace Jackdaw;
 /// <summary>
 /// A single-image sprite.
 /// </summary>
-/// <param name="texture">The texture to display.</param>
-public class SpriteSingle(Subtexture texture) : Sprite() {
-    readonly Subtexture Texture = texture;
-    readonly RectInt textureBounds = new(texture.Size.FloorToPoint2());
-    readonly Point2 halfSize = (texture.Size / 2).FloorToPoint2();
+public class SpriteSingle : Sprite {
+    readonly Subtexture Texture;
+    readonly RectInt textureBounds;
+    readonly Point2 halfSize;
+    /// <param name="texture">The texture to display.</param>
+    public SpriteSingle(Subtexture texture) : base() {
+        Texture = texture;
+        textureBounds = new(texture.Size.FloorToPoint2());
+        halfSize = (texture.Size / 2).FloorToPoint2();
 
-    public override RectInt Bounds => textureBounds.Translate(Offset);
+        CacheBounds();
+    }
 
     /// <summary>
     /// A single-image sprite.
@@ -23,4 +28,6 @@ public class SpriteSingle(Subtexture texture) : Sprite() {
     public override void Render(Batcher batcher) {
         batcher.Image(Texture, Bounds.Center, halfSize, Flip.GetScale(), 0, Color);
     }
+
+    public override Rect GetObjectBounds() => textureBounds;
 }

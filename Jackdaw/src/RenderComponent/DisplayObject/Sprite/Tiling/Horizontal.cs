@@ -5,11 +5,9 @@ namespace Jackdaw;
 /// <summary>
 /// A horizontally resizable sprite that tiles the texture to fill space.
 /// </summary>
-/// <param name="texture">The texture to tile.</param>
-/// <param name="width">The sprite's resized width.</param>
-public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite {
-    readonly Subtexture Texture = texture;
-    readonly ScalingAxis width = new(width);
+public class SpriteTilingHorizontal : Sprite {
+    readonly Subtexture Texture;
+    readonly ScalingAxis width;
 
     /// <summary>
     /// The sprite's resized width.
@@ -21,7 +19,16 @@ public class SpriteTilingHorizontal(Subtexture texture, int width = 0) : Sprite 
     /// </summary>
     public bool PadOrigin = false;
 
-    public override RectInt Bounds => new(Offset.X + width.Position, Offset.Y, width.Size, (int)Texture.Height);
+    /// <param name="texture">The texture to tile.</param>
+    /// <param name="width">The sprite's resized width.</param>
+    public SpriteTilingHorizontal(Subtexture texture, int width = 0) {
+        Texture = texture;
+        this.width = new(width);
+
+        CacheBounds();
+    }
+
+    public override Rect GetObjectBounds() => new(width.Position, 0, width.Size, Texture.Height);
 
     public override void Render(Batcher batcher) {
         if (Width == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }

@@ -23,5 +23,7 @@ class ScalingPoint2(int width, int height) {
     public int PositionX => width.Position;
     public int PositionY => height.Position;
 
+    public Rect Bounds => new(width.Position, height.Position, width.Size, height.Size);
+
     public ScalingPoint2(Point2 point2) : this(point2.X, point2.Y) { }
 }

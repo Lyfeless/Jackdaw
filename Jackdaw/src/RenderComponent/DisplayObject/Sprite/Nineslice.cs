@@ -65,10 +65,7 @@ public class SpriteNineslice : Sprite {
     /// </summary>
     public BoundsComponent BoundsComponent;
 
-    /// <summary>
-    /// The Rectangle bounds of the nineslice.
-    /// </summary>
-    public override RectInt Bounds => BoundsComponent.Rect.Int().Translate(Offset);
+    public override Rect GetObjectBounds() => BoundsComponent.Rect;
 
     /// <summary>
     /// Create a new nineslice object.
@@ -112,6 +109,8 @@ public class SpriteNineslice : Sprite {
 
         Extend = extend;
         Constrain = constrain;
+
+        CacheBounds();
     }
 
     /// <summary>

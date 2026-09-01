@@ -107,7 +107,7 @@ public class DisplayRectangle(RectInt rect)
     public RectInt Rect { get; set; } = rect;
     public RectangleCornerRounding Corners { get; set; } = RectangleCornerRounding.None();
 
-    public override RectInt Bounds => Rect;
+    public override Rect GetObjectBounds() => Rect;
 
     /// <summary>
     /// A renderable filled rectangle.
@@ -167,7 +167,7 @@ public class DisplayRectangleLines(RectInt rect, float lineWeight)
     public float LineWeight { get; set; } = lineWeight;
     public RectangleCornerRounding Corners { get; set; } = RectangleCornerRounding.None();
 
-    public override RectInt Bounds => Rect;
+    public override Rect GetObjectBounds() => Rect;
 
     /// <summary>
     /// A renderable rectangle outline.
@@ -235,7 +235,7 @@ public class DisplayRectangleLinesDashed(RectInt rect, float lineWeight, float d
     public float OffsetPercent { get; set; } = 0;
     // Dashed Rectangle doesn't support rounded corners
 
-    public override RectInt Bounds => Rect;
+    public override Rect GetObjectBounds() => Rect;
 
     /// <summary>
     /// A renderable dashed rectangle outline.

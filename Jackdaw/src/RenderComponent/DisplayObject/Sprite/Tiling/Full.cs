@@ -5,11 +5,9 @@ namespace Jackdaw;
 /// <summary>
 /// A resizable sprite that tiles the texture to fill space.
 /// </summary>
-/// <param name="texture">The texture to tile.</param>
-/// <param name="size">The sprite's resized size.</param>
-public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
-    readonly Subtexture Texture = texture;
-    readonly ScalingPoint2 size = new(size);
+public class SpriteTiling : Sprite {
+    readonly Subtexture Texture;
+    readonly ScalingPoint2 size;
 
     public int Width { get => size.Width; set => size.Width = value; }
     public int Height { get => size.Height; set => size.Height = value; }
@@ -24,7 +22,16 @@ public class SpriteTiling(Subtexture texture, Point2 size) : Sprite {
     /// </summary>
     public bool PadOriginY = false;
 
-    public override RectInt Bounds => new(Offset + size.Position, size.Size);
+    /// <param name="texture">The texture to tile.</param>
+    /// <param name="size">The sprite's resized size.</param>
+    public SpriteTiling(Subtexture texture, Point2 size) {
+        Texture = texture;
+        this.size = new(size);
+
+        CacheBounds();
+    }
+
+    public override Rect GetObjectBounds() => size.Bounds;
 
     public override void Render(Batcher batcher) {
         if (Width == 0 || Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }

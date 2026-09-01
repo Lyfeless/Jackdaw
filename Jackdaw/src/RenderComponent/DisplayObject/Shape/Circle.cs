@@ -43,7 +43,7 @@ public class DisplayCircle(Circle circle)
     public Circle Circle { get; set; } = circle;
     public int Resolution { get; set; } = 16;
 
-    public override RectInt Bounds => Circle.Bounds.Int();
+    public override Rect GetObjectBounds() => Circle.Bounds;
 
     /// <summary>
     /// A renderable filled circle.
@@ -86,7 +86,7 @@ public class DisplayCircleLines(Circle circle, float lineWeight)
     public int Resolution { get; set; } = 16;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Circle.Bounds.Int();
+    public override Rect GetObjectBounds() => Circle.Bounds;
 
     /// <summary>
     /// A renderable circle outline.
@@ -135,7 +135,7 @@ public class DisplayCircleLinesDashed(Circle circle, float lineWeight, float das
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
 
-    public override RectInt Bounds => Circle.Bounds.Int();
+    public override Rect GetObjectBounds() => Circle.Bounds;
 
     /// <summary>
     /// A renderable dashed circle outline.
@@ -186,7 +186,7 @@ public class DisplaySemiCircle(Circle circle, float startRadians, float endRadia
     public float StartRadians { get; set; } = startRadians;
     public float EndRadians { get; set; } = endRadians;
 
-    public override RectInt Bounds => Circle.Bounds.Int();
+    public override Rect GetObjectBounds() => Circle.Bounds;
 
     /// <summary>
     /// A renderable filled semicircle.
@@ -239,7 +239,7 @@ public class DisplaySemiCircleLines(Circle circle, float startRadians, float end
     public float EndRadians { get; set; } = endRadians;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Circle.Bounds.Int();
+    public override Rect GetObjectBounds() => Circle.Bounds;
 
     /// <summary>
     /// A renderable semicircle outline.

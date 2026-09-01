@@ -5,23 +5,15 @@ namespace Jackdaw;
 /// <summary>
 /// An animated sprite, begins animated when created.
 /// </summary>
-/// <param name="game">The current game instance.</param>
-/// <param name="animation">The sprite animation to use.</param>
-public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
-    readonly AnimationData Animation = animation;
+public class SpriteAnimated : Sprite {
+    readonly AnimationData Animation;
 
     /// <summary>
     /// The timer controlling the animation playback.
     /// </summary>
-    public readonly TicklessTimer Timer = new(
-        game: game,
-        duration: animation.Duration
-    ) {
-        Looping = animation.Looping
-    };
+    public readonly TicklessTimer Timer;
 
-    readonly RectInt bounds = new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect.Int();
-    public override RectInt Bounds => bounds.Translate(Offset);
+    readonly RectInt bounds;
 
     /// <summary>
     /// If the animation has finished. Will always be false when looping.
@@ -32,6 +24,15 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
     /// The current animation frame.
     /// </summary>
     public AnimationFrame Frame => Animation.GetFrame(Timer.ElapsedTimeClamped);
+    /// <param name="game">The current game instance.</param>
+    /// <param name="animation">The sprite animation to use.</param>
+    public SpriteAnimated(Game game, AnimationData animation) {
+        Animation = animation;
+        Timer = new(game: game, duration: animation.Duration) { Looping = animation.Looping };
+        bounds = new BoundsBuilder([.. animation.Frames.Select(e => new Rect(animation.PositionOffset + e.PositionOffset, animation.FrameTexture(e).Size))]).Rect.Int();
+
+        CacheBounds();
+    }
 
     /// <summary>
     /// An animated sprite, begins animated when created.
@@ -46,4 +47,6 @@ public class SpriteAnimated(Game game, AnimationData animation) : Sprite {
         bool flipY = frame.FlipY != Flip.Y;
         batcher.Image(Animation.FrameTexture(frame), Animation.PositionOffset + frame.PositionOffset + Bounds.Center, Bounds.Size / 2, SpriteFlip.GetScaleOf(flipX, flipY), 0, Color);
     }
+
+    public override Rect GetObjectBounds() => bounds;
 }

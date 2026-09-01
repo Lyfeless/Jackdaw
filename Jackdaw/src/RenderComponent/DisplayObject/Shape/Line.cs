@@ -23,7 +23,7 @@ public class DisplayLine(Line line, float lineWeight)
     public Line Line { get; set; } = line;
     public float LineWeight { get; set; } = lineWeight;
 
-    public override RectInt Bounds => Line.Bounds.Int();
+    public override Rect GetObjectBounds() => Line.Bounds;
 
     /// <summary>
     /// A renderable single line.
@@ -72,7 +72,7 @@ public class DisplayLineDashed(Line line, float lineWeight, float dashLength)
     public float DashLength { get; set; } = dashLength;
     public float OffsetPercent { get; set; } = 0;
 
-    public override RectInt Bounds => Line.Bounds.Int();
+    public override Rect GetObjectBounds() => Line.Bounds;
 
     /// <summary>
     /// A renderable single dashed line.
