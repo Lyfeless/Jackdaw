@@ -68,7 +68,7 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// Returns a copy of the flip with an inverted y value.
     /// </summary>
     /// <returns>A flip with the new state.</returns>
-    public SpriteFlip WithYInverted() => new(X, !Y);
+    public SpriteFlip WithInvertedY() => new(X, !Y);
 
     /// <summary>
     /// Returns a copy of the flip with both the x and y axis inverted.

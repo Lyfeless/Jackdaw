@@ -9,6 +9,7 @@ public class SpriteSingle : Sprite {
     readonly Subtexture Texture;
     readonly RectInt textureBounds;
     readonly Point2 halfSize;
+
     /// <param name="texture">The texture to display.</param>
     public SpriteSingle(Subtexture texture) : base() {
         Texture = texture;
