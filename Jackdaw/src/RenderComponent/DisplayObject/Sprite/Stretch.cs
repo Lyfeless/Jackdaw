@@ -37,7 +37,7 @@ public class SpriteStretch : Sprite {
     public override void Render(Batcher batcher) {
         TryCacheBounds();
         Vector2 scale = BoundsComponent.Rect.Size / textureBounds.Size;
-        batcher.Image(Texture, Bounds.Center, halfSize, Flip.GetScale() * scale, 0, Color);
+        batcher.Image(Texture, ((Rect)Bounds).Center, halfSize, Flip.GetScale() * scale, 0, Color);
     }
 
     void TryCacheBounds() {

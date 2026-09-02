@@ -50,7 +50,7 @@ public class SpriteTilingHorizontal : Sprite {
     public override Rect GetObjectBounds() => new(width.Position, 0, width.Size, Texture.Height);
 
     public override void Render(Batcher batcher) {
-        if (Width == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+        if (Width == 0) { return; }
 
         if (storedFlip != Flip) { PrecalculateValues(); }
         Vector2 flipScale = Flip.GetScale();
@@ -60,7 +60,7 @@ public class SpriteTilingHorizontal : Sprite {
         }
 
         for (int i = 0; i < count; ++i) {
-            Vector2 iterPos = new(tileStart + (i * Texture.Height), 0);
+            Vector2 iterPos = new(tileStart + (i * Texture.Width), 0);
             batcher.Image(Texture, Offset + iterPos + halfSize, halfSize, flipScale, 0, Color);
         }
     }
@@ -94,7 +94,7 @@ public class SpriteTilingHorizontal : Sprite {
             if (Flip.X) { stateMatch = !stateMatch; }
             int remainderClipWidth = stateMatch ? 0 : textureSize.X - remainder;
 
-            Rect clipBounds = new(remainderClipWidth, 0, remainder, textureSize.X);
+            Rect clipBounds = new(remainderClipWidth, 0, remainder, textureSize.Y);
             halfClipSize = clipBounds.Size / 2;
             clipTexture = Texture.GetClipSubtexture(clipBounds);
         }
