@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -8,13 +9,13 @@ namespace Jackdaw;
 public class SpriteSingle : Sprite {
     readonly Subtexture Texture;
     readonly RectInt textureBounds;
-    readonly Point2 halfSize;
+    readonly Vector2 halfSize;
 
     /// <param name="texture">The texture to display.</param>
     public SpriteSingle(Subtexture texture) : base() {
         Texture = texture;
         textureBounds = new(texture.Size.FloorToPoint2());
-        halfSize = (texture.Size / 2).FloorToPoint2();
+        halfSize = texture.Size / 2;
 
         CacheBounds();
     }

@@ -9,7 +9,7 @@ namespace Jackdaw;
 public class SpriteStretch : Sprite {
     readonly Subtexture Texture;
     readonly RectInt textureBounds;
-    readonly Point2 halfSize;
+    readonly Vector2 halfSize;
     Rect oldRect;
 
     /// <summary>
@@ -25,7 +25,7 @@ public class SpriteStretch : Sprite {
     public SpriteStretch(Subtexture texture, BoundsComponent bounds) {
         Texture = texture;
         textureBounds = new(texture.Size.FloorToPoint2());
-        halfSize = (texture.Size / 2).FloorToPoint2();
+        halfSize = texture.Size / 2;
         BoundsComponent = bounds;
         oldRect = BoundsComponent.Rect;
 

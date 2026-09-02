@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace Jackdaw;
@@ -17,6 +18,11 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// If the sprite should flip on the y axis.
     /// </summary>
     public readonly bool Y = y;
+
+    /// <summary>
+    /// If the sprite should be flipped on either axis.
+    /// </summary>
+    public readonly bool IsFlipped = x || y;
 
     /// <summary>
     /// Information for how a sprite should be flipped when displayed.
@@ -75,4 +81,9 @@ public readonly struct SpriteFlip(bool x, bool y) {
     /// </summary>
     /// <returns>A flip with the new state.</returns>
     public SpriteFlip WithBothInverted() => new(!X, !Y);
+
+    public static bool operator ==(SpriteFlip a, SpriteFlip b) => a.X == b.X && a.Y == b.Y;
+    public static bool operator !=(SpriteFlip a, SpriteFlip b) => !(a == b);
+    public override bool Equals([NotNullWhen(true)] object? obj) => obj is SpriteFlip flip && (flip == this);
+    public override int GetHashCode() => HashCode.Combine(X, Y);
 }
