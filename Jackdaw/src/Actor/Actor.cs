@@ -308,6 +308,20 @@ public sealed class Actor {
     /// <summary>
     /// Create a new actor from a single component.
     /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="component">The component to add the the actor.</param>
+    public Actor(Game game, Component component) : this(game) => Components.Add(component);
+
+    /// <summary>
+    /// Create a new actor from a single child.
+    /// </summary>
+    /// <param name="game">The current game instance.</param>
+    /// <param name="child">The child to add the the actor.</param>
+    public Actor(Game game, Actor child) : this(game) => Children.Add(child);
+
+    /// <summary>
+    /// Create a new actor from a single component.
+    /// </summary>
     /// <param name="component">The component to add to the actor.</param>
     public Actor(Component component) : this(component.Game) => Components.Add(component);
 
