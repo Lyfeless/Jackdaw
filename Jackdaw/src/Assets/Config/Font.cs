@@ -15,4 +15,7 @@ internal class FontConfigEntry {
 
     [JsonPropertyName("size")]
     public int Size { get; set; }
+
+    [JsonPropertyName("pixelPerfect")]
+    public bool PixelPerfect { get; set; }
 }

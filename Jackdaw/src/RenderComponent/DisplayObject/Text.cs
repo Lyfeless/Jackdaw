@@ -53,6 +53,6 @@ public class DisplayText : DisplayObject {
         : this(text, game.Assets.GetSpriteFont(font)) { }
 
     public override void Render(Batcher batcher) {
-        batcher.Text(Font, Text, Vector2.Zero, Color);
+        batcher.Text(Font, Text, Offset, Color);
     }
 }

@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Text.Json;
 using Foster.Framework;
 
@@ -21,7 +22,12 @@ public class FontLoader() : AssetLoaderStage() {
 
             SpriteFont font;
             lock (assets.GraphicsDevice) {
-                font = new(assets.GraphicsDevice, stream, configEntry?.Size ?? FontConfig.DefaultFontSize);
+                font = new(
+                    graphicsDevice: assets.GraphicsDevice,
+                    stream: stream,
+                    size: configEntry?.Size ?? FontConfig.DefaultFontSize,
+                    pixelPerfect: configEntry?.PixelPerfect ?? false
+                );
             }
             AddAsset(assets, item.Name, font);
         }
