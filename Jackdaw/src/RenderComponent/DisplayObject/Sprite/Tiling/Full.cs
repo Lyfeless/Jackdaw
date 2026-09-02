@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -7,10 +8,39 @@ namespace Jackdaw;
 /// </summary>
 public class SpriteTiling : Sprite {
     readonly Subtexture Texture;
+    readonly Vector2 halfSize;
     readonly ScalingPoint2 size;
 
-    public int Width { get => size.Width; set => size.Width = value; }
-    public int Height { get => size.Height; set => size.Height = value; }
+    SpriteFlip storedFlip;
+    Point2 tileStart;
+    Point2 remainderStart;
+    Point2 count;
+    bool hasRemainderX;
+    bool hasRemainderY;
+    bool hasRemainderBoth;
+    Subtexture clipTextureX;
+    Subtexture clipTextureY;
+    Subtexture clipTextureCorner;
+    Vector2 halfClipSizeX;
+    Vector2 halfClipSizeY;
+    Vector2 halfClipSizeCorner;
+
+    public int Width {
+        get => size.Width;
+        set {
+            size.Width = value;
+            CacheBounds();
+            PrecalculateValues();
+        }
+    }
+    public int Height {
+        get => size.Height;
+        set {
+            size.Height = value;
+            CacheBounds();
+            PrecalculateValues();
+        }
+    }
 
     /// <summary>
     /// If horizontal tiling should grow from the texture's origin or outer edge.
@@ -26,89 +56,116 @@ public class SpriteTiling : Sprite {
     /// <param name="size">The sprite's resized size.</param>
     public SpriteTiling(Subtexture texture, Point2 size) {
         Texture = texture;
+        halfSize = texture.Size / 2;
         this.size = new(size);
 
         CacheBounds();
+        PrecalculateValues();
     }
+
+    /// <param name="texture">The texture to tile.</param>
+    /// <param name="width">The sprite's resized width.</param>
+    /// <param name="height">The sprite's resized height.</param>
+    public SpriteTiling(Subtexture texture, int width, int height) : this(texture, new(width, height)) { }
 
     public override Rect GetObjectBounds() => size.Bounds;
 
     public override void Render(Batcher batcher) {
-        if (Width == 0 || Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+        if (Width == 0 || Height == 0) { return; }
 
-        bool padLeft = PadOriginX;
-        bool padTop = PadOriginY;
-        int offsetX = 0;
-        int offsetY = 0;
+        if (storedFlip != Flip) { PrecalculateValues(); }
+        Vector2 flipScale = Flip.GetScale();
 
-        if (Width < 0) {
-            padLeft = !padLeft;
-            offsetX = Width;
+        if (hasRemainderBoth) {
+            batcher.Image(clipTextureCorner, Offset + remainderStart + halfClipSizeCorner, halfClipSizeCorner, flipScale, 0, Color);
         }
 
-        if (Height < 0) {
-            padTop = !padTop;
-            offsetY = Height;
-        }
-
-        Render(batcher, new Point2(offsetX, offsetY), padLeft, padTop);
-    }
-
-    void Render(Batcher batcher, Point2 offset, bool padLeft, bool padTop) {
-        Point2 textureSize = Texture.Size.FloorToPoint2();
-
-        Point2 count = new(
-            Math.Abs(Width) / textureSize.X,
-            Math.Abs(Height) / textureSize.Y
-        );
-
-        Point2 remainder = new(
-            Math.Abs(Width) % textureSize.X,
-            Math.Abs(Height) % textureSize.Y
-        );
-
-        int cornerX = count.X * textureSize.X;
-        int cornerY = count.Y * textureSize.Y;
-        int clipX = 0;
-        int clipY = 0;
-        int clipWidth = remainder.X;
-        int clipHeight = remainder.Y;
-        int offsetChangeX = 0;
-        int offsetChangeY = 0;
-
-        if (padLeft) {
-            cornerX = 0;
-            clipX = textureSize.X - remainder.X;
-            offsetChangeX = remainder.X;
-        }
-
-        if (padTop) {
-            cornerY = 0;
-            clipY = textureSize.Y - remainder.Y;
-            offsetChangeY = remainder.Y;
-        }
-
-        batcher.Image(Texture.GetClipSubtexture(new(clipX, clipY, clipWidth, clipHeight)), Offset + offset + new Point2(cornerX, cornerY), Color);
-
-        SpriteTilingHorizontal horizontal = new(Texture.GetClipSubtexture(new(0, clipY, textureSize.X, clipHeight)), Math.Abs(Width) - remainder.X) {
-            Offset = Offset + offset + new Point2(offsetChangeX, cornerY),
-            PadOrigin = padLeft
-        };
-
-        SpriteTilingVertical vertical = new(Texture.GetClipSubtexture(new(clipX, 0, clipWidth, textureSize.Y)), Math.Abs(Height) - remainder.Y) {
-            Offset = Offset + offset + new Point2(cornerX, offsetChangeY),
-            PadOrigin = padTop
-        };
-
-        offset += new Point2(offsetChangeX, offsetChangeY);
-
-        for (int x = 0; x < count.X; ++x) {
-            for (int y = 0; y < count.Y; ++y) {
-                batcher.Image(Texture, Offset + offset + (new Point2(x, y) * Texture.Size), Color);
+        if (hasRemainderX) {
+            for (int i = 0; i < count.Y; ++i) {
+                Vector2 iterPos = new(
+                    remainderStart.X,
+                    tileStart.Y + (i * Texture.Height)
+                );
+                batcher.Image(clipTextureX, Offset + iterPos + halfClipSizeX, halfClipSizeX, flipScale, 0, Color);
             }
         }
 
-        horizontal.Render(batcher);
-        vertical.Render(batcher);
+        if (hasRemainderY) {
+            for (int i = 0; i < count.X; ++i) {
+                Vector2 iterPos = new(
+                    tileStart.X + (i * Texture.Width),
+                    remainderStart.Y
+                );
+                batcher.Image(clipTextureY, Offset + iterPos + halfClipSizeY, halfClipSizeY, flipScale, 0, Color);
+            }
+        }
+
+        for (int x = 0; x < count.X; ++x) {
+            for (int y = 0; y < count.Y; ++y) {
+                Vector2 iterPos = tileStart + new Vector2(x * Texture.Width, y * Texture.Height);
+                batcher.Image(Texture, Offset + iterPos + halfSize, halfSize, flipScale, 0, Color);
+            }
+        }
+    }
+
+    void PrecalculateValues() {
+        storedFlip = Flip;
+
+        Point2 textureSize = Texture.Size.FloorToPoint2();
+
+        Point2 absSize = new(Math.Abs(Width), Math.Abs(Height));
+        Point2 minSize = new(Math.Min(Width, 0), Math.Min(Height, 0));
+        count = absSize / textureSize;
+        Point2 remainder = absSize - (count * textureSize);
+
+        bool isNegativeX = Width < 0;
+        bool isNegativeY = Height < 0;
+        bool stateMatchX = isNegativeX == PadOriginX;
+        bool stateMatchY = isNegativeY == PadOriginY;
+
+        tileStart = remainder;
+        remainderStart = Point2.Zero;
+
+        if (stateMatchX) {
+            tileStart.X = 0;
+            remainderStart.X = absSize.X - remainder.X;
+        }
+
+        if (stateMatchY) {
+            tileStart.Y = 0;
+            remainderStart.Y = absSize.Y - remainder.Y;
+        }
+
+        tileStart += minSize;
+        remainderStart += minSize;
+
+        hasRemainderX = remainder.X > 0;
+        hasRemainderY = remainder.Y > 0;
+        hasRemainderBoth = hasRemainderX && hasRemainderY;
+
+        Point2 remainderClipPosition = Point2.Zero;
+        if (hasRemainderX) {
+            if (Flip.X) { stateMatchX = !stateMatchX; }
+            if (!stateMatchX) { remainderClipPosition.X = textureSize.X - remainder.X; }
+
+            Rect clipBounds = new(remainderClipPosition.X, 0, remainder.X, textureSize.Y);
+            halfClipSizeX = clipBounds.Size / 2;
+            clipTextureX = Texture.GetClipSubtexture(clipBounds);
+        }
+
+        if (hasRemainderY) {
+            if (Flip.Y) { stateMatchY = !stateMatchY; }
+            if (!stateMatchY) { remainderClipPosition.Y = textureSize.Y - remainder.Y; }
+
+            Rect clipBounds = new(0, remainderClipPosition.Y, textureSize.X, remainder.Y);
+            halfClipSizeY = clipBounds.Size / 2;
+            clipTextureY = Texture.GetClipSubtexture(clipBounds);
+        }
+
+        if (hasRemainderBoth) {
+            Rect clipBounds = new(remainderClipPosition, remainder);
+            halfClipSizeCorner = clipBounds.Size / 2;
+            clipTextureCorner = Texture.GetClipSubtexture(clipBounds);
+        }
     }
 }

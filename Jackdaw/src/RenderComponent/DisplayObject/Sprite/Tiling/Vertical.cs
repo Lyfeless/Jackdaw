@@ -50,7 +50,7 @@ public class SpriteTilingVertical : Sprite {
     public override Rect GetObjectBounds() => new(0, height.Position, Texture.Width, height.Size);
 
     public override void Render(Batcher batcher) {
-        if (Height == 0 || Texture.Width == 0 || Texture.Height == 0) { return; }
+        if (Height == 0) { return; }
 
         if (storedFlip != Flip) { PrecalculateValues(); }
         Vector2 flipScale = Flip.GetScale();
