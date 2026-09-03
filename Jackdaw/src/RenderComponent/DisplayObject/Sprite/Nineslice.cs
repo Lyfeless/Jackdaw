@@ -1,3 +1,4 @@
+using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -64,6 +65,7 @@ public class SpriteNineslice : Sprite {
     Rect oldRect;
     SpriteFlip oldFlip;
     Point2 oldOffset;
+    Vector2 oldAlignment;
 
     /// <summary>
     /// The method used to extend the texture past its regular size.
@@ -148,7 +150,12 @@ public class SpriteNineslice : Sprite {
         : this(assets.GetSubtexture(texture), center, bounds) { }
 
     public override void Render(Batcher batcher) {
-        if (oldRect != BoundsComponent.Rect || oldFlip != Flip || oldOffset != Offset) { PrecalculateValues(); }
+        if (
+            oldRect != BoundsComponent.Rect ||
+            oldFlip != Flip ||
+            oldOffset != Offset ||
+            oldAlignment != new Vector2(Alignment.PercentX, Alignment.PercentY)
+        ) { PrecalculateValues(); }
 
         switch (Extend) {
             case ExtendBehavior.TILE:
@@ -184,6 +191,7 @@ public class SpriteNineslice : Sprite {
         oldRect = BoundsComponent.Rect;
         oldFlip = Flip;
         oldOffset = Offset;
+        oldAlignment = new Vector2(Alignment.PercentX, Alignment.PercentY);
 
         Point2 boundsSize = BoundsComponent.Size.CeilingToPoint2();
         Point2 topLeftSize = TopLeft.Size.CeilingToPoint2();
@@ -219,10 +227,10 @@ public class SpriteNineslice : Sprite {
             centerY = bottomRightSize.Y;
         }
 
-        TopLeft.Offset = Offset + new Point2(leftPosition, topPosition);
-        TopRight.Offset = Offset + new Point2(rightPosition, topPosition);
-        BottomLeft.Offset = Offset + new Point2(leftPosition, bottomPosition);
-        BottomRight.Offset = Offset + new Point2(rightPosition, bottomPosition);
+        TopLeft.Offset = Bounds.Position + new Point2(leftPosition, topPosition);
+        TopRight.Offset = Bounds.Position + new Point2(rightPosition, topPosition);
+        BottomLeft.Offset = Bounds.Position + new Point2(leftPosition, bottomPosition);
+        BottomRight.Offset = Bounds.Position + new Point2(rightPosition, bottomPosition);
 
         TopLeft.Flip = Flip;
         TopRight.Flip = Flip;
@@ -237,11 +245,11 @@ public class SpriteNineslice : Sprite {
                 RightStretch.BoundsComponent.Size = new(RightStretch.BoundsComponent.Size.X, middleSize.Y);
                 CenterStretch.BoundsComponent.Size = middleSize;
 
-                TopStretch.Offset = Offset + new Point2(centerX, topPosition);
-                BottomStretch.Offset = Offset + new Point2(centerX, bottomPosition);
-                LeftStretch.Offset = Offset + new Point2(leftPosition, centerY);
-                RightStretch.Offset = Offset + new Point2(rightPosition, centerY);
-                CenterStretch.Offset = Offset + new Point2(centerX, centerY);
+                TopStretch.Offset = Bounds.Position + new Point2(centerX, topPosition);
+                BottomStretch.Offset = Bounds.Position + new Point2(centerX, bottomPosition);
+                LeftStretch.Offset = Bounds.Position + new Point2(leftPosition, centerY);
+                RightStretch.Offset = Bounds.Position + new Point2(rightPosition, centerY);
+                CenterStretch.Offset = Bounds.Position + new Point2(centerX, centerY);
 
                 TopStretch.Flip = Flip;
                 BottomStretch.Flip = Flip;
@@ -257,11 +265,11 @@ public class SpriteNineslice : Sprite {
                 CenterTiling.Width = middleSize.X;
                 CenterTiling.Height = middleSize.Y;
 
-                TopTiling.Offset = Offset + new Point2(centerX, topPosition);
-                BottomTiling.Offset = Offset + new Point2(centerX, bottomPosition);
-                LeftTiling.Offset = Offset + new Point2(leftPosition, centerY);
-                RightTiling.Offset = Offset + new Point2(rightPosition, centerY);
-                CenterTiling.Offset = Offset + new Point2(centerX, centerY);
+                TopTiling.Offset = Bounds.Position + new Point2(centerX, topPosition);
+                BottomTiling.Offset = Bounds.Position + new Point2(centerX, bottomPosition);
+                LeftTiling.Offset = Bounds.Position + new Point2(leftPosition, centerY);
+                RightTiling.Offset = Bounds.Position + new Point2(rightPosition, centerY);
+                CenterTiling.Offset = Bounds.Position + new Point2(centerX, centerY);
 
                 TopTiling.Flip = Flip;
                 BottomTiling.Flip = Flip;

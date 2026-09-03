@@ -77,7 +77,7 @@ public class SpriteTiling : Sprite {
         Vector2 flipScale = Flip.GetScale();
 
         if (hasRemainderBoth) {
-            batcher.Image(clipTextureCorner, Offset + remainderStart + halfClipSizeCorner, halfClipSizeCorner, flipScale, 0, Color);
+            batcher.Image(clipTextureCorner, Bounds.Position + remainderStart + halfClipSizeCorner, halfClipSizeCorner, flipScale, 0, Color);
         }
 
         if (hasRemainderX) {
@@ -86,7 +86,7 @@ public class SpriteTiling : Sprite {
                     remainderStart.X,
                     tileStart.Y + (i * Texture.Height)
                 );
-                batcher.Image(clipTextureX, Offset + iterPos + halfClipSizeX, halfClipSizeX, flipScale, 0, Color);
+                batcher.Image(clipTextureX, Bounds.Position + iterPos + halfClipSizeX, halfClipSizeX, flipScale, 0, Color);
             }
         }
 
@@ -96,14 +96,14 @@ public class SpriteTiling : Sprite {
                     tileStart.X + (i * Texture.Width),
                     remainderStart.Y
                 );
-                batcher.Image(clipTextureY, Offset + iterPos + halfClipSizeY, halfClipSizeY, flipScale, 0, Color);
+                batcher.Image(clipTextureY, Bounds.Position + iterPos + halfClipSizeY, halfClipSizeY, flipScale, 0, Color);
             }
         }
 
         for (int x = 0; x < count.X; ++x) {
             for (int y = 0; y < count.Y; ++y) {
                 Vector2 iterPos = tileStart + new Vector2(x * Texture.Width, y * Texture.Height);
-                batcher.Image(Texture, Offset + iterPos + halfSize, halfSize, flipScale, 0, Color);
+                batcher.Image(Texture, Bounds.Position + iterPos + halfSize, halfSize, flipScale, 0, Color);
             }
         }
     }

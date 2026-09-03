@@ -1,4 +1,3 @@
-using System.Numerics;
 using Foster.Framework;
 
 namespace Jackdaw;
@@ -53,6 +52,6 @@ public class DisplayText : DisplayObject {
         : this(text, game.Assets.GetSpriteFont(font)) { }
 
     public override void Render(Batcher batcher) {
-        batcher.Text(Font, Text, Offset, Color);
+        batcher.Text(Font, Text, Bounds.Position, Color);
     }
 }

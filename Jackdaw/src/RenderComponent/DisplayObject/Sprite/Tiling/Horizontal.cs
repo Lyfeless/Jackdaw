@@ -56,12 +56,12 @@ public class SpriteTilingHorizontal : Sprite {
         Vector2 flipScale = Flip.GetScale();
 
         if (hasRemainder) {
-            batcher.Image(clipTexture, Offset + new Point2(remainderStart, 0) + halfClipSize, halfClipSize, flipScale, 0, Color);
+            batcher.Image(clipTexture, Bounds.Position + new Point2(remainderStart, 0) + halfClipSize, halfClipSize, flipScale, 0, Color);
         }
 
         for (int i = 0; i < count; ++i) {
             Vector2 iterPos = new(tileStart + (i * Texture.Width), 0);
-            batcher.Image(Texture, Offset + iterPos + halfSize, halfSize, flipScale, 0, Color);
+            batcher.Image(Texture, Bounds.Position + iterPos + halfSize, halfSize, flipScale, 0, Color);
         }
     }
 
